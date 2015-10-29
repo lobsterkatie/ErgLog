@@ -211,37 +211,43 @@ class Following(db.Model):
                                   followee=self.followee_id)
 
 
-class Rating(db.Model):
-    """Ratings table"""
+class Workout_result(db.Model):
+    """The data/results of a workout"""
 
-    __tablename__ = "Ratings"
+    __tablename__ = "Workout_results"
 
+    workout_results_id = db.Column(db.Integer, primary_key=True,
+                                   autoincrement=True)
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.Time, nullable=True)
+    #TODO SHOULD BE FILLED IN WHEN PIECES ARE ADDED (ONUPDATE BELT ETC?)
+    total_meters = db.Column(db.Integer, nullable=False, default=0)
+    avg_HR = db.Column(db.Integer, nullable=True)
+    calories = db.Column(db.Integer, nullable=True)
+    comments = db.Column(db.UnicodeText, nullable=True)
+    public = db.Column(db.Boolean, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("User.user_id"), nullable=False)
+    workout_template_id = db.Column(db.Integer,
+                          db.ForeignKey("Workout_template.workout_template_id"),
+                          nullable=False)
 
-    rating_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    movie_id = db.Column(db.Integer, db.ForeignKey("Movies.movie_id"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("Users.user_id"), nullable=False)
-    score = db.Column(db.Integer, nullable=False)
-
-    movie = db.relationship('Movie',
-                            backref=db.backref("ratings"), order_by=desc(score))
-    user = db.relationship("User", 
-                           backref=db.backref("ratings"), order_by=desc(score))
-
-    #TODO clean seed data so we can put this back in then fix add new rating
-    #route to try adding the new rating (which will error out if it's a duplicate)
-    #and then reroute to the update route (this also means add/update ratings hasn't
-    #been fully tested yet)
-    __table_args__ = (schema.UniqueConstraint(user_id, movie_id),)
+    user = db.relationship("User",
+                           backref=db.backref("workout_results",
+                                              order_by=(date, time)))
+    #HOW DO I MAKE IT SO THAT THE BACKREF ONLY GETS RESULTS FROM THIS USER?
+    workout_template = db.relationship("Workout_template")
 
 
     def __repr__(self):
-        """Provide helpful representation when printed."""
+        """Output the object's values when it's printed"""
 
-        repr_string = "<Rating rating_id={id}, movie_id={movie}, user_id={user}, score={score}>"
-        return repr_string.format(id=self.rating_id,
-                                  movie=self.movie_id,
-                                  user=self.user_id,
-                                  score=self.score)
+        repr_string = "<Workout_result id:{id}, template_id: {template_id}" +
+                      "user_id: {user_id}, date: {date}, time: {time}>"
+        return repr_string.format(id=self.workout_results_id,
+                                  template_id=workout_template_id,
+                                  user_id=user_id,
+                                  date=date,
+                                  time=time)
 
 ##############################################################################
 # Helper functions

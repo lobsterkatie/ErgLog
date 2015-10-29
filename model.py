@@ -123,7 +123,7 @@ class User_stat(db.Model):
         for attr, value in self.__dict__.items():
             # print attr, type(attr)
             # print value, type(value)
-            if not str(attr).startswith(("_", "user_id")):
+            if not attr.startswith(("_", "user_id")):
 
                 #format the values
                 if attr.endswith("time"):
@@ -140,25 +140,29 @@ class User_stat(db.Model):
         return repr_string
 
 
+class Following(db.Model):
+    """Table keeping track of who's following whom"""
 
-class Movie(db.Model):
-    """Movie table"""
+    __tablename__ = "Followings"
 
-    __tablename__ = "Movies"
+    followship_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    follower_id = db.Column(db.Integer, db.ForeignKey("User.user_id"), nullable=False)
+    followee_id = db.Column(db.Integer, db.ForeignKey("User.user_id"), nullable=False)
 
-    movie_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String(50), nullable=False)
-    released_at = db.Column(db.DateTime, nullable=True)
-    imdb_url = db.Column(db.Text, nullable=True)
+    #HOW DO I DO THE RELATIONSHIPS, WHEN THEY'RE BOTH FROM THE SAME TABLE?
+    #SHOULD I DO A COMPOSITE PRIMARY KEY INSTEAD OF A REGULAR ID? HOW TO DO THIS? 
+    #(IF SO, CAN PRESUMABLY TAKE OUT THE COMPOSITE UNIQUE CONSTRAINT BELOW)
+
+    #make sure that the same follower can't follow the same followee twice
+    __table_args__ = (schema.UniqueConstraint(follower_id, followee_id),)
+
 
     def __repr__(self):
-        """Provide helpful representation when printed."""
+        """Output the object's values when it's printed"""
 
-        repr_string = "<Movie movie_id={id}, title={title}, released_at={date}, imdb_url={url}>"
-        return repr_string.format(id=self.movie_id, 
-                                  title=self.title, 
-                                  date=self.released_at, 
-                                  url=self.imdb_url)
+        repr_string = "<Following followship_id: {id}, follower_id: " +
+                      "{follower}, followee_id: {followee}>"
+        return repr_string.format(id=self.)
 
 
 class Rating(db.Model):

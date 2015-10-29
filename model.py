@@ -73,10 +73,21 @@ class User(db.Model):
     password = db.Column(db.String(128), nullable=False)
     #ASK ABOUT DEFAULT TODAY
     date_joined = db.Column(db.Date, nullable=False, default=date.today())
-    #WOULD LIKE TO CALCULATE THIS FROM ZIPCODE
+    #WOULD LIKE TO CALCULATE THIS FROM ZIPCODE EVENTUALLY
     # in hours ahead or behind UTC
     timezone = db.Column(db.Integer, nullable=False, default=0)
     weight = db.Column(db.Numeric(4, 1), nullable=False)
+
+    #get lists of a user's followers or followees
+    followers = relationship("User",
+                             secondary="Followings",
+                             primaryjoin=(user_id == Following.followee_id),
+                             secondaryjoin=(user_id == Following.follower_id),
+                             backref=db.backref("followees", lazy="dynamic"))
+
+
+
+
 
     def __repr__(self):
         """Output the object's values when it's printed"""
@@ -84,6 +95,39 @@ class User(db.Model):
         repr_string = "<User id: {id}, name: {firstname} {lastname}, email: {email}>"
         return repr_string.format(id=self.user_id, firstname=self.firstname,
                                   lastname=self.lastname, email=self.email)
+
+    def is_following(self, user):
+        """Returns true iff self is already following user"""
+
+        #filter the list of users self is following by [user]'s id
+        #if something is found, self is already following [user]
+        return self.followees.filter(Following.followee_id == user.user_id)
+                             .count() != 0
+
+
+    def follow(self, user):
+        """Adds user to self's list of followees"""
+
+        if not self.is_following(user):
+            self.followees.append(user) #DOES THIS WORK???
+
+            #new_following = Following(follower_id=self.user_id, followee_id=user.user_id)
+            #db.session.add(new_following)
+            #db.session.commit()
+
+
+    def unfollow(self, user):
+        """Removes user from self's list of followees"""
+
+        if self.is_following(user):
+            self.followees.remove(user) #DOES THIS WORK??
+
+            # followhsip = db.session.query(Following)
+            #                        .filter(Following.follower_id == self.user_id,
+            #                                Following.followee_id == user.user_id)
+            #                        .one()
+            # db.session.delete(followship)
+            # db.session.commit()
 
 
 class User_stat(db.Model):
@@ -149,8 +193,8 @@ class Following(db.Model):
     follower_id = db.Column(db.Integer, db.ForeignKey("User.user_id"), nullable=False)
     followee_id = db.Column(db.Integer, db.ForeignKey("User.user_id"), nullable=False)
 
-    #HOW DO I DO THE RELATIONSHIPS, WHEN THEY'RE BOTH FROM THE SAME TABLE?
     #SHOULD I DO A COMPOSITE PRIMARY KEY INSTEAD OF A REGULAR ID? HOW TO DO THIS? 
+    #(seems like just putting primary key on both does it?)
     #(IF SO, CAN PRESUMABLY TAKE OUT THE COMPOSITE UNIQUE CONSTRAINT BELOW)
 
     #make sure that the same follower can't follow the same followee twice
@@ -162,7 +206,9 @@ class Following(db.Model):
 
         repr_string = "<Following followship_id: {id}, follower_id: " +
                       "{follower}, followee_id: {followee}>"
-        return repr_string.format(id=self.)
+        return repr_string.format(id=self.followship_id, 
+                                  follower=self.follower_id,
+                                  followee=self.followee_id)
 
 
 class Rating(db.Model):

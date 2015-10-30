@@ -1,0 +1,32 @@
+"""I control everything."""
+
+from jinja2 import StrictUndefined
+from flask import Flask, render_template, redirect, request, flash, session
+from model import connect_to_db, db
+
+app = Flask(__name__)
+
+app.secret_key = "shhhhhhhhhhh!!! don't tell!"
+
+#keep jinja from failing silently because of undefined variables
+app.jinja_env.undefined = StrictUndefined
+
+
+
+#################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    """If we run this file from the command line, do this stuff"""
+
+    app.debug = True
+
+    connect_to_db(app)
+
+    app.run()

@@ -16,9 +16,9 @@ app.jinja_env.undefined = StrictUndefined
 def index():
     """Show the homepage"""
 
-    return "I exist!"
+    # return "I exist!"
 
-    # return render_template("home.html")
+    return render_template("home.html")
 
 
 #################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################

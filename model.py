@@ -78,16 +78,6 @@ class User(db.Model):
     timezone = db.Column(db.Integer, nullable=False, default=0)
     weight = db.Column(db.Numeric(4, 1), nullable=False)
 
-    #get lists of a user's followers or followees
-    followers = relationship("User",
-                             secondary="Followings",
-                             primaryjoin=(user_id == Following.followee_id),
-                             secondaryjoin=(user_id == Following.follower_id),
-                             backref=db.backref("followees", lazy="dynamic"))
-
-
-
-
 
     def __repr__(self):
         """Output the object's values when it's printed"""
@@ -96,44 +86,12 @@ class User(db.Model):
         return repr_string.format(id=self.user_id, firstname=self.firstname,
                                   lastname=self.lastname, email=self.email)
 
-    def is_following(self, user):
-        """Returns true iff self is already following user"""
-
-        #filter the list of users self is following by [user]'s id
-        #if something is found, self is already following [user]
-        return self.followees.filter(Following.followee_id == user.user_id)
-                             .count() != 0
 
 
-    def follow(self, user):
-        """Adds user to self's list of followees"""
-
-        if not self.is_following(user):
-            self.followees.append(user) #DOES THIS WORK???
-
-            #new_following = Following(follower_id=self.user_id, followee_id=user.user_id)
-            #db.session.add(new_following)
-            #db.session.commit()
-
-
-    def unfollow(self, user):
-        """Removes user from self's list of followees"""
-
-        if self.is_following(user):
-            self.followees.remove(user) #DOES THIS WORK??
-
-            # followhsip = db.session.query(Following)
-            #                        .filter(Following.follower_id == self.user_id,
-            #                                Following.followee_id == user.user_id)
-            #                        .one()
-            # db.session.delete(followship)
-            # db.session.commit()
-
-
-class User_stat(db.Model):
+class User_stat_list(db.Model):
     """Stats for a given user, mostly PR's (one-to-one with Users)"""
 
-    __tablename__ = "User_stats"
+    __tablename__ = "User_stat_lists"
 
     user_id = db.Column(db.Integer, db.ForeignKey("Users.user_id"),
                         primary_key=True)
@@ -152,14 +110,15 @@ class User_stat(db.Model):
     half_marathon_PR_time = db.Column(db.Numeric(6, 1), nullable=True)
     marathon_PR_time = db.Column(db.Numeric(6, 1), nullable=True)
 
-    user = db.relationship("User", backref="stats")
+    #one (user) to one (stats)
+    user = db.relationship("User", backref="stat_list")
 
 
     def __repr__(self):
         """Output the object's values when it's printed"""
 
         #start the string with the user_id
-        repr_string = "<User_stat user_id: {id} ".format(id=self.user_id)
+        repr_string = "<User_stat_list user_id: {id} ".format(id=self.user_id)
 
         #for each of the object's attributes, excluding dunder attributes
         #(because we don't care about them) and the user_id (because we've
@@ -184,40 +143,15 @@ class User_stat(db.Model):
         return repr_string
 
 
-class Following(db.Model):
-    """Table keeping track of who's following whom"""
-
-    __tablename__ = "Followings"
-
-    followship_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    follower_id = db.Column(db.Integer, db.ForeignKey("User.user_id"), nullable=False)
-    followee_id = db.Column(db.Integer, db.ForeignKey("User.user_id"), nullable=False)
-
-    #SHOULD I DO A COMPOSITE PRIMARY KEY INSTEAD OF A REGULAR ID? HOW TO DO THIS? 
-    #(seems like just putting primary key on both does it?)
-    #(IF SO, CAN PRESUMABLY TAKE OUT THE COMPOSITE UNIQUE CONSTRAINT BELOW)
-
-    #make sure that the same follower can't follow the same followee twice
-    __table_args__ = (schema.UniqueConstraint(follower_id, followee_id),)
-
-
-    def __repr__(self):
-        """Output the object's values when it's printed"""
-
-        repr_string = "<Following followship_id: {id}, follower_id: " +
-                      "{follower}, followee_id: {followee}>"
-        return repr_string.format(id=self.followship_id, 
-                                  follower=self.follower_id,
-                                  followee=self.followee_id)
-
 
 class Workout_result(db.Model):
     """The data/results of a workout"""
 
     __tablename__ = "Workout_results"
 
-    workout_results_id = db.Column(db.Integer, primary_key=True,
-                                   autoincrement=True)
+    workout_result_id = db.Column(db.Integer,
+                                  primary_key=True,
+                                  autoincrement=True)
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=True)
     #TODO SHOULD BE FILLED IN WHEN PIECES ARE ADDED (ONUPDATE BELT ETC?)
@@ -226,57 +160,70 @@ class Workout_result(db.Model):
     calories = db.Column(db.Integer, nullable=True)
     comments = db.Column(db.UnicodeText, nullable=True)
     public = db.Column(db.Boolean, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("User.user_id"), nullable=False)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("Users.user_id"),
+                        nullable=False)
     workout_template_id = db.Column(db.Integer,
-                          db.ForeignKey("Workout_template.workout_template_id"),
-                          nullable=False)
+                                    db.ForeignKey("Workout_templates.workout_template_id"),
+                                    nullable=False)
 
-    user = db.relationship("User",
-                           backref=db.backref("workout_results",
-                                              order_by=(date, time)))
-    #HOW DO I MAKE IT SO THAT THE BACKREF ONLY GETS RESULTS FROM THIS USER?
-    workout_template = db.relationship("Workout_template")
+    #one (user) to many (workout results)
+    user = db.relationship("User", backref="workout_results")
+    #one (workout template) to many (workout results)
+    workout_template = db.relationship("Workout_template",
+                                       backref="workout_results")
 
 
     def __repr__(self):
         """Output the object's values when it's printed"""
 
-        repr_string = "<Workout_result id:{id}, template_id: {template_id}" +
-                      "user_id: {user_id}, date: {date}, time: {time}>"
+        repr_string = ("<Workout_result id: {id}, template_id: {template_id}" +
+                       "user_id: {user_id}, date: {date}, time: {time}>")
         return repr_string.format(id=self.workout_results_id,
-                                  template_id=workout_template_id,
-                                  user_id=user_id,
-                                  date=date,
-                                  time=time)
+                                  template_id=self.workout_template.workout_template_id,
+                                  user_id=self.user_id,
+                                  date=self.date,
+                                  time=self.time)
 
 
-class Abstract_piece_result(db.Model):
-    """An abstract class for piece results"""
+class Piece_result(db.Model):
+    """Piece results"""
 
-    __tablename__ = "WHAT? I'M AN ABSTRACT CLASS!"
+    __tablename__ = "Piece_results"
 
+    piece_result_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     avg_split_seconds = db.Column(db.Integer, nullable=False)
     avg_SR = db.Column(db.Integer, nullable=False)
     avg_watts = db.Column(db.Integer, nullable=True)
     avg_HR = db.Column(db.Integer, nullable=True)
     drag_factor = db.Column(db.Integer, nullable=True)
     comments = db.Column(db.UnicodeText, nullable=True)
-    workout_results_id = db.Column(db.Integer, 
-                                   db.ForeignKey("Workout_result.workout_results_id"),
+    workout_results_id = db.Column(db.Integer,
+                                   db.ForeignKey("Workout_results.workout_results_id"),
                                    nullable=False)
-    #SHOULD I PUT A FIELD HERE TO LINK DIRECTLY TO THE PIECE TEMPLATE? OR SHOULD
-    #THAT BE A RELATIONSHIP? HOW DO YOU DO A MULTI-JUMP RELATIONSHIP?
-    #SHOULD BE IN THE CONCRETE CLASSES ANYWAY...
+    piece_template_id = db.Column(db.Integer,
+                                  db.ForeignKey("Piece_templates.piece_template_id"),
+                                  nullable=False)
 
-    #HOW DO YOU DO A UNION FOR THE BACKREF?
-    workout_result = db.relationship("Workout_result")
+    #one (workout result) to many (piece results) relationship
+    workout_result = db.relationship("Workout_result", backref="piece_results")
+
+    #one (piece template) to many (piece results) relationship
+    piece_template = db.relationship("Piece_template", backref="piece_results")
+
+    def __repr__(self):
+        """Output the object's values when it's printed"""
+
+        repr_string = ("<Piece_result id: {id}, " +
+                       "workout_result_id: {workout_result_id}, " +
+                       "piece_template_id: {piece_template_id}>")
+        return repr_string.format(id=self.piece_result_id,
+                                  workout_result_id=self.workout_result.workout_result_id,
+                                  piece_template_id=self.piece_template.piece_template_id)
 
 
-class Distance_piece_result(Abstract_piece_result):
-    """Concrete subclass of Abstract_piece_result class for distance-based
-       pieces"""
 
-    __tablename__ = "Distance"
+
 
 
 ##############################################################################

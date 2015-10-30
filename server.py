@@ -12,6 +12,14 @@ app.secret_key = "shhhhhhhhhhh!!! don't tell!"
 app.jinja_env.undefined = StrictUndefined
 
 
+@app.route('/')
+def index():
+    """Show the homepage"""
+
+    return "I exist!"
+
+    # return render_template("home.html")
+
 
 #################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################
 

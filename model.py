@@ -329,6 +329,8 @@ class Piece_template(db.Model):
     """Templates for pices (many-to-many with workout templates, via the
         wtemlate-ptemplate_pairing class/table)"""
 
+    __tablename__ = "Piece_templates"
+
     piece_template_id = db.Column(db.Integer,
                                   primary_key=True,
                                   autoincrement=True)

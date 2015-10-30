@@ -58,14 +58,15 @@ def format_time_from_seconds(sec):
 # Model definitions
 
 class User(db.Model):
-    """Logbook user"""
+    """Logbook user (one-to-one with user stat lists, one-to-many with both
+       workout results and workout templates)"""
 
     __tablename__ = "Users"
 
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     firstname = db.Column(db.Unicode(64), nullable=False)
     lastname = db.Column(db.Unicode(64), nullable=False)
-    gender = db.Column(db.Enum(["F", "M", "Other"]), nullable=False)
+    gender = db.Column(db.Enum("F", "M", "Other", name="genders"), nullable=False)
     birthdate = db.Column(db.Date, nullable=False)
     #I GUESS THAT MEANS ONLY THE US FOR THE MOMENT
     zipcode = db.Column(db.Numeric(5, 0), nullable=False)
@@ -111,7 +112,7 @@ class User_stat_list(db.Model):
     marathon_PR_time = db.Column(db.Numeric(6, 1), nullable=True)
 
     #one (user) to one (stats)
-    user = db.relationship("User", backref="stat_list")
+    user = db.relationship("User", backref="stat_list", uselist=False)
 
 
     def __repr__(self):
@@ -145,7 +146,8 @@ class User_stat_list(db.Model):
 
 
 class Workout_result(db.Model):
-    """The data/results of a workout"""
+    """The data/results of a workout (one-to-many with piece results,
+       many-to-one with both users and workout templates)"""
 
     __tablename__ = "Workout_results"
 
@@ -179,7 +181,7 @@ class Workout_result(db.Model):
 
         repr_string = ("<Workout_result id: {id}, template_id: {template_id}" +
                        "user_id: {user_id}, date: {date}, time: {time}>")
-        return repr_string.format(id=self.workout_results_id,
+        return repr_string.format(id=self.workout_result_id,
                                   template_id=self.workout_template_id,
                                   user_id=self.user_id,
                                   date=self.date,
@@ -187,7 +189,8 @@ class Workout_result(db.Model):
 
 
 class Piece_result(db.Model):
-    """Piece results (many-to-one with workout_results)"""
+    """Piece results (many-to-one with workout_results, one-to-many with
+       piece templates)"""
 
     __tablename__ = "Piece_results"
 
@@ -258,6 +261,60 @@ class Split_result(db.Model):
         return repr_string.format(id=self.split_result_id,
                                   piece_result_id=self.piece_result_id,
                                   ordinal=self.ordinal)
+
+
+class Workout_template(db.Model):
+    """Workout templates (many-to-many with piece templates, many-to-one
+       with users)"""
+
+    __tablename__ = "Workout_templates"
+
+    workout_template_id = db.Column(db.Integer,
+                                    primary_key=True,
+                                    autoincrement=True)
+    description = db.Column(db.Unicode(256), nullable=False)
+    primary_zone = db.Column(db.String(8), nullable=True)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("Users.user_id"),
+                        nullable=False)
+
+    #one (user) to many (workout templtates)
+    user = db.relationship("User", backref="workout_templates")
+
+    #many (piece templates) to many (workout templates)
+    piece_templates = db.relationship("Piece_template",
+                                      secondary="Wtemplate_ptemplate_associations",
+                                      primaryjoin="Workout_template.workout_template_id == Wtemplate_ptemplate_association.workout_template_id",
+                                      secondaryjoin="Piece_template.piece_template_id == Wtemplate_ptemplate_association.piece_template_id",
+                                      viewonly=True)
+
+
+    def __repr__(self):
+        """Output the object's values when it's printed"""
+
+        repr_string = "<Workout_template id: {id}, user_id: {user_id}>"
+        return repr_string.format(id=self.workout_template_id,
+                                  user_id=user_id)
+
+
+class Wtemplate_ptemplate_association(db.Model):
+    """Not quite a true association table (because it has ordinal data)
+       between workout templates and piece templates (one-to-many with
+       both)"""
+
+    __tablename__ = "Wtemplate_ptemplate_associations"
+
+    wtemplate_ptemplate_association_id = db.Column(db.Integer,
+                                             primary_key=True,
+                                             autoincrement=True)
+    ordinal = db.Column(db.Integer, nullable=False)
+    workout_template_id = db.Column(db.Integer,
+                                    db.ForeignKey("Workout_templates.workout_template_id"),
+                                    nullable=False)
+    piece_template_id = db.Column(db.Integer,
+                                  db.ForeignKey("Piece_templates.piece_template_id"),
+                                  nullable=False)
+
 
 
 ##############################################################################

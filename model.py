@@ -2,7 +2,6 @@
     Based largely on the model.py file written by HB staff. (Thanks, guys!)"""
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import desc, schema
 from datetime import date
 
 # This is the connection to the SQLite database; we're getting this through
@@ -66,7 +65,7 @@ class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     firstname = db.Column(db.Unicode(64), nullable=False)
     lastname = db.Column(db.Unicode(64), nullable=False)
-    gender = db.Column(db.Enum("F", "M", "Other", name="genders"), nullable=False)
+    gender = db.Column(db.Enum("F", "M", "Other", name="Genders"), nullable=False)
     birthdate = db.Column(db.Date, nullable=False)
     #I GUESS THAT MEANS ONLY THE US FOR THE MOMENT
     zipcode = db.Column(db.Numeric(5, 0), nullable=False)
@@ -204,8 +203,8 @@ class Piece_result(db.Model):
     drag_factor = db.Column(db.Integer, nullable=True)
     comments = db.Column(db.UnicodeText, nullable=True)
     workout_result_id = db.Column(db.Integer,
-                                   db.ForeignKey("Workout_results.workout_result_id"),
-                                   nullable=False)
+                                  db.ForeignKey("Workout_results.workout_result_id"),
+                                  nullable=False)
     piece_template_id = db.Column(db.Integer,
                                   db.ForeignKey("Piece_templates.piece_template_id"),
                                   nullable=False)
@@ -264,8 +263,8 @@ class Split_result(db.Model):
 
 
 class Workout_template(db.Model):
-    """Workout templates (many-to-many with piece templates, many-to-one
-       with users)"""
+    """Workout templates (many-to-many with piece templates via the
+        wtemlate-ptemplate_pairing class/table, many-to-one with users)"""
 
     __tablename__ = "Workout_templates"
 
@@ -283,9 +282,9 @@ class Workout_template(db.Model):
 
     #many (piece templates) to many (workout templates)
     piece_templates = db.relationship("Piece_template",
-                                      secondary="Wtemplate_ptemplate_associations",
-                                      primaryjoin="Workout_template.workout_template_id == Wtemplate_ptemplate_association.workout_template_id",
-                                      secondaryjoin="Piece_template.piece_template_id == Wtemplate_ptemplate_association.piece_template_id",
+                                      secondary="Wtemplate_ptemplate_pairings",
+                                      primaryjoin="Workout_template.workout_template_id == Wtemplate_ptemplate_pairing.workout_template_id",
+                                      secondaryjoin="Piece_template.piece_template_id == Wtemplate_ptemplate_pairing.piece_template_id",
                                       viewonly=True)
 
 
@@ -294,19 +293,19 @@ class Workout_template(db.Model):
 
         repr_string = "<Workout_template id: {id}, user_id: {user_id}>"
         return repr_string.format(id=self.workout_template_id,
-                                  user_id=user_id)
+                                  user_id=self.user_id)
 
 
-class Wtemplate_ptemplate_association(db.Model):
+class Wtemplate_ptemplate_pairing(db.Model):
     """Not quite a true association table (because it has ordinal data)
        between workout templates and piece templates (one-to-many with
        both)"""
 
-    __tablename__ = "Wtemplate_ptemplate_associations"
+    __tablename__ = "Wtemplate_ptemplate_pairings"
 
-    wtemplate_ptemplate_association_id = db.Column(db.Integer,
-                                             primary_key=True,
-                                             autoincrement=True)
+    wtemplate_ptemplate_pairing_id = db.Column(db.Integer,
+                                               primary_key=True,
+                                               autoincrement=True)
     ordinal = db.Column(db.Integer, nullable=False)
     workout_template_id = db.Column(db.Integer,
                                     db.ForeignKey("Workout_templates.workout_template_id"),
@@ -315,6 +314,43 @@ class Wtemplate_ptemplate_association(db.Model):
                                   db.ForeignKey("Piece_templates.piece_template_id"),
                                   nullable=False)
 
+    #one (workout template) to many (wtemlate-ptemplate pairings)
+    workout_template = db.relationship("Workout_template",
+                                       backref="wtemplate_ptemplate_pairings")
+
+    #one (piece template) to many (wtemlate-ptemplate pairings)
+    piece_template = db.relationship("Piece_template",
+                                     backref="wtemplate_ptemplate_pairings")
+
+    #TODO DO I NEED A __REPR__ METHOD?
+
+
+class Piece_template(db.Model):
+    """Templates for pices (many-to-many with workout templates, via the
+        wtemlate-ptemplate_pairing class/table)"""
+
+    piece_template_id = db.Column(db.Integer,
+                                  primary_key=True,
+                                  autoincrement=True)
+    piece_type = db.Column(db.Enum("time", "distance", name="Piece_types"),
+                           nullable=False)
+    distance = db.Column(db.Integer, nullable=True)
+    time_seconds = db.Column(db.Integer, nullable=True)
+    goal_split_seconds = db.Column(db.Integer, nullable=True)
+    goal_SR = db.Column(db.Integer, nullable=True)
+    phase = db.Column(db.Enum("warmup", "workout body", "cooldown",
+                              name="Workout_phases"), nullable=False)
+    zone = db.Column(db.String(8), nullable=True)
+    description = db.Column(db.UnicodeText(), nullable=False)
+    split_length = db.Column(db.Integer, nullable=True)
+
+
+    def __repr__(self):
+        """Output the object's values when it's printed"""
+
+        repr_string = "<Piece_template id: {id} ({description})>"
+        return repr_string.format(id=self.piece_template_id,
+                                  description=self.description)
 
 
 ##############################################################################
@@ -324,7 +360,7 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure to use our SQLite database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ratings.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///workoutlog'
     db.app = app
     db.init_app(app)
 

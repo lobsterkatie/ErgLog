@@ -153,7 +153,7 @@ class Workout_result(db.Model):
                                   primary_key=True,
                                   autoincrement=True)
     date = db.Column(db.Date, nullable=False)
-    time = db.Column(db.Time, nullable=True)
+    time_of_day = db.Column(db.Time, nullable=True)
     #TODO SHOULD BE FILLED IN WHEN PIECES ARE ADDED (ONUPDATE BELT ETC?)
     total_meters = db.Column(db.Integer, nullable=False, default=0)
     avg_HR = db.Column(db.Integer, nullable=True)
@@ -180,36 +180,39 @@ class Workout_result(db.Model):
         repr_string = ("<Workout_result id: {id}, template_id: {template_id}" +
                        "user_id: {user_id}, date: {date}, time: {time}>")
         return repr_string.format(id=self.workout_results_id,
-                                  template_id=self.workout_template.workout_template_id,
+                                  template_id=self.workout_template_id,
                                   user_id=self.user_id,
                                   date=self.date,
-                                  time=self.time)
+                                  time=self.time_of_day)
 
 
 class Piece_result(db.Model):
-    """Piece results"""
+    """Piece results (many-to-one with workout_results)"""
 
     __tablename__ = "Piece_results"
 
     piece_result_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    total_time_seconds = db.Column(db.Integer, nullable=False)
+    total_meters = db.Column(db.Integer, nullable=False)
     avg_split_seconds = db.Column(db.Integer, nullable=False)
     avg_SR = db.Column(db.Integer, nullable=False)
     avg_watts = db.Column(db.Integer, nullable=True)
     avg_HR = db.Column(db.Integer, nullable=True)
     drag_factor = db.Column(db.Integer, nullable=True)
     comments = db.Column(db.UnicodeText, nullable=True)
-    workout_results_id = db.Column(db.Integer,
-                                   db.ForeignKey("Workout_results.workout_results_id"),
+    workout_result_id = db.Column(db.Integer,
+                                   db.ForeignKey("Workout_results.workout_result_id"),
                                    nullable=False)
     piece_template_id = db.Column(db.Integer,
                                   db.ForeignKey("Piece_templates.piece_template_id"),
                                   nullable=False)
 
-    #one (workout result) to many (piece results) relationship
+    #one (workout result) to many (piece results)
     workout_result = db.relationship("Workout_result", backref="piece_results")
 
-    #one (piece template) to many (piece results) relationship
+    #one (piece template) to many (piece results)
     piece_template = db.relationship("Piece_template", backref="piece_results")
+
 
     def __repr__(self):
         """Output the object's values when it's printed"""
@@ -218,12 +221,43 @@ class Piece_result(db.Model):
                        "workout_result_id: {workout_result_id}, " +
                        "piece_template_id: {piece_template_id}>")
         return repr_string.format(id=self.piece_result_id,
-                                  workout_result_id=self.workout_result.workout_result_id,
-                                  piece_template_id=self.piece_template.piece_template_id)
+                                  workout_result_id=self.workout_result_id,
+                                  piece_template_id=self.piece_template_id)
 
 
 
+class Split_result(db.Model):
+    """Split results (many-to-one with piece_results)"""
 
+    __tablename__ = "Split_results"
+
+    split_result_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ordinal = db.Column(db.Integer, nullable=False)
+    label = db.Column(db.String(64), nullable=True)
+    time_seconds = db.Column(db.Integer, nullable=False)
+    meters = db.Column(db.Integer, nullable=False)
+    avg_split_seconds = db.Column(db.Integer, nullable=False)
+    avg_SR = db.Column(db.Integer, nullable=False)
+    avg_watts = db.Column(db.Integer, nullable=True)
+    avg_HR = db.Column(db.Integer, nullable=True)
+    comments = db.Column(db.UnicodeText, nullable=True)
+    piece_result_id = db.Column(db.Integer,
+                                db.ForeignKey("Piece_results.piece_result_id"),
+                                nullable=False)
+
+    #one (piece result) to many (split results)
+    piece_result = db.relationship("Piece_result", backref="split_results")
+
+
+    def __repr__(self):
+        """Output the object's values when it's printed"""
+
+        repr_string = ("<Split_result id: {id}, " +
+                       "piece_result_id:{piece_result_id}>" +
+                       "(split # {ordinal})>")
+        return repr_string.format(id=self.split_result_id,
+                                  piece_result_id=self.piece_result_id,
+                                  ordinal=self.ordinal)
 
 
 ##############################################################################

@@ -23,7 +23,9 @@ def index():
 
 #################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################
 
-
+@app.route("/registration")
+def show_registration_form():
+    """Show new user registration modal"""
 
 
 

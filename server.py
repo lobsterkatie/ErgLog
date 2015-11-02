@@ -2,7 +2,7 @@
 
 from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, flash, session
-from model import connect_to_db, db
+from model import connect_to_db, db, User
 
 app = Flask(__name__)
 
@@ -25,9 +25,28 @@ def index():
 
 @app.route("/register-user", methods=["POST"])
 def add_new_user():
-    """Add new user to the Users and User_stat_lists tables"""
+    """Add new user to the Users and User_stat_lists tables
 
-    pass
+       Note that all form data is validated before being submitted, so the
+       values here should just work"""
+
+    firstname = request.form.get("firstname")
+    lastname = request.form.get("lastname")
+    gender = request.form.get("gender")
+    birthdate = request.form.get("birthdate")
+    zipcode = request.form.get("zipcode")
+    email = request.form.get("email")
+    username = request.form.get("username")
+    password = hash(request.form.get("password"))
+    timezone = 0 #TODO implement timezones
+    weight = request.form.get("weight")
+
+    new_user = User(firstname=firstname, lastname=lastname, gender=gender,
+                    birthdate=birthdate, zipcode=zipcode, email=email,
+                    username=username, password=password, timezone=timezone,
+                    weight=weight)
+    db.session.add(new_user)
+    db.session.commit()
 
 
 

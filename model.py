@@ -70,6 +70,7 @@ class User(db.Model):
     #I GUESS THAT MEANS ONLY THE US FOR THE MOMENT
     zipcode = db.Column(db.Numeric(5, 0), nullable=False)
     email = db.Column(db.String(64), nullable=False, unique=True)
+    username = db.Column(db.String(32), nullable=False, unique=True)
     password = db.Column(db.String(128), nullable=False)
     #ASK ABOUT DEFAULT TODAY
     date_joined = db.Column(db.Date, nullable=False, default=date.today())

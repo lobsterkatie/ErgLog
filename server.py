@@ -23,9 +23,11 @@ def index():
 
 #################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################
 
-@app.route("/registration")
-def show_registration_form():
-    """Show new user registration modal"""
+@app.route("/register-user")
+def add_new_user():
+    """Add new user to the Users and User_stat_lists tables"""
+
+    pass
 
 
 

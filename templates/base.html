@@ -41,15 +41,22 @@
 
     <div class="container-fluid" id="everything-else">
 
-        <div class="modal fade" id="registrationModal" tabindex="-1" role="dialog" aria-labelledby="registrationModal" aria-hidden="true">
+        <!-- REGISTRATION MODAL -->
+        <div class="modal fade" id="registrationModal" tabindex="-1" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
+
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title" id="myModalLabel">Please fill out the form below to register. All fields are required.</h4>
-                    </div>
+                        <button type="button" class="close" data-dismiss="modal">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Please fill out the form below to register. All fields are required.
+                        </h4>
+                    </div> <!-- end of modal header -->
+
                     <div class="modal-body">
-                        <form>
+                        <form action="/register-user" method="POST">
                             <label> First Name
                                 <input type="text" name="firstname" required>
                             </label>
@@ -58,7 +65,7 @@
                             </label>
                             <br>
                             <label> Gender
-                                <select>
+                                <select required>
                                     <option value="F">Female</option>
                                     <option value="M">Male</option>
                                     <option value="Other">Other</option>
@@ -66,18 +73,53 @@
                             </label>
                             <br>
                             <label> Birthdate
+                                    <div class="input-group date">
+                                        <input type="text" class="form-control" required>
+                                        <span class="input-group-addon">
+                                            <i class="glyphicon glyphicon-th">
+                                            </i>
+                                        </span>
+                                        <script type="text/javascript">
+                                            $('#sandbox-container .input-group.date')
+                                                .datepicker({
+                                                    format: "M d, yyyy",
+                                                    endDate: "0d",
+                                                    startView: 2,
+                                                    autoclose: true});
+                                        </script>
+                                    </div>
+                            </label>
+                            <br>
+                            <label> Zipcode
+                                <input type="text" name="zipcode" required>
+                            </label>
+                            <br>
+                            <label> Email
+                                <input type="text" name="email" required>
+                            </label>
+                            <label> Username
+                                <input type="text" name="username" required>
+                            </label>
+                            <label> Password
+                                <input type="password" name="password" required>
+                            </label>
+                            <br>
+                            <label> Weight
+                                <input type="text" name="weight" required>
                             </label>
                         </form>
-                    </div>
+                    </div> <!-- end of modal body -->
+
                     <div class="modal-footer">
                         <!-- <button type="button" class="btn btn-default" data-dismiss="modal">
                             Cancel
                         </button> -->
                         <button type="button" class="btn btn-primary">Register!</button>
-                    </div>
-                </div>
+                    </div> <!-- end of modal footer -->
+
+                </div> <!-- end of modal content -->
             </div>
-        </div>
+        </div> <!-- end of registration modal -->
 
         <div class="row" id="flashed-messages">
             {% with messages = get_flashed_messages() %}

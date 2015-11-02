@@ -1,10 +1,18 @@
 <!doctype html>
 <html>
 <head>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-MfvZlkHCEqatNoGiOXveE8FIwMzZg4W85qfrfIFBfYc= sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
-    <link rel="stylesheet" href="static/css/stylesheet.css">
+    <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha256-Sk3nkD6mLTMOF0EOpNtsIry+s1CsaqQC1rVLTAy+0yc= sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <!-- Bootstrap-datepicker -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.min.css"></link>
+    <!-- jQuery validation plugin -->
+    
+    <!-- my base stylesheet -->
+    <link rel="stylesheet" href="static/css/stylesheet.css">
     <title>{% block title%}TITLE GOES HERE!{% endblock %}</title>
 </head>
 
@@ -73,22 +81,16 @@
                             </label>
                             <br>
                             <label> Birthdate
-                                    <!-- credit to https://eternicode.github.io/bootstrap-datepicker for datepicker code -->
+                                <!-- credit to https://eternicode.github.io/bootstrap-datepicker for datepicker code -->
+                                <div id="sandbox-container">
                                     <div class="input-group date">
-                                        <input type="text" name="birthdate" class="form-control" required>
+                                        <input id="dob-input" type="text" name="birthdate" class="form-control" required>
                                         <span class="input-group-addon">
                                             <i class="glyphicon glyphicon-th">
                                             </i>
                                         </span>
-                                        <script type="text/javascript">
-                                            $('#sandbox-container .input-group.date')
-                                                .datepicker({
-                                                    format: "M d, yyyy",
-                                                    endDate: "0d",
-                                                    startView: 2,
-                                                    autoclose: true});
-                                        </script>
                                     </div>
+                                </div>
                             </label> <!-- end of DOB datepicker -->
                             <br>
                             <label> Zipcode
@@ -112,7 +114,7 @@
                     </div> <!-- end of modal body -->
 
                     <div class="modal-footer">
-                        <input type="submit" class="btn btn-primary" value="Register!" form="registration-form">
+                        <input id="registration-button" type="submit" class="btn btn-primary" value="Register!" form="registration-form">
                     </div> <!-- end of modal footer -->
 
                 </div> <!-- end of modal content -->
@@ -133,5 +135,7 @@
             BODY STUFF
         {% endblock %}
     </div>
+
+    <script src="/static/js/registration.js"></script>
 </body>
 </html>

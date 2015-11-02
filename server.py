@@ -23,7 +23,7 @@ def index():
 
 #################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################
 
-@app.route("/register-user")
+@app.route("/register-user", methods=["POST"])
 def add_new_user():
     """Add new user to the Users and User_stat_lists tables"""
 

@@ -61,19 +61,21 @@
                         <h4 class="modal-title" id="myModalLabel">
                             Please fill out the form below to register. All fields are required.
                         </h4>
+                        <span id="registration-form-validation-error" class="form-validation-error" style="color:red">
+                        </span>
                     </div> <!-- end of modal header -->
 
                     <div class="modal-body">
                         <form id="registration-form" action="/register-user" method="POST">
                             <label> First Name
-                                <input type="text" name="firstname" required>
+                                <input type="text" name="firstname">
                             </label>
                             <label> Last Name
-                                <input type="text" name="lastname" required>
+                                <input type="text" name="lastname">
                             </label>
                             <br>
                             <label> Gender
-                                <select required>
+                                <select name="gender">
                                     <option value="F">Female</option>
                                     <option value="M">Male</option>
                                     <option value="Other">Other</option>
@@ -82,9 +84,9 @@
                             <br>
                             <label> Birthdate
                                 <!-- credit to https://eternicode.github.io/bootstrap-datepicker for datepicker code -->
-                                <div id="sandbox-container">
+                                <div id="dob-datepicker">
                                     <div class="input-group date">
-                                        <input id="dob-input" type="text" name="birthdate" class="form-control" required>
+                                        <input type="text" name="birthdate" class="form-control" readonly id="dob-picker">
                                         <span class="input-group-addon">
                                             <i class="glyphicon glyphicon-th">
                                             </i>
@@ -94,21 +96,22 @@
                             </label> <!-- end of DOB datepicker -->
                             <br>
                             <label> Zipcode
-                                <input type="text" name="zipcode" required>
+                                <input type="text" name="zipcode" class="form-control">
                             </label>
                             <br>
                             <label> Email
-                                <input type="text" name="email" required>
+                                <input type="text" name="email">
                             </label>
+                            <br>
                             <label> Username
-                                <input type="text" name="username" required>
+                                <input type="text" name="username">
                             </label>
                             <label> Password
-                                <input type="password" name="password" required>
+                                <input type="password" name="password">
                             </label>
                             <br>
                             <label> Weight
-                                <input type="text" name="weight" required>
+                                <input type="text" name="weight">
                             </label>
                         </form>
                     </div> <!-- end of modal body -->

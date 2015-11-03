@@ -60,9 +60,14 @@ $(document).ready(function () {
             },
             username: {
                 required: true,
+
                 remote: "/check-username"
             },
             password: "required",
+            password2: {
+                required: true,
+                equalTo: "#password-original"
+            },
             weight: "required"
         }, //end rules
 
@@ -87,6 +92,7 @@ $(document).ready(function () {
                 remote: "This username is taken. Please choose another."
             },
             password: "Please enter a password",
+            password2: "Please ensure that your passwords match",
             weight: "Please enter your weight"
         } //end messages
     });

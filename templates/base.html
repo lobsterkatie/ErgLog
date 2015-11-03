@@ -36,12 +36,29 @@
                     <li><a href="#">About</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li id="nav-button[-2]">
-                        <a data-toggle="modal" href="#" data-target="#registrationModal">
-                            Register
-                        </a>
-                    </li>
-                    <li id="nav-button[-1]"><a href="#">Login</a></li>
+                    {% if session.get("user") %}
+                        <li id="nav-button[-2]">
+                            <a data-toggle="modal" href="#" data-target="#profileModal">
+                                Profile
+                            </a>
+                        </li>
+                        <li id="nav-button[-1]">
+                            <a href="#" data-target="logoutModal">
+                                Logout
+                            </a>
+                        </li>
+                    {% else %}
+                        <li id="nav-button[-2]">
+                            <a data-toggle="modal" href="#" data-target="#registrationModal">
+                                Register
+                            </a>
+                        </li>
+                        <li id="nav-button[-1]">
+                            <a href="#" data-target="loginModal">
+                                Login
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -58,7 +75,7 @@
                         <button type="button" class="close" data-dismiss="modal">
                             &times;
                         </button>
-                        <h4 class="modal-title" id="myModalLabel">
+                        <h4 class="modal-title">
                             Please fill out the form below to register. All fields are required.
                         </h4>
                         <span id="registration-form-validation-error" class="form-validation-error" style="color:red">
@@ -86,7 +103,7 @@
                                 <!-- credit to https://eternicode.github.io/bootstrap-datepicker for datepicker code -->
                                 <div id="dob-datepicker">
                                     <div class="input-group date">
-                                        <input type="text" name="birthdate" class="form-control" readonly id="dob-picker">
+                                        <input id="dob-picker" class="form-control" type="text" name="birthdate" readonly>
                                         <span class="input-group-addon">
                                             <i class="glyphicon glyphicon-th">
                                             </i>
@@ -106,8 +123,12 @@
                             <label> Username
                                 <input type="text" name="username">
                             </label>
+                            <br>
                             <label> Password
-                                <input type="password" name="password">
+                                <input id="password-original" type="password" name="password">
+                            </label>
+                            <label> Confirm password
+                                <input type="password" name="password2">
                             </label>
                             <br>
                             <label> Weight
@@ -123,6 +144,42 @@
                 </div> <!-- end of modal content -->
             </div>
         </div> <!-- end of registration modal -->
+
+        <!-- LOGIN MODAL -->
+        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            &times;
+                        </button>
+                        <h4 class="modal-title">
+                            Log in
+                        </h4>
+                        <span id="login-form-validation-error" class="form-validation-error" style="color:red">
+                        </span>
+                    </div> <!-- end of modal header -->
+
+                    <div class="modal-body">
+                        <form id="login-form" action="/login" method="POST">
+                            <label> Username or email
+                                <input type="text" name="username-or-email">
+                            </label>
+                            <br>
+                            <label> Password
+                                <input type="password" name="password">
+                            </label>
+                        </form>
+                    </div> <!-- end of modal body -->
+
+                    <div class="modal-footer">
+                        <input id="registration-button" type="submit" class="btn btn-primary" value="Register!" form="registration-form">
+                    </div> <!-- end of modal footer -->
+
+                </div> <!-- end of modal content -->
+            </div>
+        </div> <!-- end of login modal -->
 
         <div class="row" id="flashed-messages">
             {% with messages = get_flashed_messages() %}

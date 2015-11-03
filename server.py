@@ -1,7 +1,8 @@
 """I control everything."""
 
 from jinja2 import StrictUndefined
-from flask import Flask, render_template, redirect, request, flash, session
+from flask import (Flask, render_template, redirect, request, flash, session,
+                   jsonify)
 from model import connect_to_db, db, User
 from datetime import datetime
 
@@ -24,6 +25,36 @@ def index():
 
 #################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################
 
+@app.route("/check-email")
+def check_email_uniqueness():
+    """Checks the given email against the User table. Returns false if found."""
+
+    email = request.args.get("email")
+    num_matched = (db.session.query(User)
+                             .filter(User.email == email)
+                             .count())
+
+    if num_matched == 1:
+        return "false"
+    else:
+        return "true"
+
+
+@app.route("/check-username")
+def check_username_uniqueness():
+    """Checks the given username against the User table. Returns false if found."""
+
+    username = request.args.get("username")
+    num_matched = (db.session.query(User)
+                             .filter(User.username == username)
+                             .count())
+
+    if num_matched == 1:
+        return "false"
+    else:
+        return "true"
+
+
 @app.route("/register-user", methods=["POST"])
 def add_new_user():
     """Add new user to the Users and User_stat_lists tables
@@ -40,13 +71,12 @@ def add_new_user():
     email = request.form.get("email")
     username = request.form.get("username")
     password = hash(request.form.get("password"))
-    timezone = 0 #TODO implement timezones
+    #TODO implement timezones
     weight = request.form.get("weight")
 
     new_user = User(firstname=firstname, lastname=lastname, gender=gender,
                     birthdate=birthdate, zipcode=zipcode, email=email,
-                    username=username, password=password, timezone=timezone,
-                    weight=weight)
+                    username=username, password=password, weight=weight)
     db.session.add(new_user)
     db.session.commit()
 

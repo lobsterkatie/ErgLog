@@ -46,11 +46,8 @@ $(document).ready(function () {
         rules: {
             firstname: "required",
             lastname: "required",
-            gender: "required",
-            birthdate: {
-                required: true,
-                birthdate: true
-            },
+            gender: "required", //enum constraint handled by dropdown
+            birthdate: "required", //format constraint handled by datepicker
             zipcode: {
                 required: true,
                 rangelength: [5, 5],
@@ -58,12 +55,39 @@ $(document).ready(function () {
             },
             email: {
                 required: true,
-                email: true
+                email: true,
+                remote: "/check-email"
             },
             username: {
                 required: true,
+                remote: "/check-username"
+            },
+            password: "required",
+            weight: "required"
+        },
 
-            }
+        messages: {
+            firstname: "Please enter your firstname",
+            lastname: "Please enter your lastname",
+            gender: "Please enter a gender",
+            birthdate: "Please enter a birthdate",
+            zipcode: {
+                required: "Please enter a zipcode",
+                rangelength: "Zipcodes must be exactly 5 digits",
+                digits: "Zipcodes must contain only digits"
+            },
+            email: {
+                required: "Please enter an email address",
+                email: "Please enter a valid email address",
+                remote: ("A user with this email address already exists. " +
+                         "Please use the link below to log in instead.")
+            },
+            username: {
+                required: "Please enter a username address",
+                remote: "This username is taken. Please choose another."
+            },
+            password: "Please enter a password",
+            weight: "Please enter your weight"
         }
     });
 

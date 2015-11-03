@@ -76,7 +76,7 @@ class User(db.Model):
     date_joined = db.Column(db.Date, nullable=False, default=date.today())
     #WOULD LIKE TO CALCULATE THIS FROM ZIPCODE EVENTUALLY
     # in hours ahead or behind UTC
-    timezone = db.Column(db.Integer, nullable=False, default=0)
+    timezone = db.Column(db.Integer, nullable=True, default=0)
     weight = db.Column(db.Numeric(4, 1), nullable=False)
 
 

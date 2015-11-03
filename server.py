@@ -80,6 +80,8 @@ def add_new_user():
     db.session.add(new_user)
     db.session.commit()
 
+    #HOW DO I GET IT TO GO TO THE LOGIN MODAL? SAME QUESTION FOR LINK
+    #WHICH NEEDS TO BE ADDED TO REGISTRATION MODAL
 
 
 

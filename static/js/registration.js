@@ -64,7 +64,7 @@ $(document).ready(function () {
             },
             password: "required",
             weight: "required"
-        },
+        }, //end rules
 
         messages: {
             firstname: "Please enter your firstname",
@@ -88,7 +88,7 @@ $(document).ready(function () {
             },
             password: "Please enter a password",
             weight: "Please enter your weight"
-        }
+        } //end messages
     });
 
 

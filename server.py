@@ -3,6 +3,7 @@
 from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, flash, session
 from model import connect_to_db, db, User
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -33,7 +34,8 @@ def add_new_user():
     firstname = request.form.get("firstname")
     lastname = request.form.get("lastname")
     gender = request.form.get("gender")
-    birthdate = request.form.get("birthdate")
+    birthdate = (datetime.strptime(request.form.get("birthdate"), "%b %d, %Y")
+                         .date())
     zipcode = request.form.get("zipcode")
     email = request.form.get("email")
     username = request.form.get("username")
@@ -48,7 +50,7 @@ def add_new_user():
     db.session.add(new_user)
     db.session.commit()
 
-    
+
 
 
 

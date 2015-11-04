@@ -59,7 +59,8 @@ def username_in_database(username):
     else:
         return False
 
-
+def table_record_object_to_dict(record):
+    """"""
 
 #################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################
 
@@ -141,7 +142,7 @@ def add_new_user():
 
     #add the user to the session for easy grabbing and to signify thier
     #logged-in state
-    session["user"] = added_user
+    session["user"] = jsonify(added_user)
 
     #display the user's dashboard page, in logged-in state
     return redirect("/" + username)

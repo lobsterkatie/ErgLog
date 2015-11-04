@@ -66,24 +66,6 @@ $(document).ready(function () {
             form.submit();
         },*/
         
-        /*invalidHandler: function(event, validator) {
-            var errors = validator.numberOfInvalids();
-            if (errors) {
-                console.log("errors = " + errors);
-                $("#registration-form-validation-error").show();
-            }
-        }, // end of invalidHandler
-
-
-        unhighlight: function(element, errorClass) {
-            $(element).removeClass(errorClass);
-            //if that was the last error, hide the overall form error message
-            var errors = registrationValidator.numberOfInvalids();
-            if (!errors) {
-                $("#registration-form-validation-error").hide();
-            }
-        },*/
-
         rules: {
             firstname: "required",
             lastname: "required",
@@ -145,7 +127,7 @@ $(document).ready(function () {
     }); //end registration form validation
 
 
-    /* Validate lgin form data */
+    /* Validate l0gin form data */
     var loginValidator = $("#login-form").validate({
 
         errorClass: "validation-error",
@@ -157,39 +139,19 @@ $(document).ready(function () {
             form.submit();
         },*/
 
-        /*highlight: function(element, errorClass) {
-            $(element).addClass(errorClass);
-            //if there are errors, show the overall form error message
-            var errors = loginValidator.numberOfInvalids();
-            console.log("highlight, errors: " + errors);
-            if (errors) {
-                $("#login-form-validation-error").show();
-            }
-        },
-
-        unhighlight: function(element, errorClass) {
-            $(element).removeClass(errorClass);
-            //if that was the last error, hide the overall form error message
-            var errors = loginValidator.numberOfInvalids();
-            console.log("unhighlight, errors: " + errors);
-            if (!errors) {
-                $("#login-form-validation-error").hide();
-            }
-        },*/
-
-        onkeyup: function(element) {
+        /*onkeyup: function(element) {
             var element_name = $(element).attr('name');
             if (this.settings.rules[element_name].onkeyup !== false) {
                 $.validator.defaults.onkeyup.apply(this, arguments);
             }
-        },
+        },*/
 
         rules: {
             username_or_email: {
                 required: true,
                 validUsernameOrEmail: true,
-                remote: "/username-or-email-found",
-                onkeyup: false
+                remote: "/username-or-email-found"/*,
+                onkeyup: false*/
             },
             password: "required"
         }, //end of rules

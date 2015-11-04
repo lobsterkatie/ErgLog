@@ -29,6 +29,24 @@ $(document).ready(function () {
                      startView: 2,
                      autoclose: true});
 
+    /* A hash function to hash the passwords */
+    /* Based on code from 
+    http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/*/
+    var hashString = function(rawString) {
+        var hashValue = 0;
+        var currentCharCode = null;
+        var stringLength = rawString.length;
+
+        //interate through the string, updating hash value
+        for (var i = 0; i < stringLength; i++) {
+            currentCharCode  = rawString.charCodeAt(i);
+            hashValue = ((hashValue << 5) - hashValue) + currentCharCode;
+            hashValue |= 0; // Convert to 32bit integer
+        }
+
+        return hashValue;
+    };
+
     /* Set up form validation rules and handlers*/
     jQuery.validator.addMethod("validUsername",
                                function(value, element) {
@@ -61,10 +79,26 @@ $(document).ready(function () {
 
         errorContainer: "#registration-form-validation-error",
 
-            //TODO remove this and the submitHandler below if it seems safe
+        //TODO client-side hashing
         /*submitHandler: function(form) {
-            form.submit();
-        },*/
+            var pw = $("#registration-password-original").val();
+            var hashedPW = hashString(pw);
+            $("#registration-password-original").val(hashedPW);
+            $("#registration-password-confirmation").val(hashedPW);
+            formData=$("#registration-form").serialize();
+            console.log(formData);
+            $.post("/register-user",
+                   formData,
+                   function(){console.log("here");} );
+            $.ajax({
+                    type: 'POST',
+                    url: "/register-user",
+                    data: formData,
+                    success: function(){console.log("here");}
+                   });
+            return false;
+
+        }, //end submitHandler*/
         
         rules: {
             firstname: "required",
@@ -89,7 +123,7 @@ $(document).ready(function () {
             password: "required",
             password2: {
                 required: true,
-                equalTo: "#password-original"
+                equalTo: "#registration-password-original"
             },
             weight: {
                 required: true,
@@ -140,7 +174,7 @@ $(document).ready(function () {
 
         errorContainer: "#login-form-validation-error",
 
-        //TODO remove this if everything is working
+        //TODO client-side hashing
         /*submitHandler: function(form) {
             form.submit();
         },*/
@@ -152,7 +186,7 @@ $(document).ready(function () {
             }
         },*/
 
-        onkeyup: false,
+        /*onkeyup: false,*/
 
         rules: {
             username_or_email: {
@@ -168,7 +202,12 @@ $(document).ready(function () {
                     data: {
                         credential: function() {
                             return $("#login-credential").val();
-                            }
+                            }/*,
+                        //TODO client-side hashing
+                        password: function () {
+                            pw = $("#login-password").val();
+                            return hashString(pw);
+                        }*/
                     }
                 }
             } //end of password rule

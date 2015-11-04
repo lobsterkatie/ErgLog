@@ -26,7 +26,7 @@ def index():
 
 @app.route("/<string:username>")
 def show_dashboard(username):
-    pass
+    return username
 
 
 ######### HELPER FUNCTIONS FOR LOGIN, LOGOUT, AND REGISTRATION ROUTES #########
@@ -69,16 +69,23 @@ def password_is_correct(credential, password):
 
     #the presence of an @ symbol means the credential is an email
     if "@" in credential:
-        user = db.session.query(User).filter(User.email == credential).one()
+        user = db.session.query(User).filter(User.email == credential).first()
     #otherwise, assume it's a username
     else:
-        user = db.session.query(User).filter(User.username == credential).one()
+        user = db.session.query(User).filter(User.username == credential).first()
 
-    #return true if the passwords match, and false otherwise
-    if hashed_pw == user.password:
-        return True
-    else:
+    #it's possible the credential isn't in the database at all, in which case
+    #user will be None; clearly, then, the password doesn't match, so return false
+    if not user:
         return False
+
+    #otherwise, we have a valid user, but we still don't know if the passwords match
+    else:
+        #return true if the passwords match, and false otherwise
+        if hashed_pw == user.password:
+            return True
+        else:
+            return False
 
 
 def table_record_object_to_dict(record_object):
@@ -165,6 +172,7 @@ def add_new_user():
     weight = request.form.get("weight")
 
     #create the new user and add them to the database
+    print "\n\ncreating new user: ", username, " ", password
     new_user = User(firstname=firstname, lastname=lastname, gender=gender,
                     birthdate=birthdate, zipcode=zipcode, email=email,
                     username=username, password=password, weight=weight)
@@ -191,6 +199,7 @@ def check_password():
 
     credential = request.args.get("credential")
     password = request.args.get("password")
+    print "got " + credential + password
 
     if password_is_correct(credential, password):
         return "true"

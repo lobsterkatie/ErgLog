@@ -12,8 +12,14 @@ $(document).ready(function () {
     /* Clear the forms on hide */
     //TODO only clear the form on the modal that was just closed
     $('body').on('hidden.bs.modal', '.modal', function (evt) {
-         $("#registration-form")[0].reset();
-         $("#login-form")[0].reset();
+
+        //clear the form data
+        $("#registration-form")[0].reset();
+        $("#login-form")[0].reset();
+        //clear any markup from previous validation
+        $("label.validation-error").hide();
+        $(".validation-error").removeClass("validation-error");
+        $("span.form-validation-error").html("");
     });
 
     /* Trigger the datepicker for DOB */
@@ -23,7 +29,7 @@ $(document).ready(function () {
                      startView: 2,
                      autoclose: true});
 
-    /* Set up form validation rules */
+    /* Set up form validation rules and handlers*/
     jQuery.validator.addMethod("validUsername",
                                function(value, element) {
                                     // allow A-Z, a-z, 0-9, and _
@@ -43,29 +49,44 @@ $(document).ready(function () {
                                                         .call(this,
                                                               value,
                                                               element);
+                                    console.log("answer: " + answer);
                                     return answer;
                                     },
                                "This is not a valid username or email.");
 
+    //TODO move invalidHandler function up here once it's clear how to
+    //only add the message to the span on the modal in question (on event object?)
+    /*function ifInvalid (event, validator) {
+        // body...
+    }*/
+
 
     /* Validate registration form data */
-    $("#registration-form").validate({
+    var registrationValidator = $("#registration-form").validate({
 
         invalidHandler: function(event, validator) {
             var errors = validator.numberOfInvalids();
             if (errors) {
                 console.log("errors = " + errors);
-                var message = "Please fix the errors below.";
-                $("#registration-form-validation-error").html(message);
                 $("#registration-form-validation-error").show();
             }
-            else {
+            //TODO remove this and the submitHandler below if it seems safe
+            /*else {
                 $("#registration-form-validation-error").hide();
-            }
+            }*/
         }, // end of invalidHandler
 
-        submitHandler: function(form) {
+        /*submitHandler: function(form) {
             form.submit();
+        },*/
+
+        unhighlight: function(element, errorClass) {
+            $(element).removeClass(errorClass);
+            //if that was the last error, hide the overall form error message
+            var errors = registrationValidator.numberOfInvalids();
+            if (!errors) {
+                $("#registration-form-validation-error").hide();
+            }
         },
 
         errorClass: "validation-error",
@@ -127,27 +148,37 @@ $(document).ready(function () {
         } //end of messages
     }); //end validating registration form data
 
+
     /* Validate lgin form data */
-    $("#login-form").validate({
+    var loginValidator = $("#login-form").validate({
 
         invalidHandler: function(event, validator) {
             var errors = validator.numberOfInvalids();
             if (errors) {
                 console.log("errors = " + errors);
-                var message = "Please fix the errors below.";
-                $("#login-form-validation-error").html(message);
                 $("#login-form-validation-error").show();
             }
-            else {
+            //TODO remove the else if nothing seems broken
+            /*else {
                 $("#login-form-validation-error").hide();
-            }
+            }*/
         }, // end of invalidHandler
 
-        submitHandler: function(form) {
+        //TODO remove this if everything is working
+        /*submitHandler: function(form) {
             form.submit();
-        },
+        },*/
 
         errorClass: "validation-error",
+
+        unhighlight: function(element, errorClass) {
+            $(element).removeClass(errorClass);
+            //if that was the last error, hide the overall form error message
+            var errors = loginValidator.numberOfInvalids();
+            if (!errors) {
+                $("#login-form-validation-error").hide();
+            }
+        },
 
         rules: {
             username_or_email: {

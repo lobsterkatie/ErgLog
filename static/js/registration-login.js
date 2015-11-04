@@ -11,7 +11,7 @@ $(document).ready(function () {
 
     /* Clear the forms on hide */
     //TODO only clear the form on the modal that was just closed
-    $('body').on('hidden.bs.modal', '.modal', function (evt) {
+    $('body').on('hidden.bs.modal', '.modal', function(evt) {
 
         //clear the form data
         $("#registration-form")[0].reset();
@@ -19,7 +19,7 @@ $(document).ready(function () {
         //clear any markup from previous validation
         $("label.validation-error").hide();
         $(".validation-error").removeClass("validation-error");
-        $("span.form-validation-error").html("");
+        $("span.form-validation-error").hide();
     });
 
     /* Trigger the datepicker for DOB */
@@ -49,36 +49,31 @@ $(document).ready(function () {
                                                         .call(this,
                                                               value,
                                                               element);
-                                    console.log("answer: " + answer);
                                     return answer;
                                     },
                                "This is not a valid username or email.");
-
-    //TODO move invalidHandler function up here once it's clear how to
-    //only add the message to the span on the modal in question (on event object?)
-    /*function ifInvalid (event, validator) {
-        // body...
-    }*/
 
 
     /* Validate registration form data */
     var registrationValidator = $("#registration-form").validate({
 
-        invalidHandler: function(event, validator) {
+        errorClass: "validation-error",
+
+        errorContainer: "#registration-form-validation-error",
+
+            //TODO remove this and the submitHandler below if it seems safe
+        /*submitHandler: function(form) {
+            form.submit();
+        },*/
+        
+        /*invalidHandler: function(event, validator) {
             var errors = validator.numberOfInvalids();
             if (errors) {
                 console.log("errors = " + errors);
                 $("#registration-form-validation-error").show();
             }
-            //TODO remove this and the submitHandler below if it seems safe
-            /*else {
-                $("#registration-form-validation-error").hide();
-            }*/
         }, // end of invalidHandler
 
-        /*submitHandler: function(form) {
-            form.submit();
-        },*/
 
         unhighlight: function(element, errorClass) {
             $(element).removeClass(errorClass);
@@ -87,9 +82,7 @@ $(document).ready(function () {
             if (!errors) {
                 $("#registration-form-validation-error").hide();
             }
-        },
-
-        errorClass: "validation-error",
+        },*/
 
         rules: {
             firstname: "required",
@@ -143,48 +136,60 @@ $(document).ready(function () {
                         "link below to log in."
             },
             password: "Please enter a password.",
-            password2: "Please ensure that your passwords match.",
+            password2: {
+                required: "Please reenter your password.",
+                equalTo: "Passwords must match."
+            },
             weight: "Please enter your weight."
         } //end of messages
-    }); //end validating registration form data
+    }); //end registration form validation
 
 
     /* Validate lgin form data */
     var loginValidator = $("#login-form").validate({
 
-        invalidHandler: function(event, validator) {
-            var errors = validator.numberOfInvalids();
-            if (errors) {
-                console.log("errors = " + errors);
-                $("#login-form-validation-error").show();
-            }
-            //TODO remove the else if nothing seems broken
-            /*else {
-                $("#login-form-validation-error").hide();
-            }*/
-        }, // end of invalidHandler
+        errorClass: "validation-error",
+
+        errorContainer: "#login-form-validation-error",
 
         //TODO remove this if everything is working
         /*submitHandler: function(form) {
             form.submit();
         },*/
 
-        errorClass: "validation-error",
+        /*highlight: function(element, errorClass) {
+            $(element).addClass(errorClass);
+            //if there are errors, show the overall form error message
+            var errors = loginValidator.numberOfInvalids();
+            console.log("highlight, errors: " + errors);
+            if (errors) {
+                $("#login-form-validation-error").show();
+            }
+        },
 
         unhighlight: function(element, errorClass) {
             $(element).removeClass(errorClass);
             //if that was the last error, hide the overall form error message
             var errors = loginValidator.numberOfInvalids();
+            console.log("unhighlight, errors: " + errors);
             if (!errors) {
                 $("#login-form-validation-error").hide();
+            }
+        },*/
+
+        onkeyup: function(element) {
+            var element_name = $(element).attr('name');
+            if (this.settings.rules[element_name].onkeyup !== false) {
+                $.validator.defaults.onkeyup.apply(this, arguments);
             }
         },
 
         rules: {
             username_or_email: {
                 required: true,
-                validUsernameOrEmail: true/*,
-                remote: "/email-not-found"*/
+                validUsernameOrEmail: true,
+                remote: "/username-or-email-found",
+                onkeyup: false
             },
             password: "required"
         }, //end of rules
@@ -192,14 +197,12 @@ $(document).ready(function () {
         messages: {
             username_or_email: {
                 required: "Please enter a username or email address.",
-                validUsernameOrEmail: "This is not a valid username or email."/*,
-                remote: "This username is taken. Please choose another. \n" +
-                        "Or, if you've already registered, please use the " +
-                        "link below to log in."*/
+                validUsernameOrEmail: "This is not a valid username or email.",
+                remote: "Not a registered email or username."
             },
             password: "Please enter a password."
         } //end of messages
-    }); //end validating login form data
+    }); //end login form validation
 
 });
 

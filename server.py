@@ -65,7 +65,8 @@ def username_in_database(username):
 
 @app.route("/email-not-found")
 def email_not_found():
-    """Called by form validator. Returns false if given email found."""
+    """Called by form validator. Returns false if given email found in
+       the database."""
 
     if email_in_database(request.args.get("email")):
         return "false"
@@ -75,7 +76,8 @@ def email_not_found():
 
 @app.route("/username-not-found")
 def username_not_found():
-    """Called by form validator. Returns false if given username found."""
+    """Called by form validator. Returns false if given username found in
+       the database."""
 
     if username_in_database(request.args.get("username")):
         return "false"
@@ -83,14 +85,24 @@ def username_not_found():
         return "true"
 
 
-    # @app.route("/username-or-email-not-found")
-    # def username_or_email_not_found():
-    # """Checks the given username or email against the User table. Returns 
-    #     false if found."""
+@app.route("/username-or-email-found")
+def username_or_email_found():
+    """Called by form validator. Returns true if given username or email found
+       in the database."""
 
-    # value = request.args.get("username_or_email")
-    # if "@" in value:
-    #     return 
+    credential = request.args.get("username_or_email")
+
+    #assume that the presence of an @ symbol means it's an email
+    if "@" in credential:
+        found = email_in_database(credential)
+    else:
+        found = username_in_database(credential)
+
+    #return the results as a string
+    if found:
+        return "true"
+    else:
+        return "false"
 
 
 @app.route("/register-user", methods=["POST"])

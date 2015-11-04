@@ -29,61 +29,55 @@ def show_dashboard(username):
     pass
 
 
-#################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################
+######### HELPER FUNCTIONS FOR LOGIN, LOGOUT, AND REGISTRATION ROUTES #########
+def email_in_database(email):
+    """Returns true if the given email is found in the Users table."""
 
-@app.route("/email-not-found")
-def email_not_found(email=None):
-    """Checks the given email against the User table. Returns false if found."""
-
-    #if an email isn't passsed to this function as a direct argument,
-    #then the function was likely called by the form validator, so try to get
-    #the email from the form arguments; throw an exception otherwise
-    if not email:
-        try:
-            email = request.args["email"]
-        except (RuntimeError, KeyError):
-            exception_string = ("email_not_found() called with no arguments, " +
-                                "either passed directly or gotten from form.")
-            raise Exception(exception_string)
-
-    #now that we have a valid email to check, count how many users in the table
-    #have that email (should be 1 or 0)
+    #count how many users in the database have the given email (should be 1 or 0)
     num_matched = (db.session.query(User)
                              .filter(User.email == email)
                              .count())
 
-    #if there's a user with that email, return false to indicate that the given
-    #email *was* found; return true otherwise
+    #if there's a user with that email, return true; otherwise, return false
     if num_matched == 1:
+        return True
+    else:
+        return False
+
+
+def username_in_database(username):
+    """Returns true if the given username is found in the Users table."""
+
+    #count how many users in the database have the given username (should be 1 or 0)
+    num_matched = (db.session.query(User)
+                             .filter(User.username == username)
+                             .count())
+
+    #if there's a user with that username, return true; otherwise, return false
+    if num_matched == 1:
+        return True
+    else:
+        return False
+
+
+
+#################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################
+
+@app.route("/email-not-found")
+def email_not_found():
+    """Called by form validator. Returns false if given email found."""
+
+    if email_in_database(request.args.get("email")):
         return "false"
     else:
         return "true"
 
 
 @app.route("/username-not-found")
-def username_not_found(username=None):
-    """Checks the given username against the User table. Returns false if found."""
+def username_not_found():
+    """Called by form validator. Returns false if given username found."""
 
-    #if a username isn't passsed to this function as a direct argument,
-    #then the function was likely called by the form validator, so try to get
-    #the username from the form arguments; throw an exception otherwise
-    if not username:
-        try:
-            username = request.args["username"]
-        except (RuntimeError, KeyError):
-            exception_string = ("username_not_found() called with no arguments, " +
-                                "either passed directly or gotten from form.")
-            raise Exception(exception_string)
-
-    #now that we have a valid username to check, count how many users in the
-    #table have that email (should be 1 or 0)
-    num_matched = (db.session.query(User)
-                             .filter(User.username == username)
-                             .count())
-
-    #if there's a user with that username, return false to indicate that the
-    #given username *was* found; return true otherwise
-    if num_matched == 1:
+    if username_in_database(request.args.get("username")):
         return "false"
     else:
         return "true"

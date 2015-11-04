@@ -136,7 +136,7 @@ $(document).ready(function () {
                         "Please use the link below to log in instead."
             },
             username: {
-                required: "Please enter a username address.",
+                required: "Please enter a username.",
                 validUsername: "Usernames can only contain A-Z, a-z, _, and 0-9.",
                 remote: "This username is taken. Please choose another. \n" +
                         "Or, if you've already registered, please use the " +

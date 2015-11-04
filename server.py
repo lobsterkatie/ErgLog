@@ -89,6 +89,16 @@ def username_not_found(username=None):
         return "true"
 
 
+    # @app.route("/username-or-email-not-found")
+    # def username_or_email_not_found():
+    # """Checks the given username or email against the User table. Returns 
+    #     false if found."""
+
+    # value = request.args.get("username_or_email")
+    # if "@" in value:
+    #     return 
+
+
 @app.route("/register-user", methods=["POST"])
 def add_new_user():
     """Add new user to the Users and User_stat_lists tables

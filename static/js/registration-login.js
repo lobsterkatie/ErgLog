@@ -1,11 +1,19 @@
 $(document).ready(function () {
 
-    /* Clear the registration form on pageload */
+    /* Clear the forms on pageload */
+    /*var regLoginForms = $(".reg-login-form");
+    for (var i = 0; i < regLoginForms.length; i++) {
+        regLoginForms[i].reset();
+    }*/
     $("#registration-form")[0].reset();
+    $("#login-form")[0].reset();
+    
 
-    /* Clear the registration form on hide */
-    $('body').on('hidden.bs.modal', '.modal', function () {
+    /* Clear the forms on hide */
+    //TODO only clear the form on the modal that was just closed
+    $('body').on('hidden.bs.modal', '.modal', function (evt) {
          $("#registration-form")[0].reset();
+         $("#login-form")[0].reset();
     });
 
     /* Trigger the datepicker for DOB */
@@ -20,11 +28,27 @@ $(document).ready(function () {
                                function(value, element) {
                                     // allow A-Z, a-z, 0-9, and _
                                     answer = this.optional(element) ||
-                                           /^\w+$/.test(value);
+                                             /^\w+$/.test(value);
                                     return answer;
-                                    });
+                                    },
+                               "Usernames can only contain A-Z, a-z, _, and 0-9.");
 
-    /* Validate form data */
+
+    jQuery.validator.addMethod("validUsernameOrEmail",
+                               function(value, element) {
+                                    // allow valid usernames or emails
+                                    answer = this.optional(element) ||
+                                             /^\w+$/.test(value) ||
+                                             $.validator.methods.email
+                                                        .call(this,
+                                                              value,
+                                                              element);
+                                    return answer;
+                                    },
+                               "This is not a valid username or email.");
+
+
+    /* Validate registration form data */
     $("#registration-form").validate({
 
         invalidHandler: function(event, validator) {
@@ -101,9 +125,50 @@ $(document).ready(function () {
             password2: "Please ensure that your passwords match.",
             weight: "Please enter your weight."
         } //end of messages
-    });
+    }); //end validating registration form data
 
+    /* Validate lgin form data */
+    $("#login-form").validate({
 
+        invalidHandler: function(event, validator) {
+            var errors = validator.numberOfInvalids();
+            if (errors) {
+                console.log("errors = " + errors);
+                var message = "Please fix the errors below.";
+                $("#login-form-validation-error").html(message);
+                $("#login-form-validation-error").show();
+            }
+            else {
+                $("#login-form-validation-error").hide();
+            }
+        }, // end of invalidHandler
+
+        submitHandler: function(form) {
+            form.submit();
+        },
+
+        errorClass: "validation-error",
+
+        rules: {
+            username_or_email: {
+                required: true,
+                validUsernameOrEmail: true/*,
+                remote: "/email-not-found"*/
+            },
+            password: "required"
+        }, //end of rules
+
+        messages: {
+            username_or_email: {
+                required: "Please enter a username or email address.",
+                validUsernameOrEmail: "This is not a valid username or email."/*,
+                remote: "This username is taken. Please choose another. \n" +
+                        "Or, if you've already registered, please use the " +
+                        "link below to log in."*/
+            },
+            password: "Please enter a password."
+        } //end of messages
+    }); //end validating login form data
 
 });
 

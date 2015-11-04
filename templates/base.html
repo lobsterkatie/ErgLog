@@ -83,7 +83,7 @@
                     </div> <!-- end of modal header -->
 
                     <div class="modal-body">
-                        <form id="registration-form" action="/register-user" method="POST">
+                        <form id="registration-form" class="reg-login-form" action="/register-user" method="POST">
                             <label> First Name
                                 <input type="text" name="firstname">
                             </label>
@@ -170,9 +170,9 @@
                     </div> <!-- end of modal header -->
 
                     <div class="modal-body">
-                        <form id="login-form" action="/login" method="POST">
+                        <form id="login-form" class="reg-login-form" action="/login" method="POST">
                             <label> Username or email
-                                <input type="text" name="username-or-email">
+                                <input type="text" name="username_or_email">
                             </label>
                             <br>
                             <label> Password
@@ -189,7 +189,7 @@
                             </a>
                         </span>
                         <br>
-                        <input id="login-button" type="submit" class="btn btn-primary" value="Register!" form="registration-form">
+                        <input id="login-button" type="submit" class="btn btn-primary" value="Login" form="login-form">
                     </div> <!-- end of modal footer -->
 
                 </div> <!-- end of modal content -->
@@ -211,6 +211,6 @@
         {% endblock %}
     </div>
 
-    <script src="/static/js/registration.js"></script>
+    <script src="/static/js/registration-login.js"></script>
 </body>
 </html>

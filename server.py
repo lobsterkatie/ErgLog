@@ -59,8 +59,24 @@ def username_in_database(username):
     else:
         return False
 
-def table_record_object_to_dict(record):
-    """"""
+def table_record_object_to_dict(record_object):
+    """Takes an object representing a record from the database and creates
+       a dictionary out of its values (as strings)"""
+
+    pass
+
+    # record_dict = {}
+
+    # #add each of the object's attributes, excluding dunder attributes
+    # #(because we don't care about them) and the user_id (because we've
+    #     #already got it)...
+    #     for attr, value in self.__dict__.items():
+    #         # print attr, type(attr)
+    #         # print value, type(value)
+    #         if attr.startswith(("_", "password")):
+
+    #             #pop it from the dictionary
+
 
 #################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################
 
@@ -133,16 +149,14 @@ def add_new_user():
     db.session.add(new_user)
     db.session.commit()
 
-    #pull the user from the database (where they should now be), so that
-    #the user object contains the auto-assigned values as well (which the
-    #new_user object we created above doesn't)
-    added_user = (db.session.query(User)
-                            .filter(User.username == username)
-                            .one())
+    #pull the new user's id from the database
+    id_of_added_user = (db.session.query(User.user_id)
+                          .filter(User.username == username)
+                          .one())
 
-    #add the user to the session for easy grabbing and to signify thier
+    #add that id to the session for easy grabbing and to signify thier
     #logged-in state
-    session["user"] = jsonify(added_user)
+    session["logged_in_user_id"] = id_of_added_user
 
     #display the user's dashboard page, in logged-in state
     return redirect("/" + username)

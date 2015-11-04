@@ -36,7 +36,9 @@
                     <li><a href="#">About</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    {% if session.get("user") %}
+                    <!-- change the navbar buttons depending on if there's
+                         a user logged in -->
+                    {% if session.get("logged_in_user_id") %}
                         <li id="nav-button[-2]">
                             <a data-toggle="modal" href="#" data-target="#profileModal">
                                 Profile

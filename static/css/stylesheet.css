@@ -14,3 +14,9 @@
 #reg-to-login-msg {
     text-align: left;
 }
+
+.validation-error {
+    color: red;
+    font-weight: normal;
+    font-style: italic;
+}

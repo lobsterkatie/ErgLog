@@ -44,6 +44,8 @@ $(document).ready(function () {
             form.submit();
         },
 
+        errorClass: "validation-error",
+
         rules: {
             firstname: "required",
             lastname: "required",
@@ -76,7 +78,7 @@ $(document).ready(function () {
             firstname: "Please enter your firstname.",
             lastname: "Please enter your lastname.",
             gender: "Please enter a gender.",
-            birthdate: "Please enter a birthdate.",
+            birthdate: "Please enter your birthdate.",
             zipcode: {
                 required: "Please enter a zipcode.",
                 rangelength: "Zipcodes must be exactly 5 digits.",

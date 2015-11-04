@@ -91,7 +91,10 @@ $(document).ready(function () {
                 required: true,
                 equalTo: "#password-original"
             },
-            weight: "required"
+            weight: {
+                required: true,
+                number: true
+            }
         }, //end of rules
 
         messages: {
@@ -122,12 +125,15 @@ $(document).ready(function () {
                 required: "Please reenter your password.",
                 equalTo: "Passwords must match."
             },
-            weight: "Please enter your weight."
+            weight: {
+                required: "Please enter your weight.",
+                number: "Weight must be a number."
+            }
         } //end of messages
     }); //end registration form validation
 
 
-    /* Validate l0gin form data */
+    /* Validate login form data */
     var loginValidator = $("#login-form").validate({
 
         errorClass: "validation-error",
@@ -146,6 +152,8 @@ $(document).ready(function () {
             }
         },*/
 
+        onkeyup: false,
+
         rules: {
             username_or_email: {
                 required: true,
@@ -153,7 +161,17 @@ $(document).ready(function () {
                 remote: "/username-or-email-found"/*,
                 onkeyup: false*/
             },
-            password: "required"
+            password: {
+                required: true,
+                remote: {
+                    url: "/password-matches",
+                    data: {
+                        credential: function() {
+                            return $("#login-credential").val();
+                            }
+                    }
+                }
+            } //end of password rule
         }, //end of rules
 
         messages: {
@@ -162,7 +180,10 @@ $(document).ready(function () {
                 validUsernameOrEmail: "This is not a valid username or email.",
                 remote: "Not a registered email or username."
             },
-            password: "Please enter a password."
+            password: {
+                required: "Please enter a password.",
+                remote: "Incorrect password. Please try again."
+            }
         } //end of messages
     }); //end login form validation
 

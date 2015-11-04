@@ -59,6 +59,28 @@ def username_in_database(username):
     else:
         return False
 
+
+def password_is_correct(credential, password):
+    """Verifies that password is the correct one for user with given
+       credential (either username or password). Returns true for a match."""
+
+    #hash the password and make it a string, since that's how they're stored
+    hashed_pw = str(hash(password))
+
+    #the presence of an @ symbol means the credential is an email
+    if "@" in credential:
+        user = db.session.query(User).filter(User.email == credential).one()
+    #otherwise, assume it's a username
+    else:
+        user = db.session.query(User).filter(User.username == credential).one()
+
+    #return true if the passwords match, and false otherwise
+    if hashed_pw == user.password:
+        return True
+    else:
+        return False
+
+
 def table_record_object_to_dict(record_object):
     """Takes an object representing a record from the database and creates
        a dictionary out of its values (as strings)"""
@@ -162,9 +184,42 @@ def add_new_user():
     return redirect("/" + username)
 
 
-@app.route("/login/<int:user_id>")
-def log_user_in(user_id):
-    pass
+@app.route("/password-matches")
+def check_password():
+    """Called by the form validator. Returns true if password matches given
+       email or username."""
+
+    credential = request.args.get("credential")
+    password = request.args.get("password")
+
+    if password_is_correct(credential, password):
+        return "true"
+    else:
+        return "false"
+
+
+@app.route("/login", methods=["POST"])
+def log_user_in():
+    """Log the user with the given username or email in.
+
+       Note that credential validation happens on the front end."""
+
+    credential = request.form.get("username_or_email")
+
+    #look up the user in the database
+    #the presence of an @ symbol means the credential is an email
+    if "@" in credential:
+        user = db.session.query(User).filter(User.email == credential).one()
+    #otherwise, assume it's a username
+    else:
+        user = db.session.query(User).filter(User.username == credential).one()
+
+    #add the user's id to the session for easy grabbing and to signify thier
+    #logged-in state
+    session["logged_in_user_id"] = user.user_id
+
+    #display the user's dashboard page, in logged-in state
+    return redirect("/" + user.username)
 
 
 

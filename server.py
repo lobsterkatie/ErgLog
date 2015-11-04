@@ -231,6 +231,16 @@ def log_user_in():
     return redirect("/" + user.username)
 
 
+@app.route("/logout", methods=["POST"])
+def log_user_out():
+    """Log user out by clearing the session. Return user to whatever page
+       they were on."""
+
+    session.clear()
+
+    return True
+
+
 
 if __name__ == "__main__":
     """If we run this file from the command line, do this stuff"""

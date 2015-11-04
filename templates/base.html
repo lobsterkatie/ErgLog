@@ -38,7 +38,7 @@
                 <ul class="nav navbar-nav navbar-right">
                     <!-- change the navbar buttons depending on if there's
                          a user logged in -->
-                    {% if session.get("logged_in_user_id") %}
+                    <!-- {% if session.get("logged_in_user_id") %}
                         <li id="nav-button[-2]">
                             <a data-toggle="modal" href="#" data-target="#profileModal">
                                 Profile
@@ -60,7 +60,32 @@
                                 Login
                             </a>
                         </li>
-                    {% endif %}
+                    {% endif %} -->
+                    <!-- navbar buttons for a logged-in user; hidden
+                         by default -->
+                    <li id="profile-nav-button" class="logged-in-nav-buttons" style="display:none">
+                        <a data-toggle="modal" href="#" data-target="#profileModal">
+                            Profile
+                        </a>
+                    </li>
+                    <li id="logout-nav-button" class="logged-in-nav-buttons" style="display:none">
+                        <a data-toggle="modal" href="#" data-target="#logoutModal">
+                            Logout
+                        </a>
+                    </li>
+
+                    <!-- navbar buttons for a logged-out user; shown
+                         by default -->
+                    <li id="register-nav-button" class="logged-out-nav-buttons">
+                        <a data-toggle="modal" href="#" data-target="#registrationModal">
+                            Register
+                        </a>
+                    </li>
+                    <li id="login-nav-button" class="logged-out-nav-buttons">
+                        <a data-toggle="modal" href="#" data-target="#loginModal">
+                            Login
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -148,7 +173,7 @@
                             </a>
                         </span>
                         <br>
-                        <input id="registration-button" type="submit" class="btn btn-primary" value="Register!" form="registration-form">
+                        <input id="registration-submit-button" class="btn btn-primary" type="submit" value="Register!" form="registration-form">
                     </div> <!-- end of modal footer -->
 
                 </div> <!-- end of modal content -->
@@ -193,7 +218,7 @@
                             </a>
                         </span>
                         <br>
-                        <input id="login-button" type="submit" class="btn btn-primary" value="Login" form="login-form">
+                        <input id="login-submit-button" type="submit" class="btn btn-primary" value="Login" form="login-form">
                     </div> <!-- end of modal footer -->
 
                 </div> <!-- end of modal content -->

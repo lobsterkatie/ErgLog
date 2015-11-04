@@ -1,5 +1,8 @@
 $(document).ready(function () {
 
+    /* Event listener for login to change navbar*/
+    /*$("#login-form").onsubmit()*/
+
     /* Clear the forms on pageload */
     /*var regLoginForms = $(".reg-login-form");
     for (var i = 0; i < regLoginForms.length; i++) {
@@ -175,9 +178,11 @@ $(document).ready(function () {
         errorContainer: "#login-form-validation-error",
 
         //TODO client-side hashing
-        /*submitHandler: function(form) {
+        submitHandler: function(form) {
             form.submit();
-        },*/
+            $(".logged-out-nav-buttons").hide();
+            $(".logged-in-nav-buttons").show();
+        },
 
         /*onkeyup: function(element) {
             var element_name = $(element).attr('name');

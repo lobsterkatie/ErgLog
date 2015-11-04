@@ -16,14 +16,15 @@ $(document).ready(function () {
                      autoclose: true});
 
     /* Set up form validation rules */
-
+    jQuery.validator.addMethod("validUsername",
+                               function(value, element) {
+                                    // allow A-Z, a-z, 0-9, and _
+                                    answer = this.optional(element) ||
+                                           /^\w+$/.test(value);
+                                    return answer;
+                                    });
 
     /* Validate form data */
-    /*jQuery.validator.addMethod("birthdate", function(value, element) {
-        if 
-    }
-        );*/
-
     $("#registration-form").validate({
 
         invalidHandler: function(event, validator) {
@@ -60,7 +61,7 @@ $(document).ready(function () {
             },
             username: {
                 required: true,
-
+                validUsername: true,
                 remote: "/check-username"
             },
             password: "required",
@@ -69,32 +70,35 @@ $(document).ready(function () {
                 equalTo: "#password-original"
             },
             weight: "required"
-        }, //end rules
+        }, //end of rules
 
         messages: {
-            firstname: "Please enter your firstname",
-            lastname: "Please enter your lastname",
-            gender: "Please enter a gender",
-            birthdate: "Please enter a birthdate",
+            firstname: "Please enter your firstname.",
+            lastname: "Please enter your lastname.",
+            gender: "Please enter a gender.",
+            birthdate: "Please enter a birthdate.",
             zipcode: {
-                required: "Please enter a zipcode",
-                rangelength: "Zipcodes must be exactly 5 digits",
-                digits: "Zipcodes must contain only digits"
+                required: "Please enter a zipcode.",
+                rangelength: "Zipcodes must be exactly 5 digits.",
+                digits: "Zipcodes must contain only digits."
             },
             email: {
-                required: "Please enter an email address",
-                email: "Please enter a valid email address",
-                remote: ("A user with this email address already exists. " +
-                         "Please use the link below to log in instead.")
+                required: "Please enter an email address.",
+                email: "Please enter a valid email address.",
+                remote: "A user with this email address already exists. " +
+                        "Please use the link below to log in instead."
             },
             username: {
-                required: "Please enter a username address",
-                remote: "This username is taken. Please choose another."
+                required: "Please enter a username address.",
+                validUsername: "Usernames can only contain A-Z, a-z, _, and 0-9.",
+                remote: "This username is taken. Please choose another. \n" +
+                        "Or, if you've already registered, please use the " +
+                        "link below to log in."
             },
-            password: "Please enter a password",
-            password2: "Please ensure that your passwords match",
-            weight: "Please enter your weight"
-        } //end messages
+            password: "Please enter a password.",
+            password2: "Please ensure that your passwords match.",
+            weight: "Please enter your weight."
+        } //end of messages
     });
 
 

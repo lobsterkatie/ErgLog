@@ -57,12 +57,12 @@ $(document).ready(function () {
             email: {
                 required: true,
                 email: true,
-                remote: "/check-email"
+                remote: "/email-not-found"
             },
             username: {
                 required: true,
                 validUsername: true,
-                remote: "/check-username"
+                remote: "/username-not-found"
             },
             password: "required",
             password2: {

@@ -24,47 +24,65 @@ def index():
     return render_template("home.html")
 
 
-@app.route("/<string: username>")
+@app.route("/<string:username>")
 def show_dashboard(username):
     pass
 
 
 #################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################
 
-@app.route("/check-email")
-def check_email_uniqueness():
+@app.route("/email-not-found")
+def email_not_found(email=None):
     """Checks the given email against the User table. Returns false if found."""
 
-    #get the username from the form validator
-    email = request.args.get("email")
+    #if an email isn't passsed to this function as a direct argument,
+    #then the function was likely called by the form validator, so try to get
+    #the email from the form arguments; throw an exception otherwise
+    if not email:
+        try:
+            email = request.args["email"]
+        except (RuntimeError, KeyError):
+            exception_string = ("email_not_found() called with no arguments, " +
+                                "either passed directly or gotten from form.")
+            raise Exception(exception_string)
 
-    #count how many users in the table have that username (should be 1 or 0)
+    #now that we have a valid email to check, count how many users in the table
+    #have that email (should be 1 or 0)
     num_matched = (db.session.query(User)
                              .filter(User.email == email)
                              .count())
 
-    #if there's already a user with that email, return false to indicate
-    #that the given email isn't new/unique; return true otherwise
+    #if there's a user with that email, return false to indicate that the given
+    #email *was* found; return true otherwise
     if num_matched == 1:
         return "false"
     else:
         return "true"
 
 
-@app.route("/check-username")
-def check_username_uniqueness():
+@app.route("/username-not-found")
+def username_not_found(username=None):
     """Checks the given username against the User table. Returns false if found."""
 
-    #get the username from the form validator
-    username = request.args.get("username")
+    #if a username isn't passsed to this function as a direct argument,
+    #then the function was likely called by the form validator, so try to get
+    #the username from the form arguments; throw an exception otherwise
+    if not username:
+        try:
+            username = request.args["username"]
+        except (RuntimeError, KeyError):
+            exception_string = ("username_not_found() called with no arguments, " +
+                                "either passed directly or gotten from form.")
+            raise Exception(exception_string)
 
-    #count how many users in the table have that username (should be 1 or 0)
+    #now that we have a valid username to check, count how many users in the
+    #table have that email (should be 1 or 0)
     num_matched = (db.session.query(User)
                              .filter(User.username == username)
                              .count())
 
-    #if there's already a user with that username, return false to indicate
-    #that the given username isn't new/unique; return true otherwise
+    #if there's a user with that username, return false to indicate that the
+    #given username *was* found; return true otherwise
     if num_matched == 1:
         return "false"
     else:
@@ -113,7 +131,7 @@ def add_new_user():
     return redirect("/" + username)
 
 
-@app.route("/login/<int: user_id>")
+@app.route("/login/<int:user_id>")
 def log_user_in(user_id):
     pass
 

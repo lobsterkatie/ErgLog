@@ -43,7 +43,7 @@
                             </a>
                         </li>
                         <li id="nav-button[-1]">
-                            <a data-toggle="modal" href="#" data-target="logoutModal">
+                            <a data-toggle="modal" href="#" data-target="#logoutModal">
                                 Logout
                             </a>
                         </li>
@@ -54,7 +54,7 @@
                             </a>
                         </li>
                         <li id="nav-button[-1]">
-                            <a data-toggle="modal" href="#" data-target="loginModal">
+                            <a data-toggle="modal" href="#" data-target="#loginModal">
                                 Login
                             </a>
                         </li>
@@ -138,6 +138,13 @@
                     </div> <!-- end of modal body -->
 
                     <div class="modal-footer">
+                        <span id="reg-to-login-msg">
+                            Already registered? Click here to 
+                            <a data-toggle="modal" href="#" data-dismiss="modal" data-target="#loginModal">
+                                login.
+                            </a>
+                        </span>
+                        <br>
                         <input id="registration-button" type="submit" class="btn btn-primary" value="Register!" form="registration-form">
                     </div> <!-- end of modal footer -->
 
@@ -175,7 +182,14 @@
                     </div> <!-- end of modal body -->
 
                     <div class="modal-footer">
-                        <input id="registration-button" type="submit" class="btn btn-primary" value="Register!" form="registration-form">
+                        <span id="login-to-reg-msg">
+                            Not yet registered? Click here to 
+                            <a data-toggle="modal" href="#" data-dismiss="modal" data-target="#registrationModal">
+                                register.
+                            </a>
+                        </span>
+                        <br>
+                        <input id="login-button" type="submit" class="btn btn-primary" value="Register!" form="registration-form">
                     </div> <!-- end of modal footer -->
 
                 </div> <!-- end of modal content -->

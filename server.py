@@ -3,8 +3,9 @@
 from jinja2 import StrictUndefined
 from flask import (Flask, render_template, redirect, request, flash, session,
                    jsonify)
-from model import connect_to_db, db, User
 from datetime import datetime
+from model import connect_to_db, db, User
+from server-utilities import *
 
 app = Flask(__name__)
 
@@ -23,114 +24,33 @@ def index():
 
     return render_template("home.html")
 
-# def viewing_own_dashboard(dashboard_username):
-#     """Returns true if the logged-in user (if any) is viewing their own
-#        dashboard."""
 
-#     #get the user corresponding to the requested dashboard and the
-#     #id of the logged-in user (if any)
-#     dashboard_user = (db.session.query(User)
-#                                 .filter(User.username == dashboard_username)
-#                                 .first())
-#     logged_in_user_id = session.get("logged_in_user_id")
+@app.route("/<string:username>")
+def show_dashboard(username):
+    """Show the dashboard of user with given username"""
 
-#     #if dashboard_username isn't a valid username (it's not found in the
-#     #database, raise an exception)
+    #get the user with the given username (if any)
+    dash_owner = (db.session.query(User)
+                            .filter(User.username == username)
+                            .first())
 
-#     #compare this to the logged-in user's id (if any) and return true or
-#     #false accordingly
-#     if dashboard_user.user_id == 
-    
+    #if given username isn't valid (not in database), redirect to a
+    #user-not-found page
+    if dash_owner is None:
+        return render_template("user-not-found.html")
 
+    #otherwise, determine if the user is logged in and asking to view their
+    #own dashboard
+    viewing_own_dash = user_is_logged_in(username=username)
 
-# @app.route("/<string:username>")
-# def show_dashboard(username):
-#     """Show the user's dashboard"""
-
-#     #determine if the user is logged in and viewing their own dashboard
-
-
-#     return render_template("dashboard.html",
-#                            user=user,
-#                            logged_in_state=logged_in)
+    #show the dashboard
+    return render_template("dashboard.html",
+                           dash_owner=dash_owner,
+                           viewing_own_dash=viewing_own_dash)
 
 
 ######### HELPER FUNCTIONS FOR LOGIN, LOGOUT, AND REGISTRATION ROUTES #########
-def email_in_database(email):
-    """Returns true if the given email is found in the Users table."""
 
-    #count how many users in the database have the given email (should be 1 or 0)
-    num_matched = (db.session.query(User)
-                             .filter(User.email == email)
-                             .count())
-
-    #if there's a user with that email, return true; otherwise, return false
-    if num_matched == 1:
-        return True
-    else:
-        return False
-
-
-def username_in_database(username):
-    """Returns true if the given username is found in the Users table."""
-
-    #count how many users in the database have the given username (should be 1 or 0)
-    num_matched = (db.session.query(User)
-                             .filter(User.username == username)
-                             .count())
-
-    #if there's a user with that username, return true; otherwise, return false
-    if num_matched == 1:
-        return True
-    else:
-        return False
-
-
-def password_is_correct(credential, password):
-    """Verifies that password is the correct one for user with given
-       credential (either username or password). Returns true for a match."""
-
-    #hash the password and make it a string, since that's how they're stored
-    hashed_pw = str(hash(password))
-
-    #the presence of an @ symbol means the credential is an email
-    if "@" in credential:
-        user = db.session.query(User).filter(User.email == credential).first()
-    #otherwise, assume it's a username
-    else:
-        user = db.session.query(User).filter(User.username == credential).first()
-
-    #it's possible the credential isn't in the database at all, in which case
-    #user will be None; clearly, then, the password doesn't match, so return false
-    if not user:
-        return False
-
-    #otherwise, we have a valid user, but we still don't know if the passwords match
-    else:
-        #return true if the passwords match, and false otherwise
-        if hashed_pw == user.password:
-            return True
-        else:
-            return False
-
-
-def table_record_object_to_dict(record_object):
-    """Takes an object representing a record from the database and creates
-       a dictionary out of its values (as strings)"""
-
-    pass
-
-    # record_dict = {}
-
-    # #add each of the object's attributes, excluding dunder attributes
-    # #(because we don't care about them) and the user_id (because we've
-    #     #already got it)...
-    #     for attr, value in self.__dict__.items():
-    #         # print attr, type(attr)
-    #         # print value, type(value)
-    #         if attr.startswith(("_", "password")):
-
-    #             #pop it from the dictionary
 
 
 #################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################

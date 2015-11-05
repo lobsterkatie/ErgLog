@@ -1,3 +1,7 @@
+################################################################################
+#  STUFF ABOUT BEING ABLE TO SEE OTHER USER'S PAGES #
+
+
 @app.route("/<string:username>")
 def show_dashboard(username):
     """Show the dashboard of user with given username"""
@@ -20,3 +24,44 @@ def show_dashboard(username):
     return render_template("dashboard.html",
                            dash_owner=dash_owner,
                            viewing_own_dash=viewing_own_dash)
+
+
+
+
+
+
+@app.route("/register-user", methods=["POST"])
+def add_new_user():
+    
+    ...
+
+    #display the user's dashboard page, in logged-in state
+    return redirect("/" + username)
+
+
+
+
+
+
+@app.route("/login", methods=["POST"])
+def log_user_in():
+    
+    ...
+
+    #display the user's dashboard page, in logged-in state
+    return redirect("/" + user.username)
+
+
+
+
+@app.route("/logout", methods=["POST"])
+def log_user_out():
+    """Log user out by clearing the session. Return user to whatever page
+       they were on."""
+
+
+
+################################################################################
+
+
+

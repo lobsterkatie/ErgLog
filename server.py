@@ -32,8 +32,6 @@ def show_dashboard():
 
 
 
-######### HELPER FUNCTIONS FOR LOGIN, LOGOUT, AND REGISTRATION ROUTES #########
-
 
 
 #################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################
@@ -80,6 +78,21 @@ def username_or_email_found():
         return "false"
 
 
+@app.route("/password-matches-credential")
+def check_password():
+    """Called by the form validator. Returns true if password matches given
+       email or username."""
+
+    credential = request.args.get("credential")
+    password = request.args.get("password")
+    print "got " + credential + password
+
+    if password_is_correct(credential, password):
+        return "true"
+    else:
+        return "false"
+
+
 @app.route("/register-user", methods=["POST"])
 def add_new_user():
     """Add new user to the Users and User_stat_lists tables
@@ -117,23 +130,8 @@ def add_new_user():
     #logged-in state
     session["logged_in_user_id"] = id_of_added_user
 
-    #display the user's dashboard page, in logged-in state
-    return redirect("/" + username)
-
-
-@app.route("/password-matches")
-def check_password():
-    """Called by the form validator. Returns true if password matches given
-       email or username."""
-
-    credential = request.args.get("credential")
-    password = request.args.get("password")
-    print "got " + credential + password
-
-    if password_is_correct(credential, password):
-        return "true"
-    else:
-        return "false"
+    #display the user's dashboard page
+    return redirect("/dashboard")
 
 
 @app.route("/login", methods=["POST"])
@@ -156,14 +154,13 @@ def log_user_in():
     #logged-in state
     session["logged_in_user_id"] = user.user_id
 
-    #display the user's dashboard page, in logged-in state
-    return redirect("/" + user.username)
+    #display the user's dashboard page
+    return redirect("/dashboard")
 
 
 @app.route("/logout", methods=["POST"])
 def log_user_out():
-    """Log user out by clearing the session. Return user to whatever page
-       they were on."""
+    """Log user out by clearing the session. Return user to homepage."""
 
     session.clear()
 

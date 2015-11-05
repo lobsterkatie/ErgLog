@@ -203,7 +203,7 @@ $(document).ready(function () {
             password: {
                 required: true,
                 remote: {
-                    url: "/password-matches",
+                    url: "/password-matches-credential",
                     data: {
                         credential: function() {
                             return $("#login-credential").val();

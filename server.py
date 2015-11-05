@@ -23,10 +23,36 @@ def index():
 
     return render_template("home.html")
 
+# def viewing_own_dashboard(dashboard_username):
+#     """Returns true if the logged-in user (if any) is viewing their own
+#        dashboard."""
 
-@app.route("/<string:username>")
-def show_dashboard(username):
-    return username
+#     #get the user corresponding to the requested dashboard and the
+#     #id of the logged-in user (if any)
+#     dashboard_user = (db.session.query(User)
+#                                 .filter(User.username == dashboard_username)
+#                                 .first())
+#     logged_in_user_id = session.get("logged_in_user_id")
+
+#     #if dashboard_username isn't a valid username (it's not found in the
+#     #database, raise an exception)
+
+#     #compare this to the logged-in user's id (if any) and return true or
+#     #false accordingly
+#     if dashboard_user.user_id == 
+    
+
+
+# @app.route("/<string:username>")
+# def show_dashboard(username):
+#     """Show the user's dashboard"""
+
+#     #determine if the user is logged in and viewing their own dashboard
+
+
+#     return render_template("dashboard.html",
+#                            user=user,
+#                            logged_in_state=logged_in)
 
 
 ######### HELPER FUNCTIONS FOR LOGIN, LOGOUT, AND REGISTRATION ROUTES #########
@@ -238,7 +264,7 @@ def log_user_out():
 
     session.clear()
 
-    return True
+    return render_template("home.html")
 
 
 

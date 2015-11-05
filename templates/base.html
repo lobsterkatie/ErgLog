@@ -17,7 +17,7 @@
 </head>
 
 <body>
-    <!-- navbar -->
+    <!-- NAVBAR -->
     <nav role="navigation" class="navbar navbar-default">
         <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -61,14 +61,32 @@
                             </a>
                         </li>
                     {% endif %} -->
-                    <!-- navbar buttons for a logged-in user; hidden
-                         by default -->
-                    <li id="profile-nav-button" class="logged-in-nav-buttons" style="display:none">
+                    <!-- Show/hide appropriate navbar buttons (based on
+                         logged-in status) on page load, while leaving
+                         all elements in the DOM so jQuery can change
+                         their visibility later as well -->
+                    {% if session.get("logged_in_user_id") %}
+                        {% set logged_in_buttons_visibility %}
+                            style=display:inline
+                        {% endset %}
+                        {% set logged_out_buttons_visibility %}
+                            style=display:none
+                        {% endset %}
+                    {% else %}
+                        {% set logged_in_buttons_visibility %}
+                            style=display:none
+                        {% endset %}
+                        {% set logged_out_buttons_visibility %}
+                            style=display:inline
+                        {% endset %}
+                    {% endif %}
+                    <!-- navbar buttons for a logged-in user -->
+                    <li id="profile-nav-button" class="logged-in-nav-buttons" {{ logged_in_buttons_visibility }}>
                         <a data-toggle="modal" href="#" data-target="#profileModal">
                             Profile
                         </a>
                     </li>
-                    <li id="logout-nav-button" class="logged-in-nav-buttons" style="display:none">
+                    <li id="logout-nav-button" class="logged-in-nav-buttons" {{ logged_in_buttons_visibility }}>
                         <a data-toggle="modal" href="#" data-target="#logoutModal">
                             Logout
                         </a>
@@ -76,12 +94,12 @@
 
                     <!-- navbar buttons for a logged-out user; shown
                          by default -->
-                    <li id="register-nav-button" class="logged-out-nav-buttons">
+                    <li id="register-nav-button" class="logged-out-nav-buttons" {{ logged_out_buttons_visibility }}>
                         <a data-toggle="modal" href="#" data-target="#registrationModal">
                             Register
                         </a>
                     </li>
-                    <li id="login-nav-button" class="logged-out-nav-buttons">
+                    <li id="login-nav-button" class="logged-out-nav-buttons" {{ logged_out_buttons_visibility }}>
                         <a data-toggle="modal" href="#" data-target="#loginModal">
                             Login
                         </a>
@@ -224,6 +242,35 @@
                 </div> <!-- end of modal content -->
             </div>
         </div> <!-- end of login modal -->
+
+
+        <!-- LOGOUT MODAL -->
+        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            &times;
+                        </button>
+                        <h4 class="modal-title">
+                            Are you sure you want to log out?
+                        </h4>
+                    </div> <!-- end of modal header -->
+
+                    <div class="modal-body">
+                        
+                    </div> <!-- end of modal body -->
+
+                    <div class="modal-footer">
+                        <form action="/logout" method="POST">
+                            <input id="logout-submit-button" class="btn btn-primary" type="submit" value="Logout">
+                        </form>
+                    </div> <!-- end of modal footer -->
+
+                </div> <!-- end of modal content -->
+            </div>
+        </div> <!-- end of logout modal -->
 
         <div class="row" id="flashed-messages">
             {% with messages = get_flashed_messages() %}

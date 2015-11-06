@@ -15,7 +15,7 @@ app.secret_key = "shhhhhhhhhhh!!! don't tell!"
 app.jinja_env.undefined = StrictUndefined
 
 
-#################### ROUTES TO SHOW HOMEPAGE AND DASHBOARD ####################
+##################### ROUTES TO SHOW HOMEPAGE AND LOG PAGE #####################
 
 
 @app.route("/")
@@ -25,12 +25,17 @@ def index():
     return render_template("home.html")
 
 
-@app.route("/dashboard")
-def show_dashboard():
-    """Show the user their dashboard"""
+@app.route("/log")
+def show_log():
+    """Show the user their log (if they're logged in; otherwise, show the
+       homepage with the login window open.""" #LOGIN WINDOW OPEN NOT IMPLEMENTED YET
 
-
-
+    #existence of a user_id in the session signifies that someone's signed in
+    if session["logged_in_user_id"]:
+        return render_template("log.html")
+    else:
+        #TODO make login window open when home is rendered
+        return render_template("home.html")
 
 
 
@@ -130,32 +135,41 @@ def add_new_user():
     #logged-in state
     session["logged_in_user_id"] = id_of_added_user
 
-    #display the user's dashboard page
-    return redirect("/dashboard")
+    #display the user's log page
+    return redirect("/log")
 
 
 @app.route("/login", methods=["POST"])
 def log_user_in():
-    """Log the user with the given username or email in.
+    """Log in the user with the given username or email.
 
-       Note that credential validation happens on the front end."""
+       Notes:
+       1) credential validation happens on the front end.
+       2) if someone actually goes to the url stuff.com/login, the
+          'GET-ness' of the GET request will trigger the login window if
+          they're not already logged in """ #NOT IMPLEMENTED YET
 
-    credential = request.form.get("username_or_email")
+    if request.method == 'POST':
+        credential = request.form.get("username_or_email")
 
-    #look up the user in the database
-    #the presence of an @ symbol means the credential is an email
-    if "@" in credential:
-        user = db.session.query(User).filter(User.email == credential).one()
-    #otherwise, assume it's a username
-    else:
-        user = db.session.query(User).filter(User.username == credential).one()
+        #look up the user in the database
+        #the presence of an @ symbol means the credential is an email
+        if "@" in credential:
+            user = db.session.query(User).filter(User.email == credential).one()
+        #otherwise, assume it's a username
+        else:
+            user = db.session.query(User).filter(User.username == credential).one()
 
-    #add the user's id to the session for easy grabbing and to signify thier
-    #logged-in state
-    session["logged_in_user_id"] = user.user_id
+        #add the user's id to the session for easy grabbing and to signify thier
+        #logged-in state
+        session["logged_in_user_id"] = user.user_id
 
-    #display the user's dashboard page
-    return redirect("/dashboard")
+        #display the user's log page
+        return redirect("/log")
+
+    elif request.method == 'GET':
+        #TODO implement note 2 above, take off comment, add method to decorator
+        pass
 
 
 @app.route("/logout", methods=["POST"])

@@ -97,6 +97,8 @@ class User_stat_list(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("Users.user_id"),
                         primary_key=True)
     lifetime_meters = db.Column(db.Integer, nullable=False, default=0)
+    #flag to track if there's a new PR
+    new_PR = db.Column(db.Boolean, nullable=False, default=False)
     # time-based PR's are in number of meters
     one_min_PR_dist = db.Column(db.Integer, nullable=True)
     half_hour_PR_dist = db.Column(db.Integer, nullable=True)

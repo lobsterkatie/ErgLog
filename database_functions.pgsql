@@ -3,18 +3,18 @@
    record in the User_stat_lists table, with the same user_id */
 
 CREATE TRIGGER new_user_stats_trigger 
-    AFTER INSERT ON Users
+    AFTER INSERT ON "Users"
     FOR EACH ROW
     EXECUTE PROCEDURE new_user_stats();
 
 
 CREATE OR REPLACE FUNCTION new_user_stats() RETURNS trigger AS $$
     BEGIN
-        INSERT INTO User_stat_lists (user_id)
-               VALUES (NEW.user_id);
+        INSERT INTO "User_stat_lists" ("user_id", "lifetime_meters", "new_PR")
+               VALUES (NEW.user_id, 0, FALSE);
         RETURN NULL;
         END;
-    $$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 
 /* When a new record is created in the Piece_results table, check it against 

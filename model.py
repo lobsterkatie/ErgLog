@@ -148,6 +148,81 @@ class User_stat_list(db.Model):
 
 
 
+class Workout_template(db.Model):
+    """Workout templates (one-to-many with piece templates, many-to-one
+       with users)"""
+
+    __tablename__ = "Workout_templates"
+
+    workout_template_id = db.Column(db.Integer,
+                                    primary_key=True,
+                                    autoincrement=True)
+    description = db.Column(db.Unicode(256), nullable=False)
+    primary_zone = db.Column(db.String(8), nullable=True)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("Users.user_id"),
+                        nullable=False)
+
+    #one (user) to many (workout templtates)
+    user = db.relationship("User", backref="workout_templates")
+
+    #many (piece templates) to many (workout templates)
+    piece_templates = db.relationship("Piece_template",
+                                      secondary="Wtemplate_ptemplate_pairings",
+                                      primaryjoin="Workout_template.workout_template_id == Wtemplate_ptemplate_pairing.workout_template_id",
+                                      secondaryjoin="Piece_template.piece_template_id == Wtemplate_ptemplate_pairing.piece_template_id",
+                                      viewonly=True)
+
+
+    def __repr__(self):
+        """Output the object's values when it's printed"""
+
+        repr_string = "<Workout_template id: {id}, user_id: {user_id}>"
+        return repr_string.format(id=self.workout_template_id,
+                                  user_id=self.user_id)
+
+
+class Piece_template(db.Model):
+    """Templates for pices (many-to-one with workout templates)"""
+
+    __tablename__ = "Piece_templates"
+
+    piece_template_id = db.Column(db.Integer,
+                                  primary_key=True,
+                                  autoincrement=True)
+    piece_type = db.Column(db.Enum("time", "distance", name="Piece_types"),
+                           nullable=False)
+    distance = db.Column(db.Integer, nullable=True)
+    time_seconds = db.Column(db.Integer, nullable=True)
+    goal_split_seconds = db.Column(db.Integer, nullable=True)
+    goal_SR = db.Column(db.Integer, nullable=True)
+    phase = db.Column(db.Enum("warmup", "workout body", "cooldown",
+                              name="Workout_phases"), nullable=True)
+    zone = db.Column(db.String(8), nullable=True)
+    description = db.Column(db.UnicodeText(), nullable=True)
+    split_length = db.Column(db.Integer, nullable=True)
+    ordinal = db.Column(db.Integer, nullable=False)
+    workout_template_id = db.Column(db.Integer,
+                                    db.ForeignKey("Workout_templates.workout_template_id"),
+                                    nullable=False)
+
+    #one (workout template) to many (piece templates)
+    workout_template = db.relationship("Workout_template",
+                                       backref=db.backref("piece_templates",
+                                                          order_by="Piece_template.ordinal"))
+
+    __table_args__ = (schema.UniqueConstraint(workout_template_id, ordinal),)
+
+
+    def __repr__(self):
+        """Output the object's values when it's printed"""
+
+        repr_string = "<Piece_template id: {id} ({description})>"
+        return repr_string.format(id=self.piece_template_id,
+                                  description=self.description)
+
+
+
 class Workout_result(db.Model):
     """The data/results of a workout (one-to-many with piece results,
        many-to-one with both users and workout templates)"""
@@ -267,79 +342,6 @@ class Split_result(db.Model):
                                   piece_result_id=self.piece_result_id,
                                   ordinal=self.ordinal)
 
-
-class Workout_template(db.Model):
-    """Workout templates (one-to-many with piece templates, many-to-one
-       with users)"""
-
-    __tablename__ = "Workout_templates"
-
-    workout_template_id = db.Column(db.Integer,
-                                    primary_key=True,
-                                    autoincrement=True)
-    description = db.Column(db.Unicode(256), nullable=False)
-    primary_zone = db.Column(db.String(8), nullable=True)
-    user_id = db.Column(db.Integer,
-                        db.ForeignKey("Users.user_id"),
-                        nullable=False)
-
-    #one (user) to many (workout templtates)
-    user = db.relationship("User", backref="workout_templates")
-
-    #many (piece templates) to many (workout templates)
-    piece_templates = db.relationship("Piece_template",
-                                      secondary="Wtemplate_ptemplate_pairings",
-                                      primaryjoin="Workout_template.workout_template_id == Wtemplate_ptemplate_pairing.workout_template_id",
-                                      secondaryjoin="Piece_template.piece_template_id == Wtemplate_ptemplate_pairing.piece_template_id",
-                                      viewonly=True)
-
-
-    def __repr__(self):
-        """Output the object's values when it's printed"""
-
-        repr_string = "<Workout_template id: {id}, user_id: {user_id}>"
-        return repr_string.format(id=self.workout_template_id,
-                                  user_id=self.user_id)
-
-
-class Piece_template(db.Model):
-    """Templates for pices (many-to-one with workout templates)"""
-
-    __tablename__ = "Piece_templates"
-
-    piece_template_id = db.Column(db.Integer,
-                                  primary_key=True,
-                                  autoincrement=True)
-    piece_type = db.Column(db.Enum("time", "distance", name="Piece_types"),
-                           nullable=False)
-    distance = db.Column(db.Integer, nullable=True)
-    time_seconds = db.Column(db.Integer, nullable=True)
-    goal_split_seconds = db.Column(db.Integer, nullable=True)
-    goal_SR = db.Column(db.Integer, nullable=True)
-    phase = db.Column(db.Enum("warmup", "workout body", "cooldown",
-                              name="Workout_phases"), nullable=True)
-    zone = db.Column(db.String(8), nullable=True)
-    description = db.Column(db.UnicodeText(), nullable=True)
-    split_length = db.Column(db.Integer, nullable=True)
-    ordinal = db.Column(db.Integer, nullable=False)
-    workout_template_id = db.Column(db.Integer,
-                                    db.ForeignKey("Workout_templates.workout_template_id"),
-                                    nullable=False)
-
-    #one (workout template) to many (piece templates)
-    workout_template = db.relationship("Workout_template",
-                                       backref=db.backref("piece_templates",
-                                                          order_by="Piece_template.ordinal"))
-
-    __table_args__ = (schema.UniqueConstraint(workout_template_id, ordinal),)
-
-
-    def __repr__(self):
-        """Output the object's values when it's printed"""
-
-        repr_string = "<Piece_template id: {id} ({description})>"
-        return repr_string.format(id=self.piece_template_id,
-                                  description=self.description)
 
 
 ##############################################################################

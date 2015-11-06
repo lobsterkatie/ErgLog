@@ -90,3 +90,10 @@ CREATE TRIGGER check_against_PRs_trigger
 
 /* When a new record is created in the Piece_results table, add the meters to 
    lifetime_meters and workout total meters */
+
+
+
+
+
+
+/* When a workout*/

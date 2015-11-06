@@ -2,6 +2,7 @@
     Based largely on the model.py file written by HB staff. (Thanks, guys!)"""
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import schema
 from datetime import date
 
 # This is the connection to the SQLite database; we're getting this through
@@ -197,14 +198,16 @@ class Piece_result(db.Model):
     __tablename__ = "Piece_results"
 
     piece_result_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    total_time_seconds = db.Column(db.Integer, nullable=False)
-    total_meters = db.Column(db.Integer, nullable=False)
-    avg_split_seconds = db.Column(db.Integer, nullable=False)
-    avg_SR = db.Column(db.Integer, nullable=False)
+    completed = db.Column(db.Boolean, nullable=False)
+    total_time_seconds = db.Column(db.Integer, nullable=True)
+    total_meters = db.Column(db.Integer, nullable=True)
+    avg_split_seconds = db.Column(db.Integer, nullable=True)
+    avg_SR = db.Column(db.Integer, nullable=True)
     avg_watts = db.Column(db.Integer, nullable=True)
     avg_HR = db.Column(db.Integer, nullable=True)
     drag_factor = db.Column(db.Integer, nullable=True)
     comments = db.Column(db.UnicodeText, nullable=True)
+    ordinal = db.Column(db.Integer, nullable=False)
     workout_result_id = db.Column(db.Integer,
                                   db.ForeignKey("Workout_results.workout_result_id"),
                                   nullable=False)
@@ -266,8 +269,8 @@ class Split_result(db.Model):
 
 
 class Workout_template(db.Model):
-    """Workout templates (many-to-many with piece templates via the
-        wtemlate-ptemplate_pairing class/table, many-to-one with users)"""
+    """Workout templates (one-to-many with piece templates, many-to-one
+       with users)"""
 
     __tablename__ = "Workout_templates"
 
@@ -299,38 +302,8 @@ class Workout_template(db.Model):
                                   user_id=self.user_id)
 
 
-class Wtemplate_ptemplate_pairing(db.Model):
-    """Not quite a true association table (because it has ordinal data)
-       between workout templates and piece templates (one-to-many with
-       both)"""
-
-    __tablename__ = "Wtemplate_ptemplate_pairings"
-
-    wtemplate_ptemplate_pairing_id = db.Column(db.Integer,
-                                               primary_key=True,
-                                               autoincrement=True)
-    ordinal = db.Column(db.Integer, nullable=False)
-    workout_template_id = db.Column(db.Integer,
-                                    db.ForeignKey("Workout_templates.workout_template_id"),
-                                    nullable=False)
-    piece_template_id = db.Column(db.Integer,
-                                  db.ForeignKey("Piece_templates.piece_template_id"),
-                                  nullable=False)
-
-    #one (workout template) to many (wtemlate-ptemplate pairings)
-    workout_template = db.relationship("Workout_template",
-                                       backref="wtemplate_ptemplate_pairings")
-
-    #one (piece template) to many (wtemlate-ptemplate pairings)
-    piece_template = db.relationship("Piece_template",
-                                     backref="wtemplate_ptemplate_pairings")
-
-    #TODO DO I NEED A __REPR__ METHOD?
-
-
 class Piece_template(db.Model):
-    """Templates for pices (many-to-many with workout templates, via the
-        wtemlate-ptemplate_pairing class/table)"""
+    """Templates for pices (many-to-one with workout templates)"""
 
     __tablename__ = "Piece_templates"
 
@@ -344,10 +317,21 @@ class Piece_template(db.Model):
     goal_split_seconds = db.Column(db.Integer, nullable=True)
     goal_SR = db.Column(db.Integer, nullable=True)
     phase = db.Column(db.Enum("warmup", "workout body", "cooldown",
-                              name="Workout_phases"), nullable=False)
+                              name="Workout_phases"), nullable=True)
     zone = db.Column(db.String(8), nullable=True)
-    description = db.Column(db.UnicodeText(), nullable=False)
+    description = db.Column(db.UnicodeText(), nullable=True)
     split_length = db.Column(db.Integer, nullable=True)
+    ordinal = db.Column(db.Integer, nullable=False)
+    workout_template_id = db.Column(db.Integer,
+                                    db.ForeignKey("Workout_templates.workout_template_id"),
+                                    nullable=False)
+
+    #one (workout template) to many (piece templates)
+    workout_template = db.relationship("Workout_template",
+                                       backref=db.backref("piece_templates",
+                                                          order_by="Piece_template.ordinal"))
+
+    __table_args__ = (schema.UniqueConstraint(workout_template_id, ordinal),)
 
 
     def __repr__(self):

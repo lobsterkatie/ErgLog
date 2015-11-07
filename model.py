@@ -64,21 +64,19 @@ class User(db.Model):
     __tablename__ = "Users"
 
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    firstname = db.Column(db.Unicode(64), nullable=False)
-    lastname = db.Column(db.Unicode(64), nullable=False)
-    gender = db.Column(db.Enum("F", "M", "Other", name="Genders"), nullable=False)
-    birthdate = db.Column(db.Date, nullable=False)
-    #I GUESS THAT MEANS ONLY THE US FOR THE MOMENT
-    zipcode = db.Column(db.Numeric(5, 0), nullable=False)
     email = db.Column(db.String(64), nullable=False, unique=True)
     username = db.Column(db.String(32), nullable=False, unique=True)
     password = db.Column(db.String(128), nullable=False)
-    #ASK ABOUT DEFAULT TODAY
-    date_joined = db.Column(db.Date, nullable=False, default=date.today())
-    #WOULD LIKE TO CALCULATE THIS FROM ZIPCODE EVENTUALLY
+    firstname = db.Column(db.Unicode(64))
+    lastname = db.Column(db.Unicode(64))
+    gender = db.Column(db.Enum("F", "M", "Other", name="Genders"))
+    birthdate = db.Column(db.Date)
+    weight = db.Column(db.Numeric(4, 1))
+    date_joined = db.Column(db.Date, default=date.today())
+    zipcode = db.Column(db.Numeric(5, 0))
     # in hours ahead or behind UTC
-    timezone = db.Column(db.Integer, nullable=False, default=0)
-    weight = db.Column(db.Numeric(4, 1), nullable=False)
+    timezone = db.Column(db.Integer, default=0)
+    #TODO calculate timezone from zipcode or OS
 
 
     def __repr__(self):
@@ -101,18 +99,18 @@ class User_stat_list(db.Model):
     #flag to track if there's a new PR
     new_PR = db.Column(db.Boolean, nullable=False, default=False)
     # time-based PR's are in number of meters
-    one_min_PR_dist = db.Column(db.Integer, nullable=True)
-    half_hour_PR_dist = db.Column(db.Integer, nullable=True)
-    hour_PR_dist = db.Column(db.Integer, nullable=True)
+    one_min_PR_dist = db.Column(db.Integer)
+    half_hour_PR_dist = db.Column(db.Integer)
+    hour_PR_dist = db.Column(db.Integer)
     # distance-based PR's are in number of seconds
-    half_K_PR_time = db.Column(db.Numeric(6, 1), nullable=True)
-    one_K_PR_time = db.Column(db.Numeric(6, 1), nullable=True)
-    two_K_PR_time = db.Column(db.Numeric(6, 1), nullable=True)
-    five_K_PR_time = db.Column(db.Numeric(6, 1), nullable=True)
-    six_K_PR_time = db.Column(db.Numeric(6, 1), nullable=True)
-    ten_K_PR_time = db.Column(db.Numeric(6, 1), nullable=True)
-    half_marathon_PR_time = db.Column(db.Numeric(6, 1), nullable=True)
-    marathon_PR_time = db.Column(db.Numeric(6, 1), nullable=True)
+    half_K_PR_time = db.Column(db.Numeric(6, 1))
+    one_K_PR_time = db.Column(db.Numeric(6, 1))
+    two_K_PR_time = db.Column(db.Numeric(6, 1))
+    five_K_PR_time = db.Column(db.Numeric(6, 1))
+    six_K_PR_time = db.Column(db.Numeric(6, 1))
+    ten_K_PR_time = db.Column(db.Numeric(6, 1))
+    half_marathon_PR_time = db.Column(db.Numeric(6, 1))
+    marathon_PR_time = db.Column(db.Numeric(6, 1))
 
     #one (user) to one (stats)
     user = db.relationship("User", backref="stat_list", uselist=False)
@@ -157,21 +155,14 @@ class Workout_template(db.Model):
     workout_template_id = db.Column(db.Integer,
                                     primary_key=True,
                                     autoincrement=True)
-    description = db.Column(db.Unicode(256), nullable=False)
-    primary_zone = db.Column(db.String(8), nullable=True)
     user_id = db.Column(db.Integer,
                         db.ForeignKey("Users.user_id"),
                         nullable=False)
+    description = db.Column(db.Unicode(256))
+    primary_zone = db.Column(db.String(8))
 
     #one (user) to many (workout templtates)
     user = db.relationship("User", backref="workout_templates")
-
-    #many (piece templates) to many (workout templates)
-    piece_templates = db.relationship("Piece_template",
-                                      secondary="Wtemplate_ptemplate_pairings",
-                                      primaryjoin="Workout_template.workout_template_id == Wtemplate_ptemplate_pairing.workout_template_id",
-                                      secondaryjoin="Piece_template.piece_template_id == Wtemplate_ptemplate_pairing.piece_template_id",
-                                      viewonly=True)
 
 
     def __repr__(self):
@@ -182,6 +173,7 @@ class Workout_template(db.Model):
                                   user_id=self.user_id)
 
 
+
 class Piece_template(db.Model):
     """Templates for pices (many-to-one with workout templates)"""
 
@@ -190,21 +182,20 @@ class Piece_template(db.Model):
     piece_template_id = db.Column(db.Integer,
                                   primary_key=True,
                                   autoincrement=True)
-    piece_type = db.Column(db.Enum("time", "distance", name="Piece_types"),
-                           nullable=False)
-    distance = db.Column(db.Integer, nullable=True)
-    time_seconds = db.Column(db.Integer, nullable=True)
-    goal_split_seconds = db.Column(db.Integer, nullable=True)
-    goal_SR = db.Column(db.Integer, nullable=True)
-    phase = db.Column(db.Enum("warmup", "workout body", "cooldown",
-                              name="Workout_phases"), nullable=True)
-    zone = db.Column(db.String(8), nullable=True)
-    description = db.Column(db.UnicodeText(), nullable=True)
-    split_length = db.Column(db.Integer, nullable=True)
-    ordinal = db.Column(db.Integer, nullable=False)
     workout_template_id = db.Column(db.Integer,
                                     db.ForeignKey("Workout_templates.workout_template_id"),
                                     nullable=False)
+    ordinal = db.Column(db.Integer, nullable=False)
+    piece_type = db.Column(db.Enum("time", "distance", name="Piece_types"))
+    split_length = db.Column(db.Integer)
+    distance = db.Column(db.Integer)
+    time_seconds = db.Column(db.Integer)
+    goal_split_seconds = db.Column(db.Integer)
+    goal_SR = db.Column(db.Integer)
+    phase = db.Column(db.Enum("warmup", "workout body", "cooldown",
+                              name="Workout_phases"))
+    zone = db.Column(db.String(8))
+    description = db.Column(db.UnicodeText())
 
     #one (workout template) to many (piece templates)
     workout_template = db.relationship("Workout_template",
@@ -232,20 +223,19 @@ class Workout_result(db.Model):
     workout_result_id = db.Column(db.Integer,
                                   primary_key=True,
                                   autoincrement=True)
-    date = db.Column(db.Date, nullable=False)
-    time_of_day = db.Column(db.Time, nullable=True)
-    #TODO SHOULD BE FILLED IN WHEN PIECES ARE ADDED (ONUPDATE BELT ETC?)
-    total_meters = db.Column(db.Integer, nullable=False, default=0)
-    avg_HR = db.Column(db.Integer, nullable=True)
-    calories = db.Column(db.Integer, nullable=True)
-    comments = db.Column(db.UnicodeText, nullable=True)
-    public = db.Column(db.Boolean, nullable=False)
-    user_id = db.Column(db.Integer,
-                        db.ForeignKey("Users.user_id"),
-                        nullable=False)
     workout_template_id = db.Column(db.Integer,
                                     db.ForeignKey("Workout_templates.workout_template_id"),
                                     nullable=False)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("Users.user_id"),
+                        nullable=False)
+    total_meters = db.Column(db.Integer, default=0)
+    avg_HR = db.Column(db.Integer)
+    calories = db.Column(db.Integer)
+    comments = db.Column(db.UnicodeText)
+    date = db.Column(db.Date)
+    time_of_day = db.Column(db.Time)
+    public = db.Column(db.Boolean)
 
     #one (user) to many (workout results)
     user = db.relationship("User", backref="workout_results")
@@ -273,28 +263,30 @@ class Piece_result(db.Model):
     __tablename__ = "Piece_results"
 
     piece_result_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    completed = db.Column(db.Boolean, nullable=False)
-    total_time_seconds = db.Column(db.Integer, nullable=True)
-    total_meters = db.Column(db.Integer, nullable=True)
-    avg_split_seconds = db.Column(db.Integer, nullable=True)
-    avg_SR = db.Column(db.Integer, nullable=True)
-    avg_watts = db.Column(db.Integer, nullable=True)
-    avg_HR = db.Column(db.Integer, nullable=True)
-    drag_factor = db.Column(db.Integer, nullable=True)
-    comments = db.Column(db.UnicodeText, nullable=True)
-    ordinal = db.Column(db.Integer, nullable=False)
     workout_result_id = db.Column(db.Integer,
                                   db.ForeignKey("Workout_results.workout_result_id"),
                                   nullable=False)
     piece_template_id = db.Column(db.Integer,
                                   db.ForeignKey("Piece_templates.piece_template_id"),
                                   nullable=False)
+    ordinal = db.Column(db.Integer, nullable=False)
+    total_time_seconds = db.Column(db.Integer)
+    total_meters = db.Column(db.Integer)
+    avg_split_seconds = db.Column(db.Integer)
+    avg_SR = db.Column(db.Integer)
+    avg_watts = db.Column(db.Integer)
+    avg_HR = db.Column(db.Integer)
+    drag_factor = db.Column(db.Integer)
+    comments = db.Column(db.UnicodeText)
+    completed = db.Column(db.Boolean)
 
     #one (workout result) to many (piece results)
     workout_result = db.relationship("Workout_result", backref="piece_results")
 
     #one (piece template) to many (piece results)
     piece_template = db.relationship("Piece_template", backref="piece_results")
+
+    __table_args__ = (schema.UniqueConstraint(workout_result_id, ordinal),)
 
 
     def __repr__(self):
@@ -315,21 +307,23 @@ class Split_result(db.Model):
     __tablename__ = "Split_results"
 
     split_result_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    ordinal = db.Column(db.Integer, nullable=False)
-    label = db.Column(db.String(64), nullable=True)
-    time_seconds = db.Column(db.Integer, nullable=False)
-    meters = db.Column(db.Integer, nullable=False)
-    avg_split_seconds = db.Column(db.Integer, nullable=False)
-    avg_SR = db.Column(db.Integer, nullable=False)
-    avg_watts = db.Column(db.Integer, nullable=True)
-    avg_HR = db.Column(db.Integer, nullable=True)
-    comments = db.Column(db.UnicodeText, nullable=True)
     piece_result_id = db.Column(db.Integer,
                                 db.ForeignKey("Piece_results.piece_result_id"),
                                 nullable=False)
+    ordinal = db.Column(db.Integer, nullable=False)
+    label = db.Column(db.String(64))
+    time_seconds = db.Column(db.Integer)
+    meters = db.Column(db.Integer)
+    avg_split_seconds = db.Column(db.Integer)
+    avg_SR = db.Column(db.Integer)
+    avg_watts = db.Column(db.Integer)
+    avg_HR = db.Column(db.Integer)
+    comments = db.Column(db.UnicodeText)
 
     #one (piece result) to many (split results)
     piece_result = db.relationship("Piece_result", backref="split_results")
+
+    __table_args__ = (schema.UniqueConstraint(piece_result_id, ordinal),)
 
 
     def __repr__(self):

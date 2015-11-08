@@ -3,7 +3,7 @@
 
 CREATE OR REPLACE FUNCTION new_user_stats() RETURNS trigger AS $$
     BEGIN
-        INSERT INTO "User_stat_lists" ("user_id", "lifetime_meters", "new_PR")
+        INSERT INTO user_stat_lists (user_id, lifetime_meters, new_pr)
                VALUES (NEW.user_id, 0, FALSE);
         RETURN NULL;
         END;
@@ -11,7 +11,7 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE TRIGGER new_user_stats_trigger 
-    AFTER INSERT ON "Users"
+    AFTER INSERT ON users
     FOR EACH ROW
     EXECUTE PROCEDURE new_user_stats();
 

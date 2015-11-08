@@ -61,7 +61,7 @@ class User(db.Model):
     """Logbook user (one-to-one with user stat lists, one-to-many with both
        workout results and workout templates)"""
 
-    __tablename__ = "Users"
+    __tablename__ = "users"
 
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(64), nullable=False, unique=True)
@@ -69,7 +69,7 @@ class User(db.Model):
     password = db.Column(db.String(128), nullable=False)
     firstname = db.Column(db.Unicode(64))
     lastname = db.Column(db.Unicode(64))
-    gender = db.Column(db.Enum("F", "M", "Other", name="Genders"))
+    gender = db.Column(db.Enum("F", "M", "Other", name="genders"))
     birthdate = db.Column(db.Date)
     weight = db.Column(db.Numeric(4, 1))
     date_joined = db.Column(db.Date, default=date.today())
@@ -91,26 +91,26 @@ class User(db.Model):
 class User_stat_list(db.Model):
     """Stats for a given user, mostly PR's (one-to-one with Users)"""
 
-    __tablename__ = "User_stat_lists"
+    __tablename__ = "user_stat_lists"
 
-    user_id = db.Column(db.Integer, db.ForeignKey("Users.user_id"),
+    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"),
                         primary_key=True)
     lifetime_meters = db.Column(db.Integer, nullable=False, default=0)
     #flag to track if there's a new PR
-    new_PR = db.Column(db.Boolean, nullable=False, default=False)
+    new_pr = db.Column(db.Boolean, nullable=False, default=False)
     # time-based PR's are in number of meters
-    one_min_PR_dist = db.Column(db.Integer)
-    half_hour_PR_dist = db.Column(db.Integer)
-    hour_PR_dist = db.Column(db.Integer)
+    one_min_pr_dist = db.Column(db.Integer)
+    half_hour_pr_dist = db.Column(db.Integer)
+    hour_pr_dist = db.Column(db.Integer)
     # distance-based PR's are in number of seconds
-    half_K_PR_time = db.Column(db.Numeric(6, 1))
-    one_K_PR_time = db.Column(db.Numeric(6, 1))
-    two_K_PR_time = db.Column(db.Numeric(6, 1))
-    five_K_PR_time = db.Column(db.Numeric(6, 1))
-    six_K_PR_time = db.Column(db.Numeric(6, 1))
-    ten_K_PR_time = db.Column(db.Numeric(6, 1))
-    half_marathon_PR_time = db.Column(db.Numeric(6, 1))
-    marathon_PR_time = db.Column(db.Numeric(6, 1))
+    half_k_pr_time = db.Column(db.Numeric(6, 1))
+    one_k_pr_time = db.Column(db.Numeric(6, 1))
+    two_k_pr_time = db.Column(db.Numeric(6, 1))
+    five_k_pr_time = db.Column(db.Numeric(6, 1))
+    six_k_pr_time = db.Column(db.Numeric(6, 1))
+    ten_k_pr_time = db.Column(db.Numeric(6, 1))
+    half_marathon_pr_time = db.Column(db.Numeric(6, 1))
+    marathon_pr_time = db.Column(db.Numeric(6, 1))
 
     #one (user) to one (stats)
     user = db.relationship("User", backref="stat_list", uselist=False)
@@ -150,13 +150,13 @@ class Workout_template(db.Model):
     """Workout templates (one-to-many with piece templates, many-to-one
        with users)"""
 
-    __tablename__ = "Workout_templates"
+    __tablename__ = "workout_templates"
 
     workout_template_id = db.Column(db.Integer,
                                     primary_key=True,
                                     autoincrement=True)
     user_id = db.Column(db.Integer,
-                        db.ForeignKey("Users.user_id"),
+                        db.ForeignKey("users.user_id"),
                         nullable=False)
     description = db.Column(db.Unicode(256))
     primary_zone = db.Column(db.String(8))
@@ -177,23 +177,23 @@ class Workout_template(db.Model):
 class Piece_template(db.Model):
     """Templates for pices (many-to-one with workout templates)"""
 
-    __tablename__ = "Piece_templates"
+    __tablename__ = "piece_templates"
 
     piece_template_id = db.Column(db.Integer,
                                   primary_key=True,
                                   autoincrement=True)
     workout_template_id = db.Column(db.Integer,
-                                    db.ForeignKey("Workout_templates.workout_template_id"),
+                                    db.ForeignKey("workout_templates.workout_template_id"),
                                     nullable=False)
     ordinal = db.Column(db.Integer, nullable=False)
-    piece_type = db.Column(db.Enum("time", "distance", name="Piece_types"))
+    piece_type = db.Column(db.Enum("time", "distance", name="piece_types"))
     split_length = db.Column(db.Integer)
     distance = db.Column(db.Integer)
     time_seconds = db.Column(db.Integer)
     goal_split_seconds = db.Column(db.Integer)
     goal_SR = db.Column(db.Integer)
     phase = db.Column(db.Enum("warmup", "workout body", "cooldown",
-                              name="Workout_phases"))
+                              name="workout_phases"))
     zone = db.Column(db.String(8))
     description = db.Column(db.UnicodeText())
 
@@ -218,16 +218,16 @@ class Workout_result(db.Model):
     """The data/results of a workout (one-to-many with piece results,
        many-to-one with both users and workout templates)"""
 
-    __tablename__ = "Workout_results"
+    __tablename__ = "workout_results"
 
     workout_result_id = db.Column(db.Integer,
                                   primary_key=True,
                                   autoincrement=True)
     workout_template_id = db.Column(db.Integer,
-                                    db.ForeignKey("Workout_templates.workout_template_id"),
+                                    db.ForeignKey("workout_templates.workout_template_id"),
                                     nullable=False)
     user_id = db.Column(db.Integer,
-                        db.ForeignKey("Users.user_id"),
+                        db.ForeignKey("users.user_id"),
                         nullable=False)
     total_meters = db.Column(db.Integer, default=0)
     avg_HR = db.Column(db.Integer)
@@ -260,14 +260,14 @@ class Piece_result(db.Model):
     """Piece results (many-to-one with workout_results, one-to-many with
        piece templates)"""
 
-    __tablename__ = "Piece_results"
+    __tablename__ = "piece_results"
 
     piece_result_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     workout_result_id = db.Column(db.Integer,
-                                  db.ForeignKey("Workout_results.workout_result_id"),
+                                  db.ForeignKey("workout_results.workout_result_id"),
                                   nullable=False)
     piece_template_id = db.Column(db.Integer,
-                                  db.ForeignKey("Piece_templates.piece_template_id"),
+                                  db.ForeignKey("piece_templates.piece_template_id"),
                                   nullable=False)
     ordinal = db.Column(db.Integer, nullable=False)
     total_time_seconds = db.Column(db.Integer)
@@ -304,11 +304,11 @@ class Piece_result(db.Model):
 class Split_result(db.Model):
     """Split results (many-to-one with piece_results)"""
 
-    __tablename__ = "Split_results"
+    __tablename__ = "split_results"
 
     split_result_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     piece_result_id = db.Column(db.Integer,
-                                db.ForeignKey("Piece_results.piece_result_id"),
+                                db.ForeignKey("piece_results.piece_result_id"),
                                 nullable=False)
     ordinal = db.Column(db.Integer, nullable=False)
     label = db.Column(db.String(64))

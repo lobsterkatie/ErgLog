@@ -5,10 +5,6 @@ CREATE EXTENSION plpythonu;
 
 
 
-
-# When a new record is created in the Piece_results table, check it against
-# PR's table (User_stat_lists), updating as necessary
-
 CREATE OR REPLACE FUNCTION check_against_PRs() RETURNS trigger AS $$
     """Checks the new piece to see if it's one for which PR's are kept, and if
        so, compares it to the relevant PR, updating the PR if applicable."""
@@ -44,8 +40,7 @@ CREATE OR REPLACE FUNCTION check_against_PRs() RETURNS trigger AS $$
         #get the old data in that column for comparison
         select_query = ("SELECT " + PR_column_name + " FROM user_stat_lists " +
                         "WHERE user_id=" + user_id_str + ";")
-        query_result = plpy.execute(select_query)
-        old_PR_dist = query_result[0][PR_column_name]
+        old_PR_dist = plpy.execute(select_query)[0][PR_column_name]
 
         #if there was no data there, or the new result is better, update 
         #the user_stat_lists table and set the new_pr flag (column) to true
@@ -65,8 +60,7 @@ CREATE OR REPLACE FUNCTION check_against_PRs() RETURNS trigger AS $$
         #get the old data in that column for comparison
         select_query = ("SELECT " + PR_column_name + " FROM user_stat_lists " +
                         "WHERE user_id=" + user_id_str + ";")
-        query_result = plpy.execute(select_query)
-        old_PR_time = query_result[0][PR_column_name]
+        old_PR_time = plpy.execute(select_query)[0][PR_column_name]
 
         #if there was no data there, or the new result is better, update
         #the user_stat_lists table and set the new_pr flag (column) to true
@@ -89,11 +83,90 @@ CREATE TRIGGER check_against_PRs_trigger
 
 
 
+CREATE OR REPLACE FUNCTION add_piece_dist_to_totals() RETURNS trigger AS $$
+    """Adds the meters rowed in the piece both to the total for the workout
+       and to the lifetime total user stat."""
 
-# When a new record is created in the Piece_results table, add the meters to 
-# lifetime_meters and workout total meters
+    #get the piece's meters
+    new_piece_dist = TD["new"]["total_meters"]
+
+    #get the workout_results_id and user_id associated with the piece, as strings
+    workout_result_id_str = str(TD["new"]["workout_result_id"])
+    select_query = ("SELECT user_id FROM workout_results WHERE " +
+                    "workout_result_id=" + workout_result_id_str + ";")
+    user_id_str = str(plpy.execute(select_query)[0]["user_id"])
+
+    #get the current total distance for the workout and update it
+    select_query = ("SELECT total_meters FROM workout_results WHERE " +
+                    "workout_result_id=" + workout_result_id_str + ";")
+    workout_total = plpy.execute(select_query)[0]["total_meters"]
+    new_workout_total = workout_total + new_piece_dist
+    update_query = ("UPDATE workout_results SET total_meters=" +
+                    str(new_workout_total) + "WHERE user_id=" + user_id_str + ";")
+    plpy.execute(update_query)
+
+    #get the current lifetime total distance  and update it
+    select_query = ("SELECT lifetime_meters FROM user_stat_lists " +
+                    "WHERE user_id=" + user_id_str + ";")
+    lifetime_total = plpy.execute(select_query)[0]["lifetime_meters"]
+    new_lifetime_total = lifetime_total + new_piece_dist
+    update_query = ("UPDATE user_stat_lists SET lifetime_meters=" +
+                    str(new_lifetime_total) + "WHERE user_id=" + user_id_str + ";")
+    plpy.execute(update_query)
+
+$$ LANGUAGE plpythonu;
 
 
 
+CREATE TRIGGER add_piece_dist_to_totals_trigger 
+    AFTER INSERT ON "piece_results"
+    FOR EACH ROW
+    EXECUTE PROCEDURE add_piece_dist_to_totals();
+
+
+
+
+
+
+CREATE OR REPLACE FUNCTION change_piece_dist_on_totals() RETURNS trigger AS $$
+    """Reflects the change in meters rowed in the piece in both the total 
+       for the workout and the lifetime total user stat."""
+
+    #get the piece's old and new meters
+    old_piece_dist = TD["old"]["total_meters"]
+    new_piece_dist = TD["new"]["total_meters"]
+
+    #get the workout_results_id and user_id associated with the piece, as strings
+    workout_result_id_str = str(TD["new"]["workout_result_id"])
+    select_query = ("SELECT user_id FROM workout_results WHERE " +
+                    "workout_result_id=" + workout_result_id_str + ";")
+    user_id_str = str(plpy.execute(select_query)[0]["user_id"])
+
+    #get the current total distance for the workout and update it
+    select_query = ("SELECT total_meters FROM workout_results WHERE " +
+                    "workout_result_id=" + workout_result_id_str + ";")
+    workout_total = plpy.execute(select_query)[0]["total_meters"]
+    new_workout_total = workout_total - old_piece_dist + new_piece_dist
+    update_query = ("UPDATE workout_results SET total_meters=" +
+                    str(new_workout_total) + "WHERE user_id=" + user_id_str + ";")
+    plpy.execute(update_query)
+
+    #get the current lifetime total distance  and update it
+    select_query = ("SELECT lifetime_meters FROM user_stat_lists " +
+                    "WHERE user_id=" + user_id_str + ";")
+    lifetime_total = plpy.execute(select_query)[0]["lifetime_meters"]
+    new_lifetime_total = lifetime_total - old_piece_dist + new_piece_dist
+    update_query = ("UPDATE user_stat_lists SET lifetime_meters=" +
+                    str(new_lifetime_total) + "WHERE user_id=" + user_id_str + ";")
+    plpy.execute(update_query)
+
+$$ LANGUAGE plpythonu;
+
+
+
+CREATE TRIGGER change_piece_dist_on_totals_trigger 
+    AFTER UPDATE ON "piece_results"
+    FOR EACH ROW
+    EXECUTE PROCEDURE change_piece_dist_on_totals();
 
 

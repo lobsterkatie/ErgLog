@@ -27,7 +27,7 @@ CREATE OR REPLACE FUNCTION check_against_PRs() RETURNS trigger AS $$
                          10000: "ten_k_pr_time", 
                          21097: "half_marathon_pr_time", 
                          42195: "marathon_pr_time"}
-    new_piece_is_PR = False
+    
     
     #get the user_id associated with the piece, as a string
     workout_result_id_str = str(TD["new"]["workout_result_id"])
@@ -35,7 +35,8 @@ CREATE OR REPLACE FUNCTION check_against_PRs() RETURNS trigger AS $$
                     "workout_result_id=" + workout_result_id_str + ";")
     user_id_str = str(plpy.execute(select_query)[0]["user_id"])
 
-    #see if the new pices is one of the special time-pieces
+    #see if the new pices is one of the special time-pieces, and if so, update
+    #the PR list as necessary
     if special_times.get(new_piece_time) is not None:
         #figure out which column was matched
         PR_column_name = special_times[new_piece_time]
@@ -55,11 +56,8 @@ CREATE OR REPLACE FUNCTION check_against_PRs() RETURNS trigger AS $$
                             user_id_str + ";")
             plpy.execute(update_query)
 
-    #reset the internal flag because it's just *conceiveable* that a piece
-    #could be both a time *and* distance PR, or at least qualify to be so
-    new_piece_is_PR = False
-
-    #see if the new pices is one of the special distance-pieces
+    #see if the new pices is one of the special distance-pieces, and if so, 
+    #update the PR list as necessary
     if special_distances.get(new_piece_dist) is not None:
         #figure out which column was matched
         PR_column_name = special_distances[new_piece_dist]
@@ -78,26 +76,6 @@ CREATE OR REPLACE FUNCTION check_against_PRs() RETURNS trigger AS $$
                             ", new_pr=TRUE WHERE user_id=" +
                             user_id_str + ";")
             plpy.execute(update_query)
-
-        # #if there was no data there, the new pieces is automatically a PR
-        # # raise Exception("Here! " + str(query_result[0][PR_column_name]))
-        # if query_result[0][PR_column_name] is None:
-        #     new_piece_is_PR = True
-
-        # #otherwise, compare the old and new data
-        # else:
-        #     old_PR_time = plpy.execute(select_query)[0][PR_column_name]
-        #     if old_PR_time > new_piece_time:
-        #         new_piece_is_PR = True
-
-        # #if the new result is a PR, put it in the table and set the new_pr
-        # #flag (column) to true
-        # if new_piece_is_PR:
-        #     update_query = ("UPDATE user_stat_lists SET " +
-        #                     PR_column_name + "=" + str(new_piece_time) +
-        #                     ", new_pr=TRUE WHERE user_id=" +
-        #                     user_id_str + ";")
-        #     plpy.execute(update_query)
 
 $$ LANGUAGE plpythonu;
 

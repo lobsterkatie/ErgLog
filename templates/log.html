@@ -32,7 +32,7 @@
                     {# TODO DO A FOR LOOP TO DISPLAY DATA HERE #}
                     {% for workout in workouts%}
                         <tr>
-                            <td>{{"{date:%a} {date:%b} {date.day}, {date.year}"|format(date=workout.date)}}</td>
+                            <td>{{workout.date | date_filter }}</td>
                             <td>{{workout.workout_template.description}}</td>
                             <td>{{workout.total_meters}} m</td>
                             <td><a href="">Edit</a></td>

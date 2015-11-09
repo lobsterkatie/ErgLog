@@ -1,5 +1,6 @@
 from datetime import date
 from model import db, connect_to_db, User
+from server import app
 
 
 
@@ -101,9 +102,9 @@ def user_is_logged_in(**kwargs):
 
 
 def days_til_HOCR(given_date=None):
-    """Calculates the number of days between the given date and the next 
+    """Calculates the number of days between the given date and the next
        Head of the Charles. If no date is given, the current date is used.
-    
+
        Note that a return value of 0 means it's HOCR Saturday, and a return
        value of -1 means it's HOCR Sunday."""
 
@@ -144,6 +145,8 @@ def days_til_HOCR(given_date=None):
         next_HOCR_sat = date(next_year, 10, next_HOCR_sat_date)
         num_days = (next_HOCR_sat - given_date).days
         return num_days
+
+
 
 
 def table_record_object_to_dict(record_object):

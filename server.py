@@ -14,6 +14,18 @@ app.secret_key = "shhhhhhhhhhh!!! don't tell!"
 #keep jinja from failing silently because of undefined variables
 app.jinja_env.undefined = StrictUndefined
 
+@app.template_filter()
+def date_filter(value, format="Mon Jan 1, 2000"):
+    """A custom Jinja filter to format dates"""
+
+    if format == "Mon Jan 1, 2000":
+        date_string = "{date:%a} {date:%b} {date.day}, {date.year}"
+        return date_string.format(date=value)
+
+#add custom date filter to jinja's repertoire
+app.jinja_env.filters["date_filter"] = date_filter
+
+
 
 ##################### ROUTES TO SHOW HOMEPAGE AND LOG PAGE #####################
 

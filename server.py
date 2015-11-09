@@ -4,7 +4,7 @@ from jinja2 import StrictUndefined
 from flask import (Flask, render_template, redirect, request, flash, session,
                    jsonify)
 from datetime import datetime
-from model import connect_to_db, db, User
+from model import connect_to_db, db, User, Workout_result
 from server_utilities import *
 
 app = Flask(__name__)
@@ -37,8 +37,13 @@ def show_log():
                           .filter(User.user_id == logged_in_user_id)
                           .one())
         days_until_HOCR = days_til_HOCR()
+        workouts = (db.session.query(Workout_result)
+                              .filter(Workout_result.user_id == logged_in_user_id)
+                              .order_by(Workout_result.date.desc())
+                              .all())
         return render_template("log.html", user=user,
-                                           days_til_HOCR=days_until_HOCR)
+                                           days_til_HOCR=days_until_HOCR,
+                                           workouts=workouts)
     else:
         #TODO make login window open when home is rendered
         return render_template("home.html")

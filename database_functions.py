@@ -90,7 +90,7 @@ CREATE OR REPLACE FUNCTION add_piece_dist_to_totals() RETURNS trigger AS $$
     #get the piece's meters
     new_piece_dist = TD["new"]["total_meters"]
 
-    #get the workout_results_id and user_id associated with the piece, as strings
+    #get the workout_result_id and user_id associated with the piece, as strings
     workout_result_id_str = str(TD["new"]["workout_result_id"])
     select_query = ("SELECT user_id FROM workout_results WHERE " +
                     "workout_result_id=" + workout_result_id_str + ";")
@@ -102,7 +102,8 @@ CREATE OR REPLACE FUNCTION add_piece_dist_to_totals() RETURNS trigger AS $$
     workout_total = plpy.execute(select_query)[0]["total_meters"]
     new_workout_total = workout_total + new_piece_dist
     update_query = ("UPDATE workout_results SET total_meters=" +
-                    str(new_workout_total) + "WHERE user_id=" + user_id_str + ";")
+                    str(new_workout_total) + "WHERE user_id=" + user_id_str + 
+                    "AND workout_result_id=" + workout_result_id_str + ";")
     plpy.execute(update_query)
 
     #get the current lifetime total distance  and update it
@@ -136,7 +137,7 @@ CREATE OR REPLACE FUNCTION change_piece_dist_on_totals() RETURNS trigger AS $$
     old_piece_dist = TD["old"]["total_meters"]
     new_piece_dist = TD["new"]["total_meters"]
 
-    #get the workout_results_id and user_id associated with the piece, as strings
+    #get the workout_result_id and user_id associated with the piece, as strings
     workout_result_id_str = str(TD["new"]["workout_result_id"])
     select_query = ("SELECT user_id FROM workout_results WHERE " +
                     "workout_result_id=" + workout_result_id_str + ";")
@@ -148,7 +149,8 @@ CREATE OR REPLACE FUNCTION change_piece_dist_on_totals() RETURNS trigger AS $$
     workout_total = plpy.execute(select_query)[0]["total_meters"]
     new_workout_total = workout_total - old_piece_dist + new_piece_dist
     update_query = ("UPDATE workout_results SET total_meters=" +
-                    str(new_workout_total) + "WHERE user_id=" + user_id_str + ";")
+                    str(new_workout_total) + "WHERE user_id=" + user_id_str + 
+                    "AND workout_result_id=" + workout_result_id_str + ";")
     plpy.execute(update_query)
 
     #get the current lifetime total distance  and update it
@@ -179,7 +181,7 @@ CREATE OR REPLACE FUNCTION delete_piece_dist_from_totals() RETURNS trigger AS $$
     #get the piece's meters
     piece_dist = TD["old"]["total_meters"]
 
-    #get the workout_results_id and user_id associated with the piece, as strings
+    #get the workout_result_id and user_id associated with the piece, as strings
     workout_result_id_str = str(TD["old"]["workout_result_id"])
     select_query = ("SELECT user_id FROM workout_results WHERE " +
                     "workout_result_id=" + workout_result_id_str + ";")
@@ -191,7 +193,8 @@ CREATE OR REPLACE FUNCTION delete_piece_dist_from_totals() RETURNS trigger AS $$
     workout_total = plpy.execute(select_query)[0]["total_meters"]
     new_workout_total = workout_total - piece_dist
     update_query = ("UPDATE workout_results SET total_meters=" +
-                    str(new_workout_total) + "WHERE user_id=" + user_id_str + ";")
+                    str(new_workout_total) + "WHERE user_id=" + user_id_str + 
+                    "AND workout_result_id=" + workout_result_id_str + ";")
     plpy.execute(update_query)
 
     #get the current lifetime total distance  and update it

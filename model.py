@@ -230,11 +230,11 @@ class Workout_result(db.Model):
                         db.ForeignKey("users.user_id"),
                         nullable=False)
     total_meters = db.Column(db.Integer, default=0, nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    time_of_day = db.Column(db.Time)
     avg_HR = db.Column(db.Integer)
     calories = db.Column(db.Integer)
     comments = db.Column(db.UnicodeText)
-    date = db.Column(db.Date)
-    time_of_day = db.Column(db.Time)
     public = db.Column(db.Boolean)
 
     #one (user) to many (workout results)

@@ -8,9 +8,14 @@
             {{user.firstname}} {{user.lastname}}
         </div>
         <div class="col-xs-12" id="log-HOCR-counter">
-            Only {{ days_til_HOCR }} days until Head of the Charles!
+            {% if (days_til_HOCR == -1 )or (days_til_HOCR == 0) %}
+                Merry Charlesmas!
+            {% else %}
+                Only {{ days_til_HOCR }} days until Head of the Charles!
+            {% endif %}
         </div>
         <div class="col-xs-12" id="log-controllers">
+            {# TODO MAKE BUTTONS TO ADD WORKOUT, ETC #}
             Useful stuff here (date range pickers, buttons, etc)
         </div>
         <div class="col-xs-12 col-md-10 col-md-offset-1" id="log-data-table">
@@ -19,12 +24,21 @@
                     <tr>
                         <th>Date</th>
                         <th>Description</th>
-                        <th>Total Meters</th>
-                        <th>Click Here to...</th>
+                        <th>Total Distance</th>
+                        <th colspan="2">Click Here to...</th>
                     </tr>
                 </thead>
                 <tbody>
-                    
+                    {# TODO DO A FOR LOOP TO DISPLAY DATA HERE #}
+                    {% for workout in workouts%}
+                        <tr>
+                            <td>{{"{date:%a} {date:%b} {date.day}, {date.year}"|format(date=workout.date)}}</td>
+                            <td>{{workout.workout_template.description}}</td>
+                            <td>{{workout.total_meters}} m</td>
+                            <td><a href="">Edit</a></td>
+                            <td><a href="">Delete</a></td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

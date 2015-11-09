@@ -1,19 +1,4 @@
-#homepage-title {
-    text-align: center;
-    font-size: 2em;
-}
-
-#homepage-image {
-    text-align: center;
-}
-
-#dob-picker {
-    background-color: white;
-}
-
-#reg-to-login-msg {
-    text-align: left;
-}
+/* forms */
 
 .form-validation-error {
     color: red;
@@ -27,4 +12,38 @@ label.validation-error {
 
 input.validation-error {
     border-color: red;
+}
+
+/* base.html */
+
+#dob-picker {
+    background-color: white;
+}
+
+#reg-to-login-msg {
+    text-align: left;
+}
+
+/* home.html */
+
+#homepage-title {
+    text-align: center;
+    font-size: 2em;
+}
+
+#homepage-image {
+    text-align: center;
+}
+
+/* log.html */
+
+#log-owner-name {
+    text-align: center;
+    font-size: 2em;
+}
+
+#log-HOCR-counter {
+    text-align: center;
+    font-size: 1.5em;
+    font-style: italic;
 }

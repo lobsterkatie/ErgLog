@@ -1,3 +1,4 @@
+from datetime import date
 from model import db, connect_to_db, User
 
 
@@ -97,6 +98,52 @@ def user_is_logged_in(**kwargs):
         return False
     else:  #they match!
         return True
+
+
+def days_til_HOCR(given_date=None):
+    """Calculates the number of days between the given date and the next 
+       Head of the Charles. If no date is given, the current date is used.
+    
+       Note that a return value of 0 means it's HOCR Saturday, and a return
+       value of -1 means it's HOCR Sunday."""
+
+    #if no date was given, get today's date
+    if not given_date:
+        given_date = date.today()
+
+    #get the given date's (or today's) year
+    given_year = given_date.year
+
+    #HOCR is the penultimate complete weekend in October
+    #said differently, Sat of HOCR is always between 10/17 and 10/23
+    #use that the figure out the date of given/this year's HOCR Sat
+    oct_17_to_HOCR_sat = {0:22, #if 10/17 is a Mon, HOCR starts the 22nd
+                          1:21, #if 10/17 is a Tues, HOCR starts the 21st
+                          2:20, #etc
+                          3:19,
+                          4:18,
+                          5:17,
+                          6:23}
+    given_oct_17_weekday = date(given_year, 10, 17).weekday()
+    given_HOCR_sat_date = oct_17_to_HOCR_sat[given_oct_17_weekday]
+    given_HOCR_sat = date(given_year, 10, given_HOCR_sat_date)
+
+    #compute the number of days between given date and HOCR Sat of that year
+    num_days = (given_HOCR_sat - given_date).days
+
+    #if it's positive (HOCR is yet to come), zero (it's HOCR Sat), or -1
+    #(it's HOCR Sun), return it
+    if num_days >= -1:
+        return num_days
+
+    #otherwise, figure out next year's HOCR Sat date, and calculate based on that
+    else:
+        next_year = given_year + 1
+        next_oct_17_weekday = date(next_year, 10, 17).weekday()
+        next_HOCR_sat_date = oct_17_to_HOCR_sat[next_oct_17_weekday]
+        next_HOCR_sat = date(next_year, 10, next_HOCR_sat_date)
+        num_days = (next_HOCR_sat - given_date).days
+        return num_days
 
 
 def table_record_object_to_dict(record_object):

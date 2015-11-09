@@ -31,8 +31,14 @@ def show_log():
        homepage with the login window open.""" #LOGIN WINDOW OPEN NOT IMPLEMENTED YET
 
     #existence of a user_id in the session signifies that someone's signed in
-    if session["logged_in_user_id"]:
-        return render_template("log.html")
+    logged_in_user_id = session["logged_in_user_id"]
+    if logged_in_user_id:
+        user = (db.session.query(User)
+                          .filter(User.user_id == logged_in_user_id)
+                          .one())
+        days_until_HOCR = days_til_HOCR()
+        return render_template("log.html", user=user,
+                                           days_til_HOCR=days_until_HOCR)
     else:
         #TODO make login window open when home is rendered
         return render_template("home.html")
@@ -178,7 +184,7 @@ def log_user_out():
 
     session.clear()
 
-    return render_template("home.html")
+    return redirect("/")
 
 
 

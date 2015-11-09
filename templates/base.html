@@ -56,6 +56,11 @@
                         {% endset %}
                     {% endif %}
                     <!-- navbar buttons for a logged-in user -->
+                    <li id="log-nav-button" class="logged-in-nav-buttons" {{ logged_in_buttons_visibility }}>
+                        <a href="/log">
+                            Log
+                        </a>
+                    </li>
                     <li id="profile-nav-button" class="logged-in-nav-buttons" {{ logged_in_buttons_visibility }}>
                         <a data-toggle="modal" href="#" data-target="#profileModal">
                             Profile

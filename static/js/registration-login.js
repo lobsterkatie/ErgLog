@@ -130,7 +130,8 @@ $(document).ready(function () {
             },
             weight: {
                 required: true,
-                number: true
+                number: true,
+                max: 999
             }
         }, //end of rules
 
@@ -164,7 +165,8 @@ $(document).ready(function () {
             },
             weight: {
                 required: "Please enter your weight.",
-                number: "Weight must be a number."
+                number: "Weight must be a number.",
+                max: "Weight must be less than 1000."
             }
         } //end of messages
     }); //end registration form validation

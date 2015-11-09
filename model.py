@@ -229,7 +229,7 @@ class Workout_result(db.Model):
     user_id = db.Column(db.Integer,
                         db.ForeignKey("users.user_id"),
                         nullable=False)
-    total_meters = db.Column(db.Integer, default=0)
+    total_meters = db.Column(db.Integer, default=0, nullable=False)
     avg_HR = db.Column(db.Integer)
     calories = db.Column(db.Integer)
     comments = db.Column(db.UnicodeText)

@@ -129,8 +129,8 @@ CREATE TRIGGER add_piece_dist_to_totals_trigger
 
 
 CREATE OR REPLACE FUNCTION change_piece_dist_on_totals() RETURNS trigger AS $$
-    """Reflects the change in meters rowed in the piece in both the total 
-       for the workout and the lifetime total user stat."""
+    """When a piece is updated, reflects the change in meters rowed in the 
+       piece in both the total for the workout and the lifetime total user stat."""
 
     #get the piece's old and new meters
     old_piece_dist = TD["old"]["total_meters"]
@@ -170,3 +170,44 @@ CREATE TRIGGER change_piece_dist_on_totals_trigger
     EXECUTE PROCEDURE change_piece_dist_on_totals();
 
 
+
+
+CREATE OR REPLACE FUNCTION delete_piece_dist_from_totals() RETURNS trigger AS $$
+    """When a piece is deleted, reflects the loss in meters rowed in the piece
+       in both the total for the workout and the lifetime total user stat."""
+
+    #get the piece's meters
+    piece_dist = TD["old"]["total_meters"]
+
+    #get the workout_results_id and user_id associated with the piece, as strings
+    workout_result_id_str = str(TD["old"]["workout_result_id"])
+    select_query = ("SELECT user_id FROM workout_results WHERE " +
+                    "workout_result_id=" + workout_result_id_str + ";")
+    user_id_str = str(plpy.execute(select_query)[0]["user_id"])
+
+    #get the current total distance for the workout and update it
+    select_query = ("SELECT total_meters FROM workout_results WHERE " +
+                    "workout_result_id=" + workout_result_id_str + ";")
+    workout_total = plpy.execute(select_query)[0]["total_meters"]
+    new_workout_total = workout_total - piece_dist
+    update_query = ("UPDATE workout_results SET total_meters=" +
+                    str(new_workout_total) + "WHERE user_id=" + user_id_str + ";")
+    plpy.execute(update_query)
+
+    #get the current lifetime total distance  and update it
+    select_query = ("SELECT lifetime_meters FROM user_stat_lists " +
+                    "WHERE user_id=" + user_id_str + ";")
+    lifetime_total = plpy.execute(select_query)[0]["lifetime_meters"]
+    new_lifetime_total = lifetime_total - piece_dist
+    update_query = ("UPDATE user_stat_lists SET lifetime_meters=" +
+                    str(new_lifetime_total) + "WHERE user_id=" + user_id_str + ";")
+    plpy.execute(update_query)
+
+$$ LANGUAGE plpythonu;
+
+
+
+CREATE TRIGGER delete_piece_dist_from_totals_trigger 
+    AFTER DELETE ON "piece_results"
+    FOR EACH ROW
+    EXECUTE PROCEDURE delete_piece_dist_from_totals();

@@ -4,6 +4,32 @@
 CREATE EXTENSION plpythonu;
 
 
+CREATE OR REPLACE FUNCTION new_user_stats() RETURNS trigger AS $$
+    """When a new user is entered into the users table, create a corresponding
+       record in the user_stat_lists table, with the same user_id"""
+
+    #get user_id of newly created user, as a string
+    user_id_str = str(TD["new"]["user_id"])
+
+    #create insert query string and execute it, creating the new record
+    insert_query = ("INSERT INTO user_stat_lists " +
+                    "(user_id, lifetime_meters, new_pr) VALUES (" +
+                    user_id_str + ", 0, FALSE);")
+    plpy.execute(insert_query)
+
+$$ LANGUAGE plpythonu;
+
+
+CREATE TRIGGER new_user_stats_trigger
+    AFTER INSERT ON "users"
+    FOR EACH ROW
+    EXECUTE PROCEDURE new_user_stats();
+
+
+
+
+
+
 
 CREATE OR REPLACE FUNCTION check_against_PRs() RETURNS trigger AS $$
     """Checks the new piece to see if it's one for which PR's are kept, and if
@@ -12,19 +38,19 @@ CREATE OR REPLACE FUNCTION check_against_PRs() RETURNS trigger AS $$
     #create useful variables
     new_piece_time = TD["new"]["total_time_seconds"]
     new_piece_dist = TD["new"]["total_meters"]
-    special_times = {60: "one_min_pr_dist", 
-                     1800: "half_hour_pr_dist", 
+    special_times = {60: "one_min_pr_dist",
+                     1800: "half_hour_pr_dist",
                      3600: "half_hour_pr_dist"}
-    special_distances = {500: "half_k_pr_time", 
-                         1000: "one_k_pr_time", 
-                         2000: "two_k_pr_time", 
-                         5000: "five_k_pr_time", 
-                         6000: "six_k_pr_time", 
-                         10000: "ten_k_pr_time", 
-                         21097: "half_marathon_pr_time", 
+    special_distances = {500: "half_k_pr_time",
+                         1000: "one_k_pr_time",
+                         2000: "two_k_pr_time",
+                         5000: "five_k_pr_time",
+                         6000: "six_k_pr_time",
+                         10000: "ten_k_pr_time",
+                         21097: "half_marathon_pr_time",
                          42195: "marathon_pr_time"}
-    
-    
+
+
     #get the user_id associated with the piece, as a string
     workout_result_id_str = str(TD["new"]["workout_result_id"])
     select_query = ("SELECT user_id FROM workout_results WHERE " +

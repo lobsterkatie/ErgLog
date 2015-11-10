@@ -1,6 +1,11 @@
 /* When a new user is entered into the Users table, create a corresponding
    record in the user_stat_lists table, with the same user_id */
 
+
+/* NOTE: THIS HAS NOW BEEN RECREATED IN PYTHON IN DATABASE_FUNCTIONS.PY 
+   FOR EASE OF CUTTING AND PASTING ALL FUNCTIONS/TRIGGERS AT ONCE. USE 
+   THAT ONE! */
+
 CREATE OR REPLACE FUNCTION new_user_stats() RETURNS trigger AS $$
     BEGIN
         INSERT INTO user_stat_lists (user_id, lifetime_meters, new_pr)

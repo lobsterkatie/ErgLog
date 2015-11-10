@@ -47,3 +47,12 @@ input.validation-error {
     font-size: 1.5em;
     font-style: italic;
 }
+
+#log-table-title {
+    text-align: center;
+    font-size: 1.25em;
+}
+
+#log-table-col-titles {
+    background-color: #E5E5FF;
+}

@@ -18,21 +18,29 @@
             {# TODO MAKE BUTTONS TO ADD WORKOUT, ETC #}
             Useful stuff here (date range pickers, buttons, etc)
         </div>
+
+        <!-- RECENT WORKOUTS TABLE -->
         <div class="col-xs-12 col-md-10 col-md-offset-1" id="log-data-table">
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Date</th>
+                        <th id="log-table-title" colspan="5">Recent Workouts</th>
+                    </tr>
+                    <tr id="log-table-col-titles">
+                        <th>Date <i>(click for workout details)</i></th>
                         <th>Description</th>
                         <th>Total Distance</th>
                         <th colspan="2">Click Here to...</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {# TODO DO A FOR LOOP TO DISPLAY DATA HERE #}
+                    {# display each workout as a row in the table #}
                     {% for workout in workouts%}
                         <tr>
-                            <td>{{workout.date | date_filter }}</td>
+                            <td>
+                                <a href="#" data-toggle="modal" data-target="#workout-details-modal" data-workout-id="{{ workout.workout_result_id }}">
+                                    {{workout.date | date_filter }}</td>
+                                </a>
                             <td>{{workout.workout_template.description}}</td>
                             <td>{{workout.total_meters}} m</td>
                             <td><a href="">Edit</a></td>
@@ -40,7 +48,34 @@
                         </tr>
                     {% endfor %}
                 </tbody>
-            </table>
+            </table> <!-- end of recent workouts table -->
+
+            <!-- WORKOUT DETAILS MODAL -->
+            <div class="modal fade" id="workout-details-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                &times;
+                            </button>
+                            <h4 class="modal-title">
+                                Workout Details
+                            </h4>
+                        </div> <!-- end of modal header -->
+
+                        <div class="modal-body">
+                            
+                        </div> <!-- end of modal body -->
+
+                        <div class="modal-footer">
+                            
+                        </div> <!-- end of modal footer -->
+
+                    </div> <!-- end of modal content -->
+                </div>
+            </div> <!-- end of logout modal -->
+
         </div>
     </div>
 {% endblock %}

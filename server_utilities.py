@@ -1,6 +1,5 @@
 from datetime import date
 from model import db, connect_to_db, User
-from server import app
 
 
 

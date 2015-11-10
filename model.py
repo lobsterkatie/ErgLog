@@ -61,13 +61,24 @@ class ToDictMixin(object):
     """Provides a method to return a dictionary version of a model class."""
 
     def to_dict(self):
-        pass
+        """Returns a dictionary representing the object"""
+
+        dict_version = {}
+
+        #iterate through the table's columns, adding the value in each
+        #to the dictionary
+        for column_name in self.__mapper__.column_attrs.keys():
+            value = getattr(self, column_name, None)
+            dict_version[column_name] = value
+
+        #return the completed dictionary
+        return dict_version
 
 
 ##############################################################################
 # Model definitions
 
-class User(db.Model):
+class User(db.Model, ToDictMixin):
     """Logbook user (one-to-one with user stat lists, one-to-many with both
        workout results and workout templates)"""
 
@@ -98,7 +109,7 @@ class User(db.Model):
 
 
 
-class UserStatList(db.Model):
+class UserStatList(db.Model, ToDictMixin):
     """Stats for a given user, mostly PR's (one-to-one with Users)"""
 
     __tablename__ = "user_stat_lists"
@@ -156,7 +167,7 @@ class UserStatList(db.Model):
 
 
 
-class WorkoutTemplate(db.Model):
+class WorkoutTemplate(db.Model, ToDictMixin):
     """Workout templates (one-to-many with piece templates, many-to-one
        with users)"""
 
@@ -184,7 +195,7 @@ class WorkoutTemplate(db.Model):
 
 
 
-class PieceTemplate(db.Model):
+class PieceTemplate(db.Model, ToDictMixin):
     """Templates for pices (many-to-one with workout templates)"""
 
     __tablename__ = "piece_templates"
@@ -224,7 +235,7 @@ class PieceTemplate(db.Model):
 
 
 
-class WorkoutResult(db.Model):
+class WorkoutResult(db.Model, ToDictMixin):
     """The data/results of a workout (one-to-many with piece results,
        many-to-one with both users and workout templates)"""
 
@@ -266,7 +277,7 @@ class WorkoutResult(db.Model):
                                   time=self.time_of_day)
 
 
-class PieceResult(db.Model):
+class PieceResult(db.Model, ToDictMixin):
     """Piece results (many-to-one with workout_results, one-to-many with
        piece templates)"""
 
@@ -311,7 +322,7 @@ class PieceResult(db.Model):
 
 
 
-class Split_result(db.Model):
+class SplitResult(db.Model, ToDictMixin):
     """Split results (many-to-one with piece_results)"""
 
     __tablename__ = "split_results"
@@ -339,7 +350,7 @@ class Split_result(db.Model):
     def __repr__(self):
         """Output the object's values when it's printed"""
 
-        repr_string = ("<Split_result id: {id}, " +
+        repr_string = ("<SplitResult id: {id}, " +
                        "piece_result_id:{piece_result_id}>" +
                        "(split # {ordinal})>")
         return repr_string.format(id=self.split_result_id,

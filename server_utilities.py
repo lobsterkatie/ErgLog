@@ -148,20 +148,3 @@ def days_til_HOCR(given_date=None):
 
 
 
-def table_record_object_to_dict(record_object):
-    """Takes an object representing a record from the database and creates
-       a dictionary out of its values (as strings)"""
-
-    pass
-
-    # record_dict = {}
-
-    # #add each of the object's attributes, excluding dunder attributes
-    # #(because we don't care about them) and the user_id (because we've
-    #     #already got it)...
-    #     for attr, value in self.__dict__.items():
-    #         # print attr, type(attr)
-    #         # print value, type(value)
-    #         if attr.startswith(("_", "password")):
-
-    #             #pop it from the dictionary

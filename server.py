@@ -40,7 +40,7 @@ def index():
 @app.route("/log")
 def show_log():
     """Show the user their log (if they're logged in; otherwise, show the
-       homepage with the login window open.""" #LOGIN WINDOW OPEN NOT IMPLEMENTED YET
+       homepage with the login window open.)""" #LOGIN WINDOW OPEN NOT IMPLEMENTED YET
 
     #existence of a user_id in the session signifies that someone's signed in
     logged_in_user_id = session["logged_in_user_id"]

@@ -1,6 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}{{user.firstname}}'s Log{% endblock %}
+
+{% block page_specific_script_tag %}
+    <script src="/static/js/log-page.js"></script>
+{% endblock %}
+
+
+{% block title_text %}
+    {{user.firstname}}'s Log
+{% endblock %}
+
 
 {% block body %}
     <div class="row">
@@ -38,7 +47,7 @@
                     {% for workout in workouts%}
                         <tr>
                             <td>
-                                <a href="#" data-toggle="modal" data-target="#workout-details-modal" data-workout-id="{{ workout.workout_result_id }}">
+                                <a href="#workout-details-modal" data-toggle="modal" data-workout-id={{ workout.workout_result_id }}>
                                     {{workout.date | date_filter }}</td>
                                 </a>
                             <td>{{workout.workout_template.description}}</td>
@@ -62,6 +71,9 @@
                             <h4 class="modal-title">
                                 Workout Details
                             </h4>
+                            <span class="hidden-modal-data">
+                                <input id="workout-details-workout-id" type="text" readonly>
+                            </span>
                         </div> <!-- end of modal header -->
 
                         <div class="modal-body">

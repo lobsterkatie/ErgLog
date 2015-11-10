@@ -1,3 +1,5 @@
+/* general */
+
 /* forms */
 
 .form-validation-error {
@@ -55,4 +57,8 @@ input.validation-error {
 
 #log-table-col-titles {
     background-color: #E5E5FF;
+}
+
+.hidden-modal-data {
+    display: none;
 }

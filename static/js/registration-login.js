@@ -33,6 +33,7 @@ $(document).ready(function () {
                      autoclose: true});
 
     /* A hash function to hash the passwords */
+    /* NOT CURRENTLY BEING USED */
     /* Based on code from 
     http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/*/
     var hashString = function(rawString) {

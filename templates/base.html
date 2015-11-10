@@ -11,9 +11,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.min.css"></link>
     <!-- jQuery validation plugin -->
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js"></script>
+    <!-- code controlling registration and login modals -->
+    <script src="/static/js/registration-login.js"></script>
+    <!-- code specific to the page in question -->
+    {% block page_specific_script_tag %}{% endblock %}
     <!-- my base stylesheet -->
     <link rel="stylesheet" href="static/css/stylesheet.css">
-    <title>{% block title%}TITLE GOES HERE!{% endblock %}</title>
+
+    <title>{% block title_text %}TITLE GOES HERE!{% endblock %}</title>
 </head>
 
 <body>
@@ -267,6 +272,5 @@
         {% endblock %}
     </div>
 
-    <script src="/static/js/registration-login.js"></script>
 </body>
 </html>

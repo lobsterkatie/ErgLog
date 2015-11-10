@@ -60,6 +60,24 @@ def show_log():
         #TODO make login window open when home is rendered
         return render_template("home.html")
 
+@app.route("/get-workout-details/<int:workout_id>.json")
+def return_workout_details(workout_id):
+    """Given a workout_result_id, return a jsonified version of the workout
+    """
+
+    #get the workout_result object associated with the given id
+    workout_result = Workout_result.query.get(workout_id)
+
+    #get a list of all piece_result objects associated with the given workout id
+    piece_results = (Piece_result.query
+                                 .filter(Piece_result.workout_result_id ==
+                                         workout_id)
+                                 .all())
+
+    
+    #jsonify the results
+    # my_thing = jsonify(results)
+    # return my_thing
 
 
 #################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################

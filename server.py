@@ -4,7 +4,7 @@ from jinja2 import StrictUndefined
 from flask import (Flask, render_template, redirect, request, flash, session,
                    jsonify)
 from datetime import datetime
-from model import connect_to_db, db, User, Workout_result
+from model import connect_to_db, db, User, WorkoutResult
 from server_utilities import *
 
 app = Flask(__name__)
@@ -49,9 +49,9 @@ def show_log():
                           .filter(User.user_id == logged_in_user_id)
                           .one())
         days_until_HOCR = days_til_HOCR()
-        workouts = (db.session.query(Workout_result)
-                              .filter(Workout_result.user_id == logged_in_user_id)
-                              .order_by(Workout_result.date.desc())
+        workouts = (db.session.query(WorkoutResult)
+                              .filter(WorkoutResult.user_id == logged_in_user_id)
+                              .order_by(WorkoutResult.date.desc())
                               .all())
         return render_template("log.html", user=user,
                                            days_til_HOCR=days_until_HOCR,
@@ -66,15 +66,15 @@ def return_workout_details(workout_id):
     """
 
     #get the workout_result object associated with the given id
-    workout_result = Workout_result.query.get(workout_id)
+    workout_result = WorkoutResult.query.get(workout_id)
 
     #get a list of all piece_result objects associated with the given workout id
-    piece_results = (Piece_result.query
-                                 .filter(Piece_result.workout_result_id ==
+    piece_results = (PieceResult.query
+                                 .filter(PieceResult.workout_result_id ==
                                          workout_id)
                                  .all())
 
-    
+
     #jsonify the results
     # my_thing = jsonify(results)
     # return my_thing
@@ -141,7 +141,7 @@ def check_password():
 
 @app.route("/register-user", methods=["POST"])
 def add_new_user():
-    """Add new user to the Users and User_stat_lists tables
+    """Add new user to the users and user_stat_lists tables
 
        Note that all form data is validated before being submitted, so the
        values here should just work"""

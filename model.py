@@ -10,6 +10,9 @@ from datetime import date
 # object, where we do most of our interactions (like committing, etc.)
 db = SQLAlchemy()
 
+##############################################################################
+# Helper functions, ToDict mixin
+
 def format_time_from_seconds(sec):
     """return a string in the form D:H:M:S given a number of seconds"""
 
@@ -54,6 +57,13 @@ def format_time_from_seconds(sec):
     return time_string
 
 
+class ToDictMixin(object):
+    """Provides a method to return a dictionary version of a model class."""
+
+    def to_dict(self):
+        pass
+
+
 ##############################################################################
 # Model definitions
 
@@ -88,7 +98,7 @@ class User(db.Model):
 
 
 
-class User_stat_list(db.Model):
+class UserStatList(db.Model):
     """Stats for a given user, mostly PR's (one-to-one with Users)"""
 
     __tablename__ = "user_stat_lists"
@@ -120,7 +130,7 @@ class User_stat_list(db.Model):
         """Output the object's values when it's printed"""
 
         #start the string with the user_id
-        repr_string = "<User_stat_list user_id: {id} ".format(id=self.user_id)
+        repr_string = "<UserStatList user_id: {id} ".format(id=self.user_id)
 
         #for each of the object's attributes, excluding dunder attributes
         #(because we don't care about them) and the user_id (because we've
@@ -146,7 +156,7 @@ class User_stat_list(db.Model):
 
 
 
-class Workout_template(db.Model):
+class WorkoutTemplate(db.Model):
     """Workout templates (one-to-many with piece templates, many-to-one
        with users)"""
 
@@ -168,13 +178,13 @@ class Workout_template(db.Model):
     def __repr__(self):
         """Output the object's values when it's printed"""
 
-        repr_string = "<Workout_template id: {id}, user_id: {user_id}>"
+        repr_string = "<WorkoutTemplate id: {id}, user_id: {user_id}>"
         return repr_string.format(id=self.workout_template_id,
                                   user_id=self.user_id)
 
 
 
-class Piece_template(db.Model):
+class PieceTemplate(db.Model):
     """Templates for pices (many-to-one with workout templates)"""
 
     __tablename__ = "piece_templates"
@@ -198,9 +208,9 @@ class Piece_template(db.Model):
     description = db.Column(db.UnicodeText())
 
     #one (workout template) to many (piece templates)
-    workout_template = db.relationship("Workout_template",
+    workout_template = db.relationship("WorkoutTemplate",
                                        backref=db.backref("piece_templates",
-                                                          order_by="Piece_template.ordinal"))
+                                                          order_by="PieceTemplate.ordinal"))
 
     __table_args__ = (schema.UniqueConstraint(workout_template_id, ordinal),)
 
@@ -208,13 +218,13 @@ class Piece_template(db.Model):
     def __repr__(self):
         """Output the object's values when it's printed"""
 
-        repr_string = "<Piece_template id: {id} ({description})>"
+        repr_string = "<PieceTemplate id: {id} ({description})>"
         return repr_string.format(id=self.piece_template_id,
                                   description=self.description)
 
 
 
-class Workout_result(db.Model):
+class WorkoutResult(db.Model):
     """The data/results of a workout (one-to-many with piece results,
        many-to-one with both users and workout templates)"""
 
@@ -240,14 +250,14 @@ class Workout_result(db.Model):
     #one (user) to many (workout results)
     user = db.relationship("User", backref="workout_results")
     #one (workout template) to many (workout results)
-    workout_template = db.relationship("Workout_template",
+    workout_template = db.relationship("WorkoutTemplate",
                                        backref="workout_results")
 
 
     def __repr__(self):
         """Output the object's values when it's printed"""
 
-        repr_string = ("<Workout_result id: {id}, template_id: {template_id}" +
+        repr_string = ("<WorkoutResult id: {id}, template_id: {template_id}" +
                        "user_id: {user_id}, date: {date}, time: {time}>")
         return repr_string.format(id=self.workout_result_id,
                                   template_id=self.workout_template_id,
@@ -256,7 +266,7 @@ class Workout_result(db.Model):
                                   time=self.time_of_day)
 
 
-class Piece_result(db.Model):
+class PieceResult(db.Model):
     """Piece results (many-to-one with workout_results, one-to-many with
        piece templates)"""
 
@@ -281,10 +291,10 @@ class Piece_result(db.Model):
     completed = db.Column(db.Boolean)
 
     #one (workout result) to many (piece results)
-    workout_result = db.relationship("Workout_result", backref="piece_results")
+    workout_result = db.relationship("WorkoutResult", backref="piece_results")
 
     #one (piece template) to many (piece results)
-    piece_template = db.relationship("Piece_template", backref="piece_results")
+    piece_template = db.relationship("PieceTemplate", backref="piece_results")
 
     __table_args__ = (schema.UniqueConstraint(workout_result_id, ordinal),)
 
@@ -292,7 +302,7 @@ class Piece_result(db.Model):
     def __repr__(self):
         """Output the object's values when it's printed"""
 
-        repr_string = ("<Piece_result id: {id}, " +
+        repr_string = ("<PieceResult id: {id}, " +
                        "workout_result_id: {workout_result_id}, " +
                        "piece_template_id: {piece_template_id}>")
         return repr_string.format(id=self.piece_result_id,
@@ -321,7 +331,7 @@ class Split_result(db.Model):
     comments = db.Column(db.UnicodeText)
 
     #one (piece result) to many (split results)
-    piece_result = db.relationship("Piece_result", backref="split_results")
+    piece_result = db.relationship("PieceResult", backref="split_results")
 
     __table_args__ = (schema.UniqueConstraint(piece_result_id, ordinal),)
 

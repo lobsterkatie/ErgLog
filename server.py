@@ -14,6 +14,7 @@ app.secret_key = "shhhhhhhhhhh!!! don't tell!"
 #keep jinja from failing silently because of undefined variables
 app.jinja_env.undefined = StrictUndefined
 
+#define a custom filter for displaying dates in rendered templates
 @app.template_filter()
 def date_filter(value, format="Mon Jan 1, 2000"):
     """A custom Jinja filter to format dates"""
@@ -60,19 +61,30 @@ def show_log():
         #TODO make login window open when home is rendered
         return render_template("home.html")
 
+
 @app.route("/get-workout-details/<int:workout_id>.json")
 def return_workout_details(workout_id):
     """Given a workout_result_id, return a jsonified version of the workout
-    """
+       details, including the workout result, workout template, piece results,
+       piece templates, and split results."""
 
-    #get the workout_result object associated with the given id
+    data_to_jsonify = {}
+
+    #get the workout_result object associated with the given id, create a
+    #dictionary from it, and add that dictionary to data_to_jsonify
     workout_result = WorkoutResult.query.get(workout_id)
+    data_to_jsonify["workout_result"] = workout_result.to_dict()
 
-    #get a list of all piece_result objects associated with the given workout id
+    #get a list of all piece_result objects associated with the given workout
+    #id, create a dictionary of dictionaries representing them (keyed by
+    #ordinal), and add it to data_to_jsonify
     piece_results = (PieceResult.query
                                  .filter(PieceResult.workout_result_id ==
                                          workout_id)
                                  .all())
+    piece_results_as_dict_of_dicts = {}
+    # for piece in piece_results:
+    #     p
 
 
     #jsonify the results

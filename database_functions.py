@@ -29,8 +29,6 @@ CREATE TRIGGER new_user_stats_trigger
 
 
 
-
-
 CREATE OR REPLACE FUNCTION check_against_PRs() RETURNS trigger AS $$
     """Checks the new piece to see if it's one for which PR's are kept, and if
        so, compares it to the relevant PR, updating the PR if applicable."""
@@ -219,7 +217,7 @@ CREATE OR REPLACE FUNCTION delete_piece_dist_from_totals() RETURNS trigger AS $$
     workout_total = plpy.execute(select_query)[0]["total_meters"]
     new_workout_total = workout_total - piece_dist
     update_query = ("UPDATE workout_results SET total_meters=" +
-                    str(new_workout_total) + "WHERE user_id=" + user_id_str + 
+                    str(new_workout_total) + "WHERE user_id=" + user_id_str +
                     "AND workout_result_id=" + workout_result_id_str + ";")
     plpy.execute(update_query)
 
@@ -240,3 +238,4 @@ CREATE TRIGGER delete_piece_dist_from_totals_trigger
     AFTER DELETE ON "piece_results"
     FOR EACH ROW
     EXECUTE PROCEDURE delete_piece_dist_from_totals();
+

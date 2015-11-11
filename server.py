@@ -66,44 +66,84 @@ def show_log():
 def return_workout_details(workout_result_id):
     """Given a workout_result_id, return a jsonified version of the workout
        details, including the workout template, piece templates, workout result,
-       piece results, and split results."""
+       piece results, and split results.
 
+       The final jsonified data will have the following structure:
 
-    #get the workout_result, and piece_result objects associated with the
-    #given id
+       workout_details = {
+            workout_template: {dict}
+            workout_result: {dict}
+            pieces: {
+                piece 1: {
+                    piece_template: {dict}
+                    piece_result: {dict}
+                    splits: {
+                        split 1: {dict}
+                        split 2: {dict}
+                        ...
+                    }
+                piece 2: {
+                    ...
+                }
+                ...
+            }
+        }
+    """
+
+    #get the workout_result and workout_template objects associated with the
+    #given id and dictionaryify them
     workout_result = (db.session.query(WorkoutResult)
                                 .filter(WorkoutResult.workout_result_id ==
                                         workout_result_id)
                                 .one())
     workout_template = workout_result.workout_template
+    w_result_dict = workout_result.to_dict()
+    w_template_dict = workout_template.to_dict()
+
+    #get the piece results for this workout and create a dictionary of
+    #piece dictionaries (keyed by ordinal)
+    #each piece's dictionary will include dictionary versions of the
+    #template object, results object, and a splits dictionary holding 
+    #dictionary versions of the splits (also keyed by ordinal)
     piece_results = workout_result.piece_results
+    pieces_dict = {}
+    for p in piece_results:
+        #create a dictionary to hold info about this one piece, and add
+        #dictionary versions of this piece's template and results to it
+        p_dict = {}
+        p_dict["template"] = p.piece_template.to_dict()
+        p_dict["results"] = p.to_dict()
 
-    #TODO TAKE ME OUT ONCE IT'S CLEAR THIS WORKS (SEE NOTE IN MODEL.PY)
-    print piece_results
+        #get split results, if any, for this piece
+        split_results = p.split_results
 
-    #get a list of all associated piece_result objects and create a dictionary
-    #of dictionaries representing them (keyed by ordinal), as well as a
-    #dictionary
+        #if there are split results, make a dictionary to hold them and add
+        #a dictionary version of each, keyed by its ordinal, then add the whole
+        #splits dictionary to the dictionary for this piece
+        if split_results:
+            splits_dict = {} #to hold information about all this piece's splits
+            for s in split_results:
+                splits_dict["split " + str(s.ordinal)] = s.to_dict
+            p_dict["splits"] = splits_dict
 
-    pieces = {}
-    for piece_result in piece_results:
-        piece = {}
-        piece["results"] = piece_result.to_dict()
-        piece_results_dict[piece_result.ordinal] = piece
+        #otherwise (if there weren't any split results), reflect that in the
+        #piece dictionary
+        else:
+            p_dict["splits"] = None
 
-    #
+        #now that the dictionary for this piece is complete, add it to the
+        #dictionary holding all the pieces, using its ordinal as a key
+        pieces_dict["piece " + str(p.ordinal)] = p_dict
 
-    workout = {}
-    workout["results"] = workout_result.to_dict()
-    workout["template"] = workout_result.workout_template.to_dict()
+    #add the workout_template, workout_results, and pieces dictionaries to
+    #the overall workout_details dictionary, then jsonify and return it
+    workout_details_dict = {}
+    workout_details_dict["workout_template"] = w_template_dict
+    workout_details_dict["workout_results"] = w_result_dict
+    workout_details_dict["pieces"] = pieces_dict
+    workout_details = jsonify(workout_details_dict)
+    return workout_details
 
-    #add all the data to the dictionary, then jsonify and return it
-    data_to_jsonify["workout"] = workout
-    data_to_jsonify[""]
-
-    #jsonify the results
-    # my_thing = jsonify(results)
-    # return my_thing
 
 
 #################### LOGIN, LOGOUT, AND REGISTRATION ROUTES ####################

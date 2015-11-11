@@ -1,7 +1,36 @@
+################################################################################
+# TEMPLATES FOR TRIGGER FUNCTIONS #
+
+
+
+CREATE OR REPLACE FUNCTION function_name() RETURNS trigger AS $$
+    """DOCSTRING"""
+
+    #do stuff
+
+
+$$ LANGUAGE plpythonu;
+
+
+CREATE TRIGGER function_name_trigger
+    AFTER ***** ON "tablename"
+    FOR EACH ROW
+    EXECUTE PROCEDURE function_name();
+
+# ***** can be INSERT, UPDATE, or DELETE
+# tablename (if all lowercase) technically doesn't have to be in quotes,
+# but it doesn't hurt anything and makes it stand out visually here in sublime
+
+
+################################################################################
+# THE FUNCTIONS THEMSELVES #
+
 # The PL/Pythonu extension needs to be added to the database once before
 # any functions can be written in Python
 
 CREATE EXTENSION plpythonu;
+
+
 
 
 CREATE OR REPLACE FUNCTION new_user_stats() RETURNS trigger AS $$
@@ -238,4 +267,11 @@ CREATE TRIGGER delete_piece_dist_from_totals_trigger
     AFTER DELETE ON "piece_results"
     FOR EACH ROW
     EXECUTE PROCEDURE delete_piece_dist_from_totals();
+
+
+
+
+
+
+
 

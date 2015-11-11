@@ -63,16 +63,16 @@ class ToDictMixin(object):
     def to_dict(self):
         """Returns a dictionary representing the object"""
 
-        dict_version = {}
+        dict_of_obj = {}
 
         #iterate through the table's columns, adding the value in each
         #to the dictionary
         for column_name in self.__mapper__.column_attrs.keys():
             value = getattr(self, column_name, None)
-            dict_version[column_name] = value
+            dict_of_obj[column_name] = value
 
         #return the completed dictionary
-        return dict_version
+        return dict_of_obj
 
 
 ##############################################################################
@@ -168,8 +168,8 @@ class UserStatList(db.Model, ToDictMixin):
 
 
 class WorkoutTemplate(db.Model, ToDictMixin):
-    """Workout templates (one-to-many with piece templates, many-to-one
-       with users)"""
+    """Workout templates (many-to-many with piece templates via the
+       w_p_template_pairings table, many-to-one with users)"""
 
     __tablename__ = "workout_templates"
 
@@ -195,6 +195,19 @@ class WorkoutTemplate(db.Model, ToDictMixin):
     #one (user) to many (workout templtates)
     user = db.relationship("User", backref="workout_templates")
 
+    #many (workout templates) to many (piece templates)
+    piece_templates = db.relationship("PieceTemplate",
+                                      secondary="w_p_template_pairings",
+                                      order_by="WPTemplatePairing.ordinal",
+                                      backref="workout_templates")
+    #for later filtering (on phase, most likely)
+    #TODO figure out if this works and then add three attributes (one for
+    #each phase using .filter(PieceTemplate.phase == "warmup") or whatever)
+    piece_templates_query = db.relationship("PieceTemplate",
+                                            secondary="w_p_template_pairings",
+                                            order_by="WPTemplatePairing.ordinal",
+                                            lazy="dynamic")
+
 
     def __repr__(self):
         """Output the object's values when it's printed"""
@@ -205,8 +218,35 @@ class WorkoutTemplate(db.Model, ToDictMixin):
 
 
 
+class WPTemplatePairing(db.Model, ToDictMixin):
+    """Not quite a true association table (because it has ordinal data)
+       between workout templates and piece templates (one-to-many with
+       both)"""
+
+    __tablename__ = "w_p_template_pairings"
+
+    w_p_template_pairing_id = db.Column(db.Integer,
+                                        primary_key=True,
+                                        autoincrement=True)
+    workout_template_id = db.Column(db.Integer,
+                                    db.ForeignKey("workout_templates.workout_template_id"),
+                                    nullable=False)
+    piece_template_id = db.Column(db.Integer,
+                                  db.ForeignKey("piece_templates.piece_template_id"),
+                                  nullable=False)
+    ordinal = db.Column(db.Integer, nullable=False)
+
+
+    #this makes sure that two different pieces can't be the nth piece in a
+    #given workout
+    __table_args__ = (schema.UniqueConstraint(workout_template_id, ordinal),)
+
+
+
+
 class PieceTemplate(db.Model, ToDictMixin):
-    """Templates for pices (many-to-one with workout templates)"""
+    """Templates for pieces (many-to-many with workout templates via the
+       w_p_template_pairings table)"""
 
     __tablename__ = "piece_templates"
 
@@ -216,24 +256,15 @@ class PieceTemplate(db.Model, ToDictMixin):
     workout_template_id = db.Column(db.Integer,
                                     db.ForeignKey("workout_templates.workout_template_id"),
                                     nullable=False)
-    ordinal = db.Column(db.Integer, nullable=False)
+    phase = db.Column(db.Enum("warmup", "main", "cooldown",
+                              name="workout_phases"),
+                              nullable=False)
     piece_type = db.Column(db.Enum("time", "distance", name="piece_types"))
-    split_length = db.Column(db.Integer)
     distance = db.Column(db.Integer)
     time_seconds = db.Column(db.Integer)
-    goal_split_seconds = db.Column(db.Integer)
-    goal_SR = db.Column(db.Integer)
-    phase = db.Column(db.Enum("warmup", "workout body", "cooldown",
-                              name="workout_phases"))
+    default_split_length = db.Column(db.Integer)
     zone = db.Column(db.String(8))
-    description = db.Column(db.UnicodeText())
-
-    #one (workout template) to many (piece templates)
-    workout_template = db.relationship("WorkoutTemplate",
-                                       backref=db.backref("piece_templates",
-                                                          order_by="PieceTemplate.ordinal"))
-
-    __table_args__ = (schema.UniqueConstraint(workout_template_id, ordinal),)
+    description = db.Column(db.UnicodeText)
 
 
     def __repr__(self):
@@ -301,8 +332,11 @@ class PieceResult(db.Model, ToDictMixin):
                                   db.ForeignKey("piece_templates.piece_template_id"),
                                   nullable=False)
     ordinal = db.Column(db.Integer, nullable=False)
+    goal_split_seconds = db.Column(db.Integer)
+    goal_SR = db.Column(db.Integer)
     total_time_seconds = db.Column(db.Integer)
     total_meters = db.Column(db.Integer)
+    split_length = db.Column(db.Integer)
     avg_split_seconds = db.Column(db.Integer)
     avg_SR = db.Column(db.Integer)
     avg_watts = db.Column(db.Integer)
@@ -310,6 +344,7 @@ class PieceResult(db.Model, ToDictMixin):
     drag_factor = db.Column(db.Integer)
     comments = db.Column(db.UnicodeText)
     completed = db.Column(db.Boolean)
+    exclude_from_prs = db.Column(db.Boolean)
 
     #one (workout result) to many (piece results)
     workout_result = db.relationship("WorkoutResult", backref="piece_results")
@@ -317,6 +352,8 @@ class PieceResult(db.Model, ToDictMixin):
     #one (piece template) to many (piece results)
     piece_template = db.relationship("PieceTemplate", backref="piece_results")
 
+    #this makes sure that two different pieces can't be the nth piece in a
+    #given workout
     __table_args__ = (schema.UniqueConstraint(workout_result_id, ordinal),)
 
 
@@ -352,8 +389,12 @@ class SplitResult(db.Model, ToDictMixin):
     comments = db.Column(db.UnicodeText)
 
     #one (piece result) to many (split results)
-    piece_result = db.relationship("PieceResult", backref="split_results")
+    piece_result = db.relationship("PieceResult",
+                                   backref=db.backref("split_results",
+                                                      order_by="split_results.ordinal"))
 
+    #this makes sure that two different splits can't be the nth split in a
+    #given piece
     __table_args__ = (schema.UniqueConstraint(piece_result_id, ordinal),)
 
 

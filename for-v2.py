@@ -62,6 +62,11 @@ def log_user_out():
 
 
 ################################################################################
+# GOAL FIELDS TO BE PUT... SOMEWHERE... IN THE DATABASE #
 
+    goal_split_seconds = db.Column(db.Integer)
+    goal_sr = db.Column(db.Integer)
+    goal_hr = db.Column(db.Integer)
+    goal_watts = db.Column(db.Integer)
 
 

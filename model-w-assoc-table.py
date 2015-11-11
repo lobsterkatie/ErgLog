@@ -176,8 +176,8 @@ class UserStatList(db.Model, ToDictMixin):
 
 
 class WorkoutTemplate(db.Model, ToDictMixin):
-    """Workout templates (one-to-many with piece templates, many-to-one 
-       with users)"""
+    """Workout templates (many-to-many with piece templates via the
+       w_p_template_pairings table, many-to-one with users)"""
 
     __tablename__ = "workout_templates"
 
@@ -203,33 +203,40 @@ class WorkoutTemplate(db.Model, ToDictMixin):
     workout_results = db.relationship("WorkoutResult",
                                       backref="workout_template")
 
-    #many (piece templates) to one (workout templates)
+    #many (piece templates) to many (workout templates)
+    #TODO MAKE SURE THE ORDERING WORKS, AND FIGURE OUT IF YOU GET MULTIPLE
+    #COPIES OF PIECE TEMPLATES (DO I NEED TO SPECIFY PRIMARY AND SECONDARY
+    #JOINS?) SAME QUESTION WITH THE FILTERED PIECE TEMPLATES BELOW
     piece_templates = db.relationship("PieceTemplate",
-                                      order_by="PieceTemplate.ordinal",
-                                      backref="workout_template")
+                                      secondary="w_p_template_pairings",
+                                      order_by="WPTemplatePairing.ordinal",
+                                      backref="workout_templates")
 
     #internal join strings specifying the joins for filtered piece template
     #attributes below
     _wu_join = ("and_(" +
-                    "WorkoutTemplate.workout_template_id == " +
-                        "PieceTemplate.workout_template_id, " +
+                    "WPTemplatePairing.piece_template_id == " +
+                        "PieceTemplate.piece_template_id, " +
                     "PieceTemplate.phase == 'warmup')")
     _main_join = ("and_(" +
-                      "WorkoutTemplate.workout_template_id == " +
-                        "PieceTemplate.workout_template_id, " +
+                      "WPTemplatePairing.piece_template_id == " +
+                          "PieceTemplate.piece_template_id, " +
                       "PieceTemplate.phase == 'main')")
     _cd_join = ("and_(" +
-                    "WorkoutTemplate.workout_template_id == " +
-                        "PieceTemplate.workout_template_id, " +
+                    "WPTemplatePairing.piece_template_id == " +
+                        "PieceTemplate.piece_template_id, " +
                     "PieceTemplate.phase == 'cooldown')")
 
     #subsets of the associated piece templates, filtered by phase
     warmup_piece_templates = (db.relationship("PieceTemplate",
-                                              primaryjoin=_wu_join))
+                                              secondary="w_p_template_pairings",
+                                              secondaryjoin=_wu_join))
     main_piece_templates = (db.relationship("PieceTemplate",
-                                            primaryjoin=_main_join))
+                                            secondary="w_p_template_pairings",
+                                            secondaryjoin=_main_join))
     cooldown_piece_templates = (db.relationship("PieceTemplate",
-                                                primaryjoin=_cd_join))
+                                                secondary="w_p_template_pairings",
+                                                secondaryjoin=_cd_join))
 
 
     def __repr__(self):
@@ -241,18 +248,41 @@ class WorkoutTemplate(db.Model, ToDictMixin):
 
 
 
+class WPTemplatePairing(db.Model, ToDictMixin):
+    """Not quite a true association table (because it has ordinal data)
+       between workout templates and piece templates (one-to-many with
+       both)"""
+
+    __tablename__ = "w_p_template_pairings"
+
+    w_p_template_pairing_id = db.Column(db.Integer,
+                                        primary_key=True,
+                                        autoincrement=True)
+    workout_template_id = db.Column(db.Integer,
+                                    db.ForeignKey("workout_templates.workout_template_id"),
+                                    nullable=False)
+    piece_template_id = db.Column(db.Integer,
+                                  db.ForeignKey("piece_templates.piece_template_id"),
+                                  nullable=False)
+    ordinal = db.Column(db.Integer, nullable=False)
+
+
+    #this makes sure that two different pieces can't be the nth piece in a
+    #given workout
+    __table_args__ = (schema.UniqueConstraint(workout_template_id, ordinal),)
+
+
+
+
 class PieceTemplate(db.Model, ToDictMixin):
-    """Templates for pieces (many-to-one with workout templates)"""
+    """Templates for pieces (many-to-many with workout templates via the
+       w_p_template_pairings table)"""
 
     __tablename__ = "piece_templates"
 
     piece_template_id = db.Column(db.Integer,
                                   primary_key=True,
                                   autoincrement=True)
-    workout_template_id = db.Column(db.Integer,
-                                    db.ForeignKey("workout_templates.workout_template_id"),
-                                    nullable=False)
-    ordinal = db.Column(db.Integer, nullable=False)
     phase = db.Column(db.Enum("warmup", "main", "cooldown",
                               name="workout_phases"),
                               nullable=False)
@@ -262,10 +292,6 @@ class PieceTemplate(db.Model, ToDictMixin):
     default_split_length = db.Column(db.Integer)
     zone = db.Column(db.String(8))
     description = db.Column(db.UnicodeText)
-
-    #this makes sure that two different pieces can't be the nth piece in a
-    #given workout
-    __table_args__ = (schema.UniqueConstraint(workout_template_id, ordinal),)
 
 
     def __repr__(self):

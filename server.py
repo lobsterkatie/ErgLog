@@ -62,30 +62,44 @@ def show_log():
         return render_template("home.html")
 
 
-@app.route("/get-workout-details/<int:workout_id>.json")
-def return_workout_details(workout_id):
+@app.route("/get-workout-details/<int:workout_result_id>.json")
+def return_workout_details(workout_result_id):
     """Given a workout_result_id, return a jsonified version of the workout
-       details, including the workout result, workout template, piece results,
-       piece templates, and split results."""
+       details, including the workout template, piece templates, workout result,
+       piece results, and split results."""
 
-    data_to_jsonify = {}
 
-    #get the workout_result object associated with the given id, create a
-    #dictionary from it, and add that dictionary to data_to_jsonify
-    workout_result = WorkoutResult.query.get(workout_id)
-    data_to_jsonify["workout_result"] = workout_result.to_dict()
+    #get the workout_result, and piece_result objects associated with the
+    #given id
+    workout_result = (db.session.query(WorkoutResult)
+                                .filter(WorkoutResult.workout_result_id ==
+                                        workout_result_id)
+                                .one())
+    workout_template = workout_result.workout_template
+    piece_results = workout_result.piece_results
 
-    #get a list of all piece_result objects associated with the given workout
-    #id, create a dictionary of dictionaries representing them (keyed by
-    #ordinal), and add it to data_to_jsonify
-    piece_results = (PieceResult.query
-                                 .filter(PieceResult.workout_result_id ==
-                                         workout_id)
-                                 .all())
-    piece_results_as_dict_of_dicts = {}
-    # for piece in piece_results:
-    #     p
+    #TODO TAKE ME OUT ONCE IT'S CLEAR THIS WORKS (SEE NOTE IN MODEL.PY)
+    print piece_results
 
+    #get a list of all associated piece_result objects and create a dictionary
+    #of dictionaries representing them (keyed by ordinal), as well as a
+    #dictionary
+
+    pieces = {}
+    for piece_result in piece_results:
+        piece = {}
+        piece["results"] = piece_result.to_dict()
+        piece_results_dict[piece_result.ordinal] = piece
+
+    #
+
+    workout = {}
+    workout["results"] = workout_result.to_dict()
+    workout["template"] = workout_result.workout_template.to_dict()
+
+    #add all the data to the dictionary, then jsonify and return it
+    data_to_jsonify["workout"] = workout
+    data_to_jsonify[""]
 
     #jsonify the results
     # my_thing = jsonify(results)

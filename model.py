@@ -295,8 +295,9 @@ class WorkoutResult(db.Model, ToDictMixin):
     total_meters = db.Column(db.Integer, default=0, nullable=False)
     date = db.Column(db.Date, nullable=False)
     time_of_day = db.Column(db.Time)
-    avg_HR = db.Column(db.Integer)
+    avg_hr = db.Column(db.Integer)
     calories = db.Column(db.Integer)
+    goals = db.Column(db.UnicodeText)
     comments = db.Column(db.UnicodeText)
     public = db.Column(db.Boolean)
 
@@ -355,14 +356,16 @@ class PieceResult(db.Model, ToDictMixin):
                                   nullable=False)
     ordinal = db.Column(db.Integer, nullable=False)
     goal_split_seconds = db.Column(db.Integer)
-    goal_SR = db.Column(db.Integer)
+    goal_sr = db.Column(db.Integer)
+    goal_hr = db.Column(db.Integer)
+    goal_watts = db.Column(db.Integer)
     total_time_seconds = db.Column(db.Integer)
     total_meters = db.Column(db.Integer)
     split_length = db.Column(db.Integer)
     avg_split_seconds = db.Column(db.Integer)
-    avg_SR = db.Column(db.Integer)
+    avg_sr = db.Column(db.Integer)
     avg_watts = db.Column(db.Integer)
-    avg_HR = db.Column(db.Integer)
+    avg_hr = db.Column(db.Integer)
     drag_factor = db.Column(db.Integer)
     comments = db.Column(db.UnicodeText)
     completed = db.Column(db.Boolean)
@@ -370,6 +373,11 @@ class PieceResult(db.Model, ToDictMixin):
 
     #one (piece template) to many (piece results)
     piece_template = db.relationship("PieceTemplate", backref="piece_results")
+
+    #many (split results) to one (piece result)
+    split_results = db.relationship("SplitResult",
+                                    order_by="split_results.ordinal",
+                                    backref=piece_result)
 
     #this makes sure that two different pieces can't be the nth piece in a
     #given workout
@@ -402,15 +410,11 @@ class SplitResult(db.Model, ToDictMixin):
     time_seconds = db.Column(db.Integer)
     meters = db.Column(db.Integer)
     avg_split_seconds = db.Column(db.Integer)
-    avg_SR = db.Column(db.Integer)
+    avg_sr = db.Column(db.Integer)
     avg_watts = db.Column(db.Integer)
-    avg_HR = db.Column(db.Integer)
+    avg_hr = db.Column(db.Integer)
     comments = db.Column(db.UnicodeText)
 
-    #one (piece result) to many (split results)
-    piece_result = db.relationship("PieceResult",
-                                   backref=db.backref("split_results",
-                                                      order_by="split_results.ordinal"))
 
     #this makes sure that two different splits can't be the nth split in a
     #given piece

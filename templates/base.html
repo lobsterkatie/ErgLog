@@ -23,7 +23,7 @@
 
 <body>
     <!-- NAVBAR -->
-    <nav role="navigation" class="navbar navbar-default">
+    <nav role="navigation" class="navbar navbar-default navbar-fixed-top">
         <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
@@ -38,7 +38,7 @@
             <!-- Collection of nav links and other content for toggling -->
             <div id="navbarCollapse" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="#">About</a></li>
+                    <li><a href="/about">About</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <!-- Show/hide appropriate navbar buttons (based on
@@ -67,7 +67,7 @@
                         </a>
                     </li>
                     <li id="profile-nav-button" class="logged-in-nav-buttons" {{ logged_in_buttons_visibility }}>
-                        <a data-toggle="modal" href="#" data-target="#profileModal">
+                        <a href="/profile">
                             Profile
                         </a>
                     </li>
@@ -80,7 +80,7 @@
                     <!-- navbar buttons for a logged-out user; shown
                          by default -->
                     <li id="register-nav-button" class="logged-out-nav-buttons" {{ logged_out_buttons_visibility }}>
-                        <a data-toggle="modal" href="#registrationModal" >
+                        <a data-toggle="modal" href="#registrationModal">
                             Register
                         </a>
                     </li>
@@ -95,6 +95,10 @@
     </nav> <!-- end of navbar -->
 
     <div class="container-fluid" id="everything-else">
+
+        {% block body%}
+            BODY STUFF
+        {% endblock %}
 
         <!-- REGISTRATION MODAL -->
         <div class="modal fade" id="registrationModal" tabindex="-1" role="dialog">
@@ -170,7 +174,7 @@
 
                     <div class="modal-footer">
                         <span id="reg-to-login-msg">
-                            Already registered? Click here to 
+                            Already registered? Click here to
                             <a data-toggle="modal" href="#" data-dismiss="modal" data-target="#loginModal">
                                 login.
                             </a>
@@ -215,7 +219,7 @@
 
                     <div class="modal-footer">
                         <span id="login-to-reg-msg">
-                            Not yet registered? Click here to 
+                            Not yet registered? Click here to
                             <a data-toggle="modal" href="#" data-dismiss="modal" data-target="#registrationModal">
                                 register.
                             </a>
@@ -244,7 +248,7 @@
                     </div> <!-- end of modal header -->
 
                     <div class="modal-body">
-                        
+
                     </div> <!-- end of modal body -->
 
                     <div class="modal-footer">
@@ -266,10 +270,6 @@
                 {% endif %}
             {% endwith %}
         </div>
-
-        {% block body%}
-            BODY STUFF
-        {% endblock %}
     </div>
 
 </body>

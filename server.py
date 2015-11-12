@@ -69,25 +69,24 @@ def return_workout_details(workout_result_id):
        piece results, and split results.
 
        The final jsonified data will have the following structure:
-
-       workout_details = {
-            workout_template: {dict}
-            workout_result: {dict}
-            pieces: {
-                piece 1: {
-                    piece_template: {dict}
-                    piece_result: {dict}
-                    splits: {
-                        split 1: {dict}
-                        split 2: {dict}
+           workout_details = {
+                workout_template: {dict}
+                workout_result: {dict}
+                pieces: {
+                    piece 1: {
+                        piece_template: {dict}
+                        piece_result: {dict}
+                        splits: {
+                            split 1: {dict}
+                            split 2: {dict}
+                            ...
+                        }
+                    piece 2: {
                         ...
                     }
-                piece 2: {
                     ...
                 }
-                ...
             }
-        }
     """
 
     #get the workout_result and workout_template objects associated with the
@@ -103,7 +102,7 @@ def return_workout_details(workout_result_id):
     #get the piece results for this workout and create a dictionary of
     #piece dictionaries (keyed by ordinal)
     #each piece's dictionary will include dictionary versions of the
-    #template object, results object, and a splits dictionary holding 
+    #template object, results object, and a splits dictionary holding
     #dictionary versions of the splits (also keyed by ordinal)
     piece_results = workout_result.piece_results
     pieces_dict = {}

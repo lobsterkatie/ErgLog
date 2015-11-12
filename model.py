@@ -176,7 +176,7 @@ class UserStatList(db.Model, ToDictMixin):
 
 
 class WorkoutTemplate(db.Model, ToDictMixin):
-    """Workout templates (one-to-many with piece templates, many-to-one 
+    """Workout templates (one-to-many with piece templates, many-to-one
        with users)"""
 
     __tablename__ = "workout_templates"
@@ -308,15 +308,15 @@ class WorkoutResult(db.Model, ToDictMixin):
     #internal join strings specifying the joins for filtered piece result
     #attributes below
     _wu_join = ("and_(" +
-                    "WorkoutResult.workout_result_id == " + 
+                    "WorkoutResult.workout_result_id == " +
                         "PieceResult.workout_result_id, " +
                     "PieceResult.phase == 'warmup')")
     _main_join = ("and_(" +
-                      "WorkoutResult.workout_result_id == " + 
+                      "WorkoutResult.workout_result_id == " +
                           "PieceResult.workout_result_id, " +
                       "PieceResult.phase == 'main')")
     _cd_join = ("and_(" +
-                    "WorkoutResult.workout_result_id == " + 
+                    "WorkoutResult.workout_result_id == " +
                         "PieceResult.workout_result_id, " +
                     "PieceResult.phase == 'cooldown')")
 
@@ -377,7 +377,7 @@ class PieceResult(db.Model, ToDictMixin):
     #many (split results) to one (piece result)
     split_results = db.relationship("SplitResult",
                                     order_by="split_results.ordinal",
-                                    backref=piece_result)
+                                    backref="piece_result")
 
     #this makes sure that two different pieces can't be the nth piece in a
     #given workout

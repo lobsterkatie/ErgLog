@@ -305,28 +305,29 @@ class WorkoutResult(db.Model, ToDictMixin):
     #many (piece results) to one (workout result)
     piece_results = db.relationship("PieceResult", backref="workout_result")
 
-    #internal join strings specifying the joins for filtered piece result
-    #attributes below
-    _wu_join = ("and_(" +
-                    "WorkoutResult.workout_result_id == " +
-                        "PieceResult.workout_result_id, " +
-                    "PieceResult.phase == 'warmup')")
-    _main_join = ("and_(" +
-                      "WorkoutResult.workout_result_id == " +
-                          "PieceResult.workout_result_id, " +
-                      "PieceResult.phase == 'main')")
-    _cd_join = ("and_(" +
-                    "WorkoutResult.workout_result_id == " +
-                        "PieceResult.workout_result_id, " +
-                    "PieceResult.phase == 'cooldown')")
+    # TODO fix these
+    # #internal join strings specifying the joins for filtered piece result
+    # #attributes below
+    # _wu_join = ("and_(" +
+    #                 "WorkoutResult.workout_result_id == " +
+    #                     "PieceResult.workout_result_id, " +
+    #                 "PieceResult.phase == 'warmup')")
+    # _main_join = ("and_(" +
+    #                   "WorkoutResult.workout_result_id == " +
+    #                       "PieceResult.workout_result_id, " +
+    #                   "PieceResult.phase == 'main')")
+    # _cd_join = ("and_(" +
+    #                 "WorkoutResult.workout_result_id == " +
+    #                     "PieceResult.workout_result_id, " +
+    #                 "PieceResult.phase == 'cooldown')")
 
-    #subsets of the associated piece results, filtered by phase
-    warmup_piece_results = (db.relationship("PieceTemplate",
-                                              primaryjoin=_wu_join))
-    main_piece_results = (db.relationship("PieceTemplate",
-                                            primaryjoin=_main_join))
-    cooldown_piece_results = (db.relationship("PieceTemplate",
-                                                primaryjoin=_cd_join))
+    # #subsets of the associated piece results, filtered by phase
+    # warmup_piece_results = (db.relationship("PieceTemplate",
+    #                                           primaryjoin=_wu_join))
+    # main_piece_results = (db.relationship("PieceTemplate",
+    #                                         primaryjoin=_main_join))
+    # cooldown_piece_results = (db.relationship("PieceTemplate",
+    #                                             primaryjoin=_cd_join))
 
 
     def __repr__(self):
@@ -376,7 +377,7 @@ class PieceResult(db.Model, ToDictMixin):
 
     #many (split results) to one (piece result)
     split_results = db.relationship("SplitResult",
-                                    order_by="split_results.ordinal",
+                                    order_by="SplitResult.ordinal",
                                     backref="piece_result")
 
     #this makes sure that two different pieces can't be the nth piece in a

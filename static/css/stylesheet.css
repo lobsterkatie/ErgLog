@@ -18,6 +18,10 @@ input.validation-error {
 
 /* base.html */
 
+#everything-else {
+    padding-top: 70px;
+}
+
 #dob-picker {
     background-color: white;
 }

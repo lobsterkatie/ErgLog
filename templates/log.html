@@ -23,13 +23,18 @@
                 Only {{ days_til_HOCR }} days until Head of the Charles!
             {% endif %}
         </div>
+    </div>
+    <div class="row">
         <div class="col-xs-12" id="log-controllers">
             {# TODO MAKE BUTTONS TO ADD WORKOUT, ETC #}
-            Useful stuff here (date range pickers, buttons, etc)
+            <button></button>
+            <!-- Create a Workout -->
+            <!-- Add Results to a Workout -->
         </div>
-
+    </div>
+    <div class="row">
         <!-- RECENT WORKOUTS TABLE -->
-        <div class="col-xs-12 col-md-10 col-md-offset-1" id="log-data-table">
+        <div id="recent-workouts-table" class="col-xs-12 col-md-10 col-md-offset-1">
             <table class="table table-hover">
                 <thead>
                     <tr>
@@ -52,42 +57,69 @@
                                 </a>
                             <td>{{workout.workout_template.description}}</td>
                             <td>{{workout.total_meters}} m</td>
+                            <!-- TODO PROGRAM EDIT AND DELETE -->
                             <td><a href="">Edit</a></td>
                             <td><a href="">Delete</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
-            </table> <!-- end of recent workouts table -->
+            </table>
+        </div> <!-- end recent workouts table -->
 
-            <!-- WORKOUT DETAILS MODAL -->
-            <div class="modal fade" id="workout-details-modal" tabindex="-1" role="dialog">
-                <div class="modal-dialog modal-sm">
-                    <div class="modal-content">
+        <!-- CREATE A WORKOUT MODAL -->
+        <div class="modal fade" id="workout-details-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
 
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">
-                                &times;
-                            </button>
-                            <h4 class="modal-title">
-                                Workout Details
-                            </h4>
-                            <!-- <span class="hidden-modal-data">
-                                <input id="workout-details-workout-id" type="text" readonly>
-                            </span> -->
-                        </div> <!-- end of modal header -->
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            &times;
+                        </button>
+                        <h4 class="modal-title">
+                            Create a Workout
+                        </h4>
+                    </div> <!-- end of modal header -->
 
-                        <div class="modal-body">
-                            {# {{ my_thing["special_stuff"] }} #}
-                        </div> <!-- end of modal body -->
+                    <div class="modal-body">
 
-                        <div class="modal-footer">
-                            
-                        </div> <!-- end of modal footer -->
+                    </div> <!-- end of modal body -->
 
-                    </div> <!-- end of modal content -->
-                </div>
-            </div> <!-- end of logout modal -->
+                    <div class="modal-footer">
 
-        </div>
+                    </div> <!-- end of modal footer -->
+
+                </div> <!-- end of modal content -->
+            </div>
+        </div> <!-- end of create a workout modal -->
+
+        <!-- WORKOUT DETAILS MODAL -->
+        <div class="modal fade" id="workout-details-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            &times;
+                        </button>
+                        <h4 class="modal-title">
+                            Workout Details
+                        </h4>
+                        <!-- <span class="hidden-modal-data">
+                            <input id="workout-details-workout-id" type="text" readonly>
+                        </span> -->
+                    </div> <!-- end of modal header -->
+
+                    <div class="modal-body">
+                        {# {{ my_thing["special_stuff"] }} #}
+                    </div> <!-- end of modal body -->
+
+                    <div class="modal-footer">
+
+                    </div> <!-- end of modal footer -->
+
+                </div> <!-- end of modal content -->
+            </div>
+        </div> <!-- end of workout details modal -->
+
     </div>
 {% endblock %}

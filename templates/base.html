@@ -72,7 +72,7 @@
                         </a>
                     </li>
                     <li id="logout-nav-button" class="logged-in-nav-buttons" {{ logged_in_buttons_visibility }}>
-                        <a data-toggle="modal" href="#" data-target="#logoutModal">
+                        <a href="#logoutModal" data-toggle="modal" data-keyboard="false">
                             Logout
                         </a>
                     </li>
@@ -80,12 +80,12 @@
                     <!-- navbar buttons for a logged-out user; shown
                          by default -->
                     <li id="register-nav-button" class="logged-out-nav-buttons" {{ logged_out_buttons_visibility }}>
-                        <a data-toggle="modal" href="#registrationModal">
+                        <a href="#registrationModal" data-toggle="modal" data-keyboard="false">
                             Register
                         </a>
                     </li>
                     <li id="login-nav-button" class="logged-out-nav-buttons" {{ logged_out_buttons_visibility }}>
-                        <a data-toggle="modal" href="#" data-target="#loginModal">
+                        <a href="#loginModal" data-toggle="modal" data-keyboard="false">
                             Login
                         </a>
                     </li>

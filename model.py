@@ -259,8 +259,10 @@ class PieceTemplate(db.Model, ToDictMixin):
     piece_type = db.Column(db.Enum("time", "distance", name="piece_types"))
     distance = db.Column(db.Integer)
     time_seconds = db.Column(db.Integer)
+    has_splits = db.Column(db.Boolean)
     default_split_length = db.Column(db.Integer)
-    zone = db.Column(db.String(8))
+    rest = db.Column(db.Unicode(32))
+    zone = db.Column(db.Unicode(32))
     description = db.Column(db.UnicodeText)
 
     #this makes sure that two different pieces can't be the nth piece in a
@@ -362,6 +364,7 @@ class PieceResult(db.Model, ToDictMixin):
     goal_watts = db.Column(db.Integer)
     total_time_seconds = db.Column(db.Integer)
     total_meters = db.Column(db.Integer)
+    has_splits = db.Column(db.Boolean)
     split_length = db.Column(db.Integer)
     avg_split_seconds = db.Column(db.Integer)
     avg_sr = db.Column(db.Integer)

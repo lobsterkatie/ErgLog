@@ -1,11 +1,11 @@
 $(document).ready(function () {
 
-    /* event listener/handler to show workout details modal, passing the
+    /* event listener/handler to populate workout details modal, passing the
        workout id to an ajax request */
     $("#workout-details-modal").on("show.bs.modal", function (evt) {
 
         //get data-workout-id attribute of the clicked date
-        var workoutID = $(evt.relatedTarget).data("workout-id");
+        var workoutID = $(evt.relatedTarget).data("workoutId");
 
         /*//populate the hidden workoutID textbox
         $(evt.currentTarget).find("#workout-details-workout-id").val(workoutID);*/
@@ -16,7 +16,31 @@ $(document).ready(function () {
 
     });
 
-    
+    /*$(".modal").on("show.bs.modal", function (evt) {
+
+        //
+        $(evt.currentTarget).data("caller", $(evt.relatedTarget));
+
+
+
+    });
+
+    $(".modal").on("hidden.bs.modal", function (evt) {
+
+        //
+        console.log("here");
+        $("#dummy-button").click();
+
+
+
+    });*/
+
+    $("#caw-add-time-piece").click(function(evt) {
+
+
+    });
+
+
     //add workout details to the modal's DOM
     function displayWorkoutDetails (data) {
         // TODO CODE ME!!! (displayWorkoutDetails)

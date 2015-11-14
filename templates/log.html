@@ -25,17 +25,19 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-xs-12" id="log-controllers">
-            {# TODO MAKE BUTTONS TO ADD WORKOUT, ETC #}
-            <button type="button" class="btn btn-default" data-toggle="modal" href="#create-a-workout-modal">
-                Create a Workout
-            </button>
-            <button type="button" class="btn btn-default" data-toggle="modal" href="#add-results-modal">
-                Add Results to a Workout
-            </button>
+        <div class="col-xs-12">
+            <span id="log-buttons" class="center-block">
+                <button type="button" class="btn btn-default" data-toggle="modal" data-keyboard="false" href="#create-a-workout-modal">
+                    Create a Workout
+                </button>
+                <button type="button" class="btn btn-default" data-toggle="modal" href="#add-results-modal">
+                    Add Results to a Workout
+                </button>
+            </span>
         </div>
     </div>
     <div class="row">
+        <!-- <button id="dummy-button" style="display:none"></button> -->
         <!-- RECENT WORKOUTS TABLE -->
         <div id="recent-workouts-table" class="col-xs-12 col-md-10 col-md-offset-1">
             <table class="table table-hover">
@@ -68,9 +70,320 @@
                 </tbody>
             </table>
         </div> <!-- end recent workouts table -->
+    </div>
 
+    <!-- MODALS -->
+    <div class="row">
         <!-- CREATE A WORKOUT MODAL -->
-        <div class="modal fade" id="workout-details-modal" tabindex="-1" role="dialog">
+        <div class="modal fade" id="create-a-workout-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            &times;
+                        </button>
+                        <h1 class="modal-title">
+                            Create a Workout
+                        </h1>
+                        <p>
+                            Please fill out the form below. Required fields are marked with a *. When you're done, you can either save the workout and fill in your results later, or proceed directly to results entry.
+                        </p>
+                    </div> <!-- end of modal header -->
+
+                    <div class="modal-body">
+                        <form id="create-a-workout-form" class="form-horizontal" role="form" action="/create-workout" method="POST">
+                            <div id="caw-overall-description">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3>Describe the workout</h3>
+                                        <h4>
+                                            <small>
+                                                Enter descriptive details of the workout here. These are just for you, and are all optional, except for the overall description.
+                                            </small>
+                                        </h4>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-2 text-right">
+                                        <label for="workout-description" class="control-label">
+                                            Overall description (*)
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="workout-description">
+                                    </div>
+                                    <div class="col-sm-offset-2 col-sm-10">
+                                        <p class="help-block text-muted">
+                                            Make this short enough to fit on one line but specific enough to uniqely identify the workout
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-2 text-right">
+                                        <label for="primary-zone" class="control-label">
+                                            Primary zone
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" id="primary-zone" placeholder="Zone">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-2 text-right">
+                                        <label class="control-label">
+                                            Warmup
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <label for="warmup-format" hidden>
+                                            Warmup Format
+                                        </label>
+                                        <input type="text" class="form-control" id="warmup-format" placeholder="Format">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-10 col-sm-offset-2">
+                                        <label for="warmup-sr" hidden>
+                                            Warmup stroke rates
+                                        </label>
+                                        <input type="text" class="form-control" id="warmup-sr" placeholder="Stroke rates">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-10 col-sm-offset-2">
+                                        <label for="warmup-notes" hidden>
+                                            Warmup notes
+                                        </label>
+                                        <input type="text" class="form-control" id="warmup-notes" placeholder="Notes">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-2 text-right">
+                                        <label class="control-label">
+                                            Main workout
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <label for="main-format" hidden>
+                                            Main workout format
+                                        </label>
+                                        <input type="text" class="form-control" id="main-format" placeholder="Format">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-10 col-sm-offset-2">
+                                        <label for="main-sr" hidden>
+                                            Main workout stroke rates
+                                        </label>
+                                        <input type="text" class="form-control" id="main-sr" placeholder="Stroke rates">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-10 col-sm-offset-2">
+                                        <label for="main-notes" hidden>
+                                            Main workout notes
+                                        </label>
+                                        <input type="text" class="form-control" id="main-notes" placeholder="Notes">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-2 text-right">
+                                        <label class="control-label">
+                                            Cooldown
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <label for="cooldown-format" hidden>
+                                            Cooldown
+                                        </label>
+                                        <input type="text" class="form-control" id="cooldown-format" placeholder="Format">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-10 col-sm-offset-2">
+                                        <label for="cooldown-sr" hidden>
+                                            Cooldown stroke rates
+                                        </label>
+                                        <input type="text" class="form-control" id="cooldown-sr" placeholder="Stroke rates">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-10 col-sm-offset-2">
+                                        <label for="cooldown-notes" hidden>
+                                            Cooldown notes
+                                        </label>
+                                        <input type="text" class="form-control" id="cooldown-notes" placeholder="Notes">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-10 col-sm-offset-2 text-right">
+                                        <button type="submit" class="btn btn-default">
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="caw-warmup">
+                                <table id="caw-wu-table" class="table table-condensed caw-piece-table">
+                                    <thead>
+                                        <tr id="caw-wu-table-head">
+                                            <th id="caw-wu-col-ordinal" class="caw-ordinal">
+                                                Piece #
+                                            </th>
+                                            <th id="caw-wu-col-zone" class="caw-zone">
+                                                Zone
+                                            </th>
+                                            <!-- Only one of distance/time shown at a time -->
+                                            <!-- <th id="caw-col-dist-" colspan="2" hidden>
+                                                Distance
+                                            </th> -->
+                                            <th id="caw-wu-col-dist-time" class="caw-dist-time">
+                                                Distance/Time
+                                            </th>
+                                            <th id="caw-wu-col-rest" class="caw-rest">
+                                                Rest
+                                            </th>
+                                            <th id="caw-wu-col-splits" class="caw-splits">
+                                                Splits? (length)
+                                            </th>
+                                            <th id="caw-wu-col-notes" class="caw-notes">
+                                                Notes
+                                            </th>
+                                            <th id="caw-wu-col-delete" class="caw-delete">
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr id="caw-wu-inputs-piece-">
+                                            <td hidden>
+                                                <label for="caw-phase-piece-">
+                                                    Phase piece
+                                                </label>
+                                                <input id="caw-phase-piece-" type="text" name="phase-piece-" value="" readonly>
+                                            </td>
+                                            <td hidden>
+                                                <!-- <label for="caw-phase-piece-">
+                                                    Type piece
+                                                </label> -->
+                                                <!-- Piece type -->
+                                                <input id="caw-type-piece-" type="text" name="phase-piece-" aria-label="phase-piece-" value="" readonly>
+                                            </td>
+                                            <td>
+                                                <label for="caw-ordinal-piece-" hidden>
+                                                    Ordinal piece
+                                                </label>
+                                                <input id="caw-ordinal-piece-" class="caw-ordinal" type="text" name="ordinal-piece-" value="" onfocus="this.blur()" readonly>
+                                            </td>
+                                            <td>
+                                                <label for="caw-zone-piece-" hidden>
+                                                    Zone piece
+                                                </label>
+                                                <input id="caw-zone-piece-" type="text" name="zone-piece-">
+                                            </td>
+                                            <td id="caw-dist-td-piece-" hidden>
+                                                <label for="caw-dist-piece-" hidden>
+                                                    Distance piece
+                                                </label>
+                                                <input id="caw-dist-piece-" class="caw-dist-time" type="text" name="dist-piece-" placeholder="m">
+                                            </td>
+                                            <!-- <td id="caw-dist-unit-piece-" hidden>
+                                                m
+                                            </td> -->
+                                            <td>
+                                                <label for="caw-time-piece-" hidden>
+                                                    Time piece
+                                                </label>
+                                                <input id="caw-time-piece-" class="caw-dist-time" type="text" name="time-piece-" placeholder="h:m:s">
+                                            </td>
+                                            <!-- <td id="caw-time-unit-piece-">
+                                                h:m:s
+                                            </td> -->
+                                            <td>
+                                                <label for="caw-rest-piece-" hidden>
+                                                    Rest piece
+                                                </label>
+                                                <input id="caw-rest-piece-" type="text" name="rest-piece-">
+                                            </td>
+                                            <!-- <td>
+                                                <div class="input-group">
+                                                    <span class="input-group-addon">
+                                                        <input type="checkbox" aria-label="...">
+                                                    </span>
+                                                    <input type="text" class="form-control" aria-label="...">
+                                                </div>
+                                            </td> -->
+                                            <!-- <td>
+                                                <label for="caw-split-bool-piece-" hidden>
+                                                    Splits desired piece
+                                                </label>
+                                            </td> -->
+                                            <td class="caw-split-td">
+                                                <!-- <label for="caw-split-length-piece-" hidden>
+                                                    Split length piece
+                                                </label> -->
+                                                <input id="caw-split-length-piece-" class="caw-split-length"aria-label="split-length-piece-" type="text" name="split-length-piece-">
+                                                <input id="caw-split-bool-piece-" class="caw-split-bool" aria-label="splits-desired-piece-" type="checkbox" name="split-bool-piece-">
+                                            </td>
+                                            <td>
+                                                <label for="caw-notes-piece-" hidden>
+                                                    Notes piece
+                                                </label>
+                                                <input id="caw-notes-piece-" type="text" name="notes-piece-">
+                                            </td>
+                                            <td>
+                                                <label for="caw-delete-piece-" hidden>
+                                                    Delete piece
+                                                </label>
+                                                <a class="caw-delete-piece-link" href="#" data-piece-num="">Delete</a>
+                                                <!-- <input id="caw-delete-piece-" type="button" name="caw-delete-piece-" value="Delete"> -->
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot >
+                                        <tr>
+                                            <td colspan="9">
+                                                <span class="caw-table-footer center-block">
+                                                    Repeat pieces
+                                                    <input id="caw-repeat-start-piece" class="caw-repeat" type="text">
+                                                    through
+                                                    <input id="caw-repeat-end-piece" class="caw-repeat" type="text">
+                                                    ,
+                                                    <input id="caw-repeat-num-times" class="caw-repeat" type="text">
+                                                    times
+                                                    <button id="caw-repeat-go" type="button" class="btn btn-default">
+                                                        Go
+                                                    </button>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="9">
+                                                <span class="caw-table-footer center-block">
+                                                    <button id="caw-add-time-piece" type="button" class="btn btn-default" data-phase="">
+                                                        Add a time-based piece
+                                                    </button>
+                                                    <button id="caw-add-dist-piece" type="button" class="btn btn-default">
+                                                        Add a distance-based piece
+                                                    </button>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </form>
+                    </div> <!-- end of modal body -->
+
+                    <div class="modal-footer">
+
+                    </div> <!-- end of modal footer -->
+
+                </div> <!-- end of modal content -->
+            </div>
+        </div> <!-- END OF CREATE A WORKOUT MODAL -->
+
+        <!-- ADD RESULTS MODAL -->
+        <div class="modal fade" id="add-results-modal" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-sm">
                 <div class="modal-content">
 
@@ -93,7 +406,7 @@
 
                 </div> <!-- end of modal content -->
             </div>
-        </div> <!-- end of create a workout modal -->
+        </div> <!-- END OF ADD RESULTS MODAL -->
 
         <!-- WORKOUT DETAILS MODAL -->
         <div class="modal fade" id="workout-details-modal" tabindex="-1" role="dialog">
@@ -122,7 +435,7 @@
 
                 </div> <!-- end of modal content -->
             </div>
-        </div> <!-- end of workout details modal -->
-
+        </div> <!-- END OF WORKOUT DETAILS MODAL -->
     </div>
+
 {% endblock %}

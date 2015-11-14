@@ -1,5 +1,13 @@
 /* general */
 
+/*.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}*/
+
 /* forms */
 
 .form-validation-error {
@@ -20,6 +28,10 @@ input.validation-error {
 
 #everything-else {
     padding-top: 70px;
+}
+
+.close {
+    margin-top: -2px;
 }
 
 #dob-picker {
@@ -54,6 +66,10 @@ input.validation-error {
     font-style: italic;
 }
 
+#log-buttons {
+    text-align: center;
+}
+
 #log-table-title {
     text-align: center;
     font-size: 1.25em;
@@ -65,4 +81,80 @@ input.validation-error {
 
 .hidden-modal-data {
     display: none;
+}
+
+.caw-piece-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+/* make the inputs fit in their cells */
+.caw-piece-table input {
+    width: 100%;
+    border-bottom: 1px black;
+    border-style: none none solid none;
+}
+
+.caw-ordinal {
+    width: 7%;
+}
+
+.caw-zone {
+    width: 7%;
+}
+
+.caw-dist-time {
+    width: 13%;
+}
+
+.caw-rest {
+    width: 7%;
+}
+
+.caw-splits {
+    width: 15%;
+}
+
+.caw-notes {
+    width: 44%;
+}
+
+.caw-delete {
+    width: 7%;
+}
+
+input.caw-ordinal {
+    text-align: right;
+    border: none;
+}
+
+input.caw-dist-time {
+    text-align: right;
+}
+
+.caw-split-td {
+    position: relative;
+}
+
+input.caw-split-length {
+    text-align: right;
+    position: absolute;
+    right: 8px;
+    width: 70%;
+}
+
+input.caw-split-bool {
+    width: initial;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+}
+
+.caw-table-footer {
+    text-align: center;
+}
+
+input.caw-repeat {
+    width: 3%;
+    text-align: right;
 }

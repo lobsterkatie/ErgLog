@@ -95,7 +95,7 @@ input.validation-error {
     border-style: none none solid none;
 }
 
-.caw-ordinal {
+th.caw-ordinal {
     width: 7%;
 }
 
@@ -124,7 +124,7 @@ input.validation-error {
 }
 
 input.caw-ordinal {
-    text-align: right;
+    text-align: center;
     border: none;
 }
 
@@ -156,5 +156,9 @@ input.caw-split-bool {
 
 input.caw-repeat {
     width: 3%;
-    text-align: right;
+    text-align: center;
+}
+
+.caw-repeat-go-button {
+    margin-left: 5px;
 }

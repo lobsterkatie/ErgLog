@@ -265,7 +265,8 @@ $(document).ready(function () {
         $(this).closest("form").data("nextPieceNum", nextPieceNum);
         parentTable.attr("data-pieces-in-phase", newPiecesInPhase);
         parentTable.data("piecesInPhase", newPiecesInPhase);
-        $("#caw-num-pieces").val(totalPieces + 1);
+        $("#caw-num-pieces").val(++totalPieces);
+        console.log("numPieces is now " + (totalPieces));
 
 
 

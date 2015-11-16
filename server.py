@@ -62,11 +62,26 @@ def show_log():
         return render_template("home.html")
 
 
-@app.route("/save-workout-template", methods=["POST"])
+@app.route("/save-workout-template.json", methods=["POST"])
 def save_workout_template():
     """When user submits form creating a new workout, save it in the database,
        and return the template (jsonified) for further action (like adding
-       results) if desired."""
+       results) if desired.
+
+       The final jsonified data will have the following structure:
+            new_workout_template = {
+                workout_template: {dict}
+                pieces: {
+                    piece 1: {
+                        template: {dict}
+                    }
+                    piece 2: {
+                        template: {dict}
+                    }
+                    ...
+                }
+            }
+    """
 
     #create a new record in the workout_templates table with the given inputs
     new_w_temp = WorkoutTemplate()
@@ -92,7 +107,7 @@ def save_workout_template():
                                                 new_w_temp.date_added)
                                   .one())
 
-    #do the same for all the piece templates
+    #create a new record in the piece_templates table for each piece template
     num_pieces = request.form.get("num-pieces")
     for i in range(1, num_pieces):
         new_p_temp = PieceTemplate()
@@ -107,9 +122,16 @@ def save_workout_template():
         new_p_temp.rest = request.form.get()
         new_p_temp.zone = request.form.get()
         new_p_temp.notes = request.form.get()
+        db.session.add(new_p_temp)
+        db.session.commit()
 
+    #create a dictionary version of the new workout template (verbosely, which
+    #means it will include the just-added piece templates)
+    new_workout_template_dict = added_w_template.to_dict_verbose()
 
-
+    #jsonify the result and return it
+    new_workout_template_json = jsonify(new_workout_template_dict)
+    return new_workout_template_json
 
 
 
@@ -118,8 +140,8 @@ def save_workout_template():
 @app.route("/get-workout-details/<int:workout_result_id>.json")
 def return_workout_details(workout_result_id):
     """Given a workout_result_id, return a jsonified version of the workout
-       details, including the workout template, piece templates, workout result,
-       piece results, and split results.
+       details, including the workout template, piece templates, workout
+       result, piece results, and split results.
 
        The final jsonified data will have the following structure:
            workout_details = {
@@ -152,8 +174,8 @@ def return_workout_details(workout_result_id):
     workout_details_dict = workout_result.to_dict_verbose()
 
     #jsonify the result and return it
-    workout_details = jsonify(workout_details_dict)
-    return workout_details
+    workout_details_json = jsonify(workout_details_dict)
+    return workout_details_json
 
 
 

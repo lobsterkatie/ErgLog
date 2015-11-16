@@ -154,6 +154,10 @@ input.caw-split-bool {
     text-align: center;
 }
 
+.caw-repeat-row {
+    border-top: 2px;
+}
+
 input.caw-repeat {
     width: 3%;
     text-align: center;
@@ -161,4 +165,9 @@ input.caw-repeat {
 
 .caw-repeat-go-button {
     margin-left: 5px;
+}
+
+.table > tfoot > tr > td.caw-table-buttons {
+    border-top: none;
+    padding-top: 15px;
 }

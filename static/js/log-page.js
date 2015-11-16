@@ -15,6 +15,40 @@ $(document).ready(function () {
     }
 
 
+    /*********** navigate between panes in the create-a-workout form **********/
+
+    $("#caw-overall-next-button").click(function() {
+        $("#caw-overall-description").hide();
+        $("#caw-warmup").show();
+    });
+
+    $("#caw-warmup-previous-button").click(function() {
+        $("#caw-warmup").hide();
+        $("#caw-overall-description").show();
+    });
+
+    $("#caw-warmup-next-button").click(function() {
+        $("#caw-warmup").hide();
+        $("#caw-main").show();
+    });
+
+    $("#caw-main-previous-button").click(function() {
+        $("#caw-main").hide();
+        $("#caw-warmup").show();
+    });
+
+    $("#caw-main-next-button").click(function() {
+        $("#caw-main").hide();
+        $("#caw-cooldown").show();
+    });
+
+    $("#caw-cooldown-previous-button").click(function() {
+        $("#caw-cooldown").hide();
+        $("#caw-main").show();
+    });
+
+
+
     /**************** add a piece to the create-a-workout form ****************/
 
     $(".caw-add-piece-button").click(function() {

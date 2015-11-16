@@ -105,7 +105,7 @@
                                 <div class="form-group">
                                     <div class="col-sm-2 text-right">
                                         <label for="workout-description" class="control-label">
-                                            Overall description (*)
+                                            Overall description*
                                         </label>
                                     </div>
                                     <div class="col-sm-10">
@@ -193,7 +193,7 @@
                                     </div>
                                     <div class="col-sm-10">
                                         <label for="cooldown-format" hidden>
-                                            Cooldown
+                                            Cooldown format
                                         </label>
                                         <input type="text" class="form-control" id="cooldown-format" placeholder="Format">
                                     </div>
@@ -216,116 +216,254 @@
                                 </div>
                                 <div class="form-group">
                                     <div class="col-sm-10 col-sm-offset-2 text-right">
-                                        <button type="submit" class="btn btn-default">
+                                        <button type="button" id="caw-overall-next-button" class="btn btn-default">
                                             Next
                                         </button>
                                     </div>
                                 </div>
                             </div>
-                            <div id="caw-warmup">
-                                <table id="caw-table-warmup" class="table table-condensed caw-piece-table" data-phase="warmup"data-pieces-in-phase="0">
-                                    <thead hidden>
-                                        <tr id="caw-wu-table-head">
-                                            <th id="caw-wu-col-ordinal" class="caw-ordinal">
-                                                Piece #
-                                            </th>
-                                            <th id="caw-wu-col-zone" class="caw-zone">
-                                                Zone
-                                            </th>
-                                            <th id="caw-wu-col-dist-time" class="caw-dist-time">
-                                                Distance/Time
-                                            </th>
-                                            <th id="caw-wu-col-rest" class="caw-rest">
-                                                Rest
-                                            </th>
-                                            <th id="caw-wu-col-splits" class="caw-splits">
-                                                Splits? (length)
-                                            </th>
-                                            <th id="caw-wu-col-notes" class="caw-notes">
-                                                Notes
-                                            </th>
-                                            <th id="caw-wu-col-delete" class="caw-delete">
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr id="caw-wu-inputs-piece-x" hidden>
-                                            <!-- hidden info fields -->
-                                            <td hidden>
-                                                <!-- piece phase -->
-                                                <input id="caw-phase-piece-x" type="text" aria-label="phase-piece-x" name="phase-piece-x" value="" readonly>
-                                            </td>
-                                            <td hidden>
-                                                <!-- piece type -->
-                                                <input id="caw-type-piece-x" type="text" name="type-piece-x" aria-label="type-piece-x" value="" readonly>
-                                            </td>
-                                            <!-- input fields for piece x -->
-                                            <td>
-                                                <!-- piece ordinal -->
-                                                <input id="caw-ordinal-piece-x" class="caw-ordinal" type="text" aria-label="ordinal-piece-x" name="ordinal-piece-x" value="" onfocus="this.blur()" readonly>
-                                            </td>
-                                            <td>
-                                                <!-- piece zone -->
-                                                <input id="caw-zone-piece-x" type="text" aria-label="zone-piece-x" name="zone-piece-x">
-                                            </td>
-                                            <td id="caw-dist-td-piece-x" hidden>
-                                                <!-- piece distance -->
-                                                <input id="caw-dist-piece-x" class="caw-dist-time" type="text" aria-label="dist-piece-x" name="dist-piece-x" placeholder="m">
-                                            </td>
-                                            <td>
-                                                <!-- piece time -->
-                                                <input id="caw-time-piece-x" class="caw-dist-time" type="text" aria-label="time-piece-x" name="time-piece-x" placeholder="h:m:s">
-                                            </td>
-                                            <td>
-                                                <!-- piece rest -->
-                                                <input id="caw-rest-piece-x" type="text" aria-label="rest-piece-x" name="rest-piece-x">
-                                            </td>
-                                            <td class="caw-split-td">
-                                                <!-- piece splits -->
-                                                <input id="caw-split-length-piece-x" class="caw-split-length" aria-label="split-length-piece-x" type="text" name="split-length-piece-x" hidden>
-                                                <input id="caw-split-bool-piece-x" class="caw-split-bool" aria-label="splits-desired-piece-x" type="checkbox" name="split-bool-piece-x" data-piece-num="x">
-                                            </td>
-                                            <td>
-                                                <!-- piece notes -->
-                                                <input id="caw-notes-piece-x" type="text" aria-label="notes-piece-x" name="notes-piece-x">
-                                            </td>
-                                            <td>
-                                                <!-- piece delete button -->
-                                                <a class="caw-delete-piece-link" href="#" data-piece-num="">Delete</a>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                    <tfoot >
-                                        <tr class="caw-footer-repeat" hidden>
-                                            <td colspan="9">
-                                                <span class="caw-table-footer center-block">
-                                                    Repeat pieces
-                                                    <input id="caw-repeat-start-piece" class="caw-repeat" type="text">
-                                                    through
-                                                    <input id="caw-repeat-end-piece" class="caw-repeat" type="text">
-                                                    ,
-                                                    <input id="caw-repeat-num-times" class="caw-repeat" type="text">
-                                                    times
-                                                    <button id="caw-repeat-go" type="button" class="btn btn-default btn-sm caw-repeat-go-button">
-                                                        Go
-                                                    </button>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="9">
-                                                <span class="caw-table-footer center-block">
-                                                    <button type="button" class="btn btn-default btn-sm caw-add-piece-button" data-piece-type="time">
-                                                        Add a time-based piece
-                                                    </button>
-                                                    <button type="button" class="btn btn-default btn-sm caw-add-piece-button" data-piece-type="distance">
-                                                        Add a distance-based piece
-                                                    </button>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
+                            <div id="caw-warmup" hidden>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3>Warmup</h3>
+                                        <h4>
+                                            <small>
+                                                Input the details of your warmup. Distance/time is the only required field, but the more information you can give, the better!
+                                            </small>
+                                        </h4>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <table id="caw-table-warmup" class="table table-condensed caw-piece-table" data-phase="warmup" data-pieces-in-phase="0">
+                                        <thead hidden>
+                                            <tr>
+                                                <th class="caw-ordinal">
+                                                    Piece #
+                                                </th>
+                                                <th class="caw-zone">
+                                                    Zone
+                                                </th>
+                                                <th class="caw-dist-time">
+                                                    Distance/Time*
+                                                </th>
+                                                <th class="caw-rest">
+                                                    Rest
+                                                </th>
+                                                <th class="caw-splits">
+                                                    Splits? (length)
+                                                </th>
+                                                <th class="caw-notes">
+                                                    Notes
+                                                </th>
+                                                <th class="caw-delete">
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                        <tfoot >
+                                            <tr class="caw-footer-repeat" hidden>
+                                                <td class="caw-repeat-row" colspan="9">
+                                                    <span class="caw-table-footer center-block">
+                                                        Repeat pieces
+                                                        <input class="caw-repeat caw-repeat-start" type="text">
+                                                        through
+                                                        <input class="caw-repeat caw-repeat-end" type="text">
+                                                        ,
+                                                        <input class="caw-repeat caw-repeat-num-times" type="text">
+                                                        times
+                                                        <button type="button" class="btn btn-default btn-sm caw-repeat-go-button">
+                                                            Go
+                                                        </button>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="caw-table-buttons" colspan="9">
+                                                    <span class="caw-table-footer center-block">
+                                                        <button type="button" class="btn btn-default btn-sm caw-add-piece-button" data-piece-type="time">
+                                                            Add a time-based piece
+                                                        </button>
+                                                        <button type="button" class="btn btn-default btn-sm caw-add-piece-button" data-piece-type="distance">
+                                                            Add a distance-based piece
+                                                        </button>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                 </div>
+                                 <div class="form-group">
+                                    <div class="col-sm-10 col-sm-offset-2 text-right">
+                                        <button type="button" id="caw-warmup-previous-button" class="btn btn-default">
+                                            Previous
+                                        </button>
+                                        <button type="button" id="caw-warmup-next-button" class="btn btn-default">
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="caw-main" hidden>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3>Main Workout</h3>
+                                        <h4>
+                                            <small>
+                                                Input the details of the main workout. Distance/time is the only required field, but the more information you can give, the better!
+                                            </small>
+                                        </h4>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <table id="caw-table-main" class="table table-condensed caw-piece-table" data-phase="main" data-pieces-in-phase="0">
+                                        <thead hidden>
+                                            <tr>
+                                                <th class="caw-ordinal">
+                                                    Piece #
+                                                </th>
+                                                <th class="caw-zone">
+                                                    Zone
+                                                </th>
+                                                <th class="caw-dist-time">
+                                                    Distance/Time*
+                                                </th>
+                                                <th class="caw-rest">
+                                                    Rest
+                                                </th>
+                                                <th class="caw-splits">
+                                                    Splits? (length)
+                                                </th>
+                                                <th class="caw-notes">
+                                                    Notes
+                                                </th>
+                                                <th class="caw-delete">
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                        <tfoot >
+                                            <tr class="caw-footer-repeat" hidden>
+                                                <td class="caw-repeat-row" colspan="9">
+                                                    <span class="caw-table-footer center-block">
+                                                        Repeat pieces
+                                                        <input class="caw-repeat caw-repeat-start" type="text">
+                                                        through
+                                                        <input class="caw-repeat caw-repeat-end" type="text">
+                                                        ,
+                                                        <input class="caw-repeat caw-repeat-num-times" type="text">
+                                                        times
+                                                        <button type="button" class="btn btn-default btn-sm caw-repeat-go-button">
+                                                            Go
+                                                        </button>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="caw-table-buttons" colspan="9">
+                                                    <span class="caw-table-footer center-block">
+                                                        <button type="button" class="btn btn-default btn-sm caw-add-piece-button" data-piece-type="time">
+                                                            Add a time-based piece
+                                                        </button>
+                                                        <button type="button" class="btn btn-default btn-sm caw-add-piece-button" data-piece-type="distance">
+                                                            Add a distance-based piece
+                                                        </button>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                 </div>
+                                 <div class="form-group">
+                                    <div class="col-sm-10 col-sm-offset-2 text-right">
+                                        <button type="button" id="caw-main-previous-button" class="btn btn-default">
+                                            Previous
+                                        </button>
+                                        <button type="button" id="caw-main-next-button" class="btn btn-default">
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="caw-cooldown" hidden>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3>Cooldown</h3>
+                                        <h4>
+                                            <small>
+                                                Input the details of your cooldown. Distance/time is the only required field, but the more information you can give, the better!
+                                            </small>
+                                        </h4>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <table id="caw-table-cooldown" class="table table-condensed caw-piece-table" data-phase="cooldown" data-pieces-in-phase="0">
+                                        <thead hidden>
+                                            <tr>
+                                                <th class="caw-ordinal">
+                                                    Piece #
+                                                </th>
+                                                <th class="caw-zone">
+                                                    Zone
+                                                </th>
+                                                <th class="caw-dist-time">
+                                                    Distance/Time*
+                                                </th>
+                                                <th class="caw-rest">
+                                                    Rest
+                                                </th>
+                                                <th class="caw-splits">
+                                                    Splits? (length)
+                                                </th>
+                                                <th class="caw-notes">
+                                                    Notes
+                                                </th>
+                                                <th class="caw-delete">
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                        <tfoot >
+                                            <tr class="caw-footer-repeat" hidden>
+                                                <td class="caw-repeat-row" colspan="9">
+                                                    <span class="caw-table-footer center-block">
+                                                        Repeat pieces
+                                                        <input class="caw-repeat caw-repeat-start" type="text">
+                                                        through
+                                                        <input class="caw-repeat caw-repeat-end" type="text">
+                                                        ,
+                                                        <input class="caw-repeat caw-repeat-num-times" type="text">
+                                                        times
+                                                        <button type="button" class="btn btn-default btn-sm caw-repeat-go-button">
+                                                            Go
+                                                        </button>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="caw-table-buttons" colspan="9">
+                                                    <span class="caw-table-footer center-block">
+                                                        <button type="button" class="btn btn-default btn-sm caw-add-piece-button" data-piece-type="time">
+                                                            Add a time-based piece
+                                                        </button>
+                                                        <button type="button" class="btn btn-default btn-sm caw-add-piece-button" data-piece-type="distance">
+                                                            Add a distance-based piece
+                                                        </button>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                 </div>
+                                 <div class="form-group">
+                                    <div class="col-sm-10 col-sm-offset-2 text-right">
+                                        <button type="button" id="caw-cooldown-previous-button" class="btn btn-default">
+                                            Previous
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div> <!-- end of modal body -->

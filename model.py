@@ -187,17 +187,18 @@ class WorkoutTemplate(db.Model, ToDictMixin):
     user_id = db.Column(db.Integer,
                         db.ForeignKey("users.user_id"),
                         nullable=False)
-    primary_zone = db.Column(db.Unicode(32))
     description = db.Column(db.Unicode(256)) #TODO autogenerate?
+    primary_zone = db.Column(db.Unicode(32))
     warmup_format = db.Column(db.Unicode(128)) #same
     warmup_stroke_rates = db.Column(db.Unicode(128)) #same
     warmup_notes = db.Column(db.UnicodeText)
-    workout_body_format = db.Column(db.Unicode(128)) #same
-    workout_body_stroke_rates = db.Column(db.Unicode(128)) #same
-    workout_body_notes = db.Column(db.UnicodeText)
+    main_format = db.Column(db.Unicode(128)) #same
+    main_stroke_rates = db.Column(db.Unicode(128)) #same
+    main_notes = db.Column(db.UnicodeText)
     cooldown_format = db.Column(db.Unicode(128)) #same
     cooldown_stroke_rates = db.Column(db.Unicode(128)) #same
     cooldown_notes = db.Column(db.UnicodeText)
+    date_added = db.Column(db.DateTime)
 
     #many (workout results) to one (workout template)
     workout_results = db.relationship("WorkoutResult",

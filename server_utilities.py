@@ -1,4 +1,5 @@
 from datetime import date
+from re import match
 from model import db, connect_to_db, User
 
 
@@ -147,4 +148,29 @@ def days_til_HOCR(given_date=None):
 
 
 
+def hms_string_to_seconds(hms_string):
+    """Takes a string of the form hours:minutes:seconds and parses it,
+       returning the number of seconds represented by the string."""
+
+    #check to make sure string matches h:m:s, m:s, or :s format (raise an
+    #exception if not)
+    if not match(r"^(\d*:[0-5]\d:[0-5]\d)|([0-5]?\d:[0-5]\d)|(:[0-5]\d)$",
+                 hms_string):
+        raise ValueError("expected string of the format [[h:]m]:s.")
+
+    #now that we know the string is of the right format, split it on ":",
+    #figure out whether we have h:m:s, m:s, or :s, and do the appropriate math
+    seconds = 0
+    parts = hms_string.split(":")
+    if len(parts) == 3: #h:m:s
+        seconds += int(parts[0]) * 3600 #hours
+        seconds += int(parts[1]) * 60 #minutes
+        seconds += int(parts[2]) #seconds
+    elif len(parts) == 2: #m:s
+        seconds += int(parts[0]) * 60 #minutes
+        seconds += int(parts[1]) #seconds
+    else: #:s
+        seconds += int(parts[0]) #seconds
+
+    return seconds
 

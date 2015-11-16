@@ -91,12 +91,15 @@
 
                     <div class="modal-body">
                         <form id="create-a-workout-form" class="form-horizontal" role="form" action="/create-workout" method="POST" data-next-piece-num="1">
+                            <div hidden>
+                                <input id="caw-num-pieces" type="text" name="num-pieces" value="0" readonly>
+                            </div>
                             <div id="caw-overall-description">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <h3>Describe the workout</h3>
                                         <h4>
-                                            <small>
+                                            <small class="text-muted">
                                                 Enter descriptive details of the workout here. These are just for you, and are all optional, except for the overall description.
                                             </small>
                                         </h4>
@@ -104,27 +107,27 @@
                                 </div>
                                 <div class="form-group">
                                     <div class="col-sm-2 text-right">
-                                        <label for="workout-description" class="control-label">
+                                        <label for="caw-workout-description" class="control-label">
                                             Overall description*
                                         </label>
                                     </div>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="workout-description">
+                                        <input id="caw-workout-description" class="form-control" type="text" name="workout-description">
                                     </div>
                                     <div class="col-sm-offset-2 col-sm-10">
                                         <p class="help-block text-muted">
-                                            Make this short enough to fit on one line but specific enough to uniqely identify the workout
+                                            Make this short enough to fit on one line but specific enough to uniquely identify the workout
                                         </p>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-sm-2 text-right">
-                                        <label for="primary-zone" class="control-label">
+                                        <label for="caw-primary-zone" class="control-label">
                                             Primary zone
                                         </label>
                                     </div>
                                     <div class="col-sm-2">
-                                        <input type="text" class="form-control" id="primary-zone" placeholder="Zone">
+                                        <input id="caw-primary-zone" class="form-control" type="text" name="primary-zone"  placeholder="Zone">
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -134,26 +137,26 @@
                                         </label>
                                     </div>
                                     <div class="col-sm-10">
-                                        <label for="warmup-format" hidden>
+                                        <label for="caw-warmup-format" hidden>
                                             Warmup Format
                                         </label>
-                                        <input type="text" class="form-control" id="warmup-format" placeholder="Format">
+                                        <input id="caw-warmup-format" class="form-control" type="text" name="warmup-format" placeholder="Format">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-sm-10 col-sm-offset-2">
-                                        <label for="warmup-sr" hidden>
+                                        <label for="caw-warmup-sr" hidden>
                                             Warmup stroke rates
                                         </label>
-                                        <input type="text" class="form-control" id="warmup-sr" placeholder="Stroke rates">
+                                        <input id="caw-warmup-sr" class="form-control" type="text" name="warmup-sr" placeholder="Stroke rates">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-sm-10 col-sm-offset-2">
-                                        <label for="warmup-notes" hidden>
+                                        <label for="caw-warmup-notes" hidden>
                                             Warmup notes
                                         </label>
-                                        <input type="text" class="form-control" id="warmup-notes" placeholder="Notes">
+                                        <input id="caw-warmup-notes" class="form-control" type="text" name="warmup-notes" placeholder="Notes">
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -163,26 +166,26 @@
                                         </label>
                                     </div>
                                     <div class="col-sm-10">
-                                        <label for="main-format" hidden>
+                                        <label for="caw-main-format" hidden>
                                             Main workout format
                                         </label>
-                                        <input type="text" class="form-control" id="main-format" placeholder="Format">
+                                        <input id="caw-main-format" class="form-control" type="text" name="main-format" placeholder="Format">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-sm-10 col-sm-offset-2">
-                                        <label for="main-sr" hidden>
+                                        <label for="caw-main-sr" hidden>
                                             Main workout stroke rates
                                         </label>
-                                        <input type="text" class="form-control" id="main-sr" placeholder="Stroke rates">
+                                        <input id="caw-main-sr" class="form-control" type="text" name="main-sr" placeholder="Stroke rates">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-sm-10 col-sm-offset-2">
-                                        <label for="main-notes" hidden>
+                                        <label for="caw-main-notes" hidden>
                                             Main workout notes
                                         </label>
-                                        <input type="text" class="form-control" id="main-notes" placeholder="Notes">
+                                        <input id="caw-main-notes" class="form-control" type="text" name="main-notes" placeholder="Notes">
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -192,26 +195,26 @@
                                         </label>
                                     </div>
                                     <div class="col-sm-10">
-                                        <label for="cooldown-format" hidden>
+                                        <label for="caw-cooldown-format" hidden>
                                             Cooldown format
                                         </label>
-                                        <input type="text" class="form-control" id="cooldown-format" placeholder="Format">
+                                        <input id="caw-cooldown-format" class="form-control" type="text" name="cooldown-format" placeholder="Format">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-sm-10 col-sm-offset-2">
-                                        <label for="cooldown-sr" hidden>
+                                        <label for="caw-cooldown-sr" hidden>
                                             Cooldown stroke rates
                                         </label>
-                                        <input type="text" class="form-control" id="cooldown-sr" placeholder="Stroke rates">
+                                        <input id="caw-cooldown-sr" class="form-control" type="text" name="cooldown-sr" placeholder="Stroke rates">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-sm-10 col-sm-offset-2">
-                                        <label for="cooldown-notes" hidden>
+                                        <label for="caw-cooldown-notes" hidden>
                                             Cooldown notes
                                         </label>
-                                        <input type="text" class="form-control" id="cooldown-notes" placeholder="Notes">
+                                        <input id="caw-cooldown-notes" class="form-control" type="text" name="cooldown-notes" placeholder="Notes">
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -469,7 +472,12 @@
                     </div> <!-- end of modal body -->
 
                     <div class="modal-footer">
-
+                        <input type="submit" id="caw-add-results-now" class="btn btn-default" form="create-a-workout-form">
+                            Save and add results now
+                        </input>
+                        <input type="submit" id="caw-add-results-later" class="btn btn-default" form="create-a-workout-form">
+                            Save and add results later
+                        </input>
                     </div> <!-- end of modal footer -->
 
                 </div> <!-- end of modal content -->

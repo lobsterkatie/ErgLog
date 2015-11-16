@@ -260,10 +260,13 @@ $(document).ready(function () {
         //cache
         var nextPieceNum = pieceNum + 1;
         var newPiecesInPhase = piecesInPhase + 1;
+        var totalPieces = $("#caw-num-pieces").val();
         $(this).closest("form").attr("data-next-piece-num", nextPieceNum);
         $(this).closest("form").data("nextPieceNum", nextPieceNum);
         parentTable.attr("data-pieces-in-phase", newPiecesInPhase);
         parentTable.data("piecesInPhase", newPiecesInPhase);
+        $("#caw-num-pieces").val(totalPieces + 1);
+
 
 
         //add the now-complete row to the end of the table body
@@ -274,6 +277,17 @@ $(document).ready(function () {
                        .focus();
     });
 
+
+
+    /*********** repeat pieces x through y on create-a-workout form ***********/
+
+    $(".caw-repeat-go-button").click(function() {
+        //TODO CODE ME! (repeat go button on CAW modal)
+    });
+
+
+
+    /******************** create-a-workout helper functions *******************/
 
 
     /* create and return a <td> with the given attributes and content (content
@@ -340,6 +354,13 @@ $(document).ready(function () {
         }
         });
 
+
+    /****************** save workout for later results-adding *****************/
+
+    $(".caw-add-results-later").click(function(evt) {
+        evt.preventDefault();
+
+    });
 
     /*$(".modal").on("show.bs.modal", function (evt) {
 

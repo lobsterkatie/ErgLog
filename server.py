@@ -62,6 +62,12 @@ def show_log():
         return render_template("home.html")
 
 
+@app.route("/save-workout-template")
+def save_workout_template():
+    """When user submits form creating a new workout, save it in the database."""
+
+    pass
+
 @app.route("/get-workout-details/<int:workout_result_id>.json")
 def return_workout_details(workout_result_id):
     """Given a workout_result_id, return a jsonified version of the workout

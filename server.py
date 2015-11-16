@@ -110,18 +110,28 @@ def save_workout_template():
     #create a new record in the piece_templates table for each piece template
     num_pieces = request.form.get("num-pieces")
     for i in range(1, num_pieces):
+        ii = str(i) #for convenience, a string version of i
         new_p_temp = PieceTemplate()
         new_p_temp.workout_template_id = added_w_template.workout_template_id
-        new_p_temp.ordinal = request.form.get("ordinal-piece-" + i)
-        new_p_temp.phase = request.form.get("phase-piece-" + i)
-        new_p_temp.piece_type = request.form.get()
-        new_p_temp.distance = request.form.get()
-        new_p_temp.time_seconds = request.form.get()
-        new_p_temp.has_splits = request.form.get()
-        new_p_temp.default_split_length = request.form.get()
-        new_p_temp.rest = request.form.get()
-        new_p_temp.zone = request.form.get()
-        new_p_temp.notes = request.form.get()
+        new_p_temp.ordinal = request.form.get("ordinal-piece-" + ii, type=int)
+        new_p_temp.phase = request.form.get("phase-piece-" + ii)
+        new_p_temp.piece_type = request.form.get("type-piece-" + ii)
+        new_p_temp.distance = request.form.get("distance-piece-" + ii, type=int)
+        new_p_temp.time_seconds = hms_string_to_seconds(
+                                    request.form.get("time-piece-" + ii))
+        new_p_temp.has_splits = request.form.get("split-bool-piece-" + ii)
+        if new_p_temp.piece_type == "time":
+            new_p_temp.default_split_length = hms_string_to_seconds(
+                                                    request.form.get(
+                                                        "split-length-piece-" +
+                                                        ii))
+        else:
+            new_p_temp.default_split_length = request.form.get(
+                                                "split-length-piece-" + ii,
+                                                type=int)
+        new_p_temp.rest = request.form.get("rest-piece-" + ii)
+        new_p_temp.zone = request.form.get("zone-piece-" + ii)
+        new_p_temp.notes = request.form.get("notes-piece-" + ii)
         db.session.add(new_p_temp)
         db.session.commit()
 

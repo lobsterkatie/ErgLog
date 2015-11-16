@@ -62,11 +62,58 @@ def show_log():
         return render_template("home.html")
 
 
-@app.route("/save-workout-template")
+@app.route("/save-workout-template", methods=["POST"])
 def save_workout_template():
-    """When user submits form creating a new workout, save it in the database."""
+    """When user submits form creating a new workout, save it in the database,
+       and return the template (jsonified) for further action (like adding
+       results) if desired."""
 
-    pass
+    #create a new record in the workout_templates table with the given inputs
+    new_w_temp = WorkoutTemplate()
+    new_w_temp.user_id = session["logged_in_user_id"]
+    new_w_temp.primary_zone = request.form.get("primary-zone")
+    new_w_temp.description = request.form.get("workout-description")
+    new_w_temp.warmup_format = request.form.get("warmup-format")
+    new_w_temp.warmup_stroke_rates = request.form.get("warmup-sr")
+    new_w_temp.warmup_notes = request.form.get("warmup-notes")
+    new_w_temp.main_format = request.form.get("main-format")
+    new_w_temp.main_stroke_rates = request.form.get("main-sr")
+    new_w_temp.main_notes = request.form.get("main-notes")
+    new_w_temp.cooldown_format = request.form.get("cooldown-format")
+    new_w_temp.cooldown_stroke_rates = request.form.get("cooldown-sr")
+    new_w_temp.cooldown_notes = request.form.get("cooldown-notes")
+    new_w_temp.date_added = datetime.now()
+    db.session.add(new_w_temp)
+    db.session.commit()
+
+    #get the newly added workout template record from the database
+    added_w_template = (db.session.query(WorkoutTemplate)
+                                  .filter(WorkoutTemplate.date_added ==
+                                                new_w_temp.date_added)
+                                  .one())
+
+    #do the same for all the piece templates
+    num_pieces = request.form.get("num-pieces")
+    for i in range(1, num_pieces):
+        new_p_temp = PieceTemplate()
+        new_p_temp.workout_template_id = added_w_template.workout_template_id
+        new_p_temp.ordinal = request.form.get("ordinal-piece-" + i)
+        new_p_temp.phase = request.form.get("phase-piece-" + i)
+        new_p_temp.piece_type = request.form.get()
+        new_p_temp.distance = request.form.get()
+        new_p_temp.time_seconds = request.form.get()
+        new_p_temp.has_splits = request.form.get()
+        new_p_temp.default_split_length = request.form.get()
+        new_p_temp.rest = request.form.get()
+        new_p_temp.zone = request.form.get()
+        new_p_temp.notes = request.form.get()
+
+
+
+
+
+
+
 
 @app.route("/get-workout-details/<int:workout_result_id>.json")
 def return_workout_details(workout_result_id):
@@ -80,8 +127,8 @@ def return_workout_details(workout_result_id):
                 workout_result: {dict}
                 pieces: {
                     piece 1: {
-                        piece_template: {dict}
-                        piece_result: {dict}
+                        template: {dict}
+                        results: {dict}
                         splits: {
                             split 1: {dict}
                             split 2: {dict}
@@ -95,59 +142,19 @@ def return_workout_details(workout_result_id):
             }
     """
 
-    #get the workout_result and workout_template objects associated with the
-    #given id and dictionaryify them
+    #get the workout_result object associated with the given id and
+    #dictionaryify it (verbosely, which means it will include the template
+    #and the pieces)
     workout_result = (db.session.query(WorkoutResult)
                                 .filter(WorkoutResult.workout_result_id ==
                                         workout_result_id)
                                 .one())
-    workout_template = workout_result.workout_template
-    w_result_dict = workout_result.to_dict()
-    w_template_dict = workout_template.to_dict()
+    workout_details_dict = workout_result.to_dict_verbose()
 
-    #get the piece results for this workout and create a dictionary of
-    #piece dictionaries (keyed by ordinal)
-    #each piece's dictionary will include dictionary versions of the
-    #template object, results object, and a splits dictionary holding
-    #dictionary versions of the splits (also keyed by ordinal)
-    piece_results = workout_result.piece_results
-    pieces_dict = {}
-    for p in piece_results:
-        #create a dictionary to hold info about this one piece, and add
-        #dictionary versions of this piece's template and results to it
-        p_dict = {}
-        p_dict["template"] = p.piece_template.to_dict()
-        p_dict["results"] = p.to_dict()
-
-        #get split results, if any, for this piece
-        split_results = p.split_results
-
-        #if there are split results, make a dictionary to hold them and add
-        #a dictionary version of each, keyed by its ordinal, then add the whole
-        #splits dictionary to the dictionary for this piece
-        if split_results:
-            splits_dict = {} #to hold information about all this piece's splits
-            for s in split_results:
-                splits_dict["split " + str(s.ordinal)] = s.to_dict
-            p_dict["splits"] = splits_dict
-
-        #otherwise (if there weren't any split results), reflect that in the
-        #piece dictionary
-        else:
-            p_dict["splits"] = None
-
-        #now that the dictionary for this piece is complete, add it to the
-        #dictionary holding all the pieces, using its ordinal as a key
-        pieces_dict["piece " + str(p.ordinal)] = p_dict
-
-    #add the workout_template, workout_results, and pieces dictionaries to
-    #the overall workout_details dictionary, then jsonify and return it
-    workout_details_dict = {}
-    workout_details_dict["workout_template"] = w_template_dict
-    workout_details_dict["workout_results"] = w_result_dict
-    workout_details_dict["pieces"] = pieces_dict
+    #jsonify the result and return it
     workout_details = jsonify(workout_details_dict)
     return workout_details
+
 
 
 
@@ -231,7 +238,6 @@ def add_new_user():
     weight = request.form.get("weight")
 
     #create the new user and add them to the database
-    print "\n\ncreating new user: ", username, " ", password
     new_user = User(firstname=firstname, lastname=lastname, gender=gender,
                     birthdate=birthdate, zipcode=zipcode, email=email,
                     username=username, password=password, weight=weight)

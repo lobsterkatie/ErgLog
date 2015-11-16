@@ -217,7 +217,7 @@ class WorkoutTemplate(db.Model, ToDictMixin):
                     "PieceTemplate.phase == 'warmup')")
     _main_join = ("and_(" +
                       "WorkoutTemplate.workout_template_id == " +
-                        "PieceTemplate.workout_template_id, " +
+                          "PieceTemplate.workout_template_id, " +
                       "PieceTemplate.phase == 'main')")
     _cd_join = ("and_(" +
                     "WorkoutTemplate.workout_template_id == " +
@@ -241,6 +241,42 @@ class WorkoutTemplate(db.Model, ToDictMixin):
                                   user_id=self.user_id)
 
 
+    def to_dict_verbose(self):
+        """Creates a dictionary representation of the WorkoutTemplate
+           object, including all associated piece templates.
+
+           The returned dictionary will have the following structure:
+                returned_dict = {
+                    workout_template: {dict}
+                    pieces: {
+                        piece 1: {
+                            template: {dict}
+                        }
+                        piece 2: {
+                            template: {dict}
+                        }
+                        ...
+                    }
+                }
+        """
+
+        #create a dictionary of self and add it to dict_to_return
+        dict_to_return = {}
+        dict_to_return["workout_template"] = self.to_dict()
+
+        #create a dictionary to hold piece templates, and stock it, keyed
+        #by piece ordinal
+        pieces_dict = {}
+        for p in self.piece_templates:
+            p_dict = {}
+            p_dict["template"] = p.to_dict()
+            pieces_dict["piece " + str(p.ordinal)] = p_dict
+
+        #add the pieces dictionary to the main dictionary and return it
+        dict_to_return["pieces"] = pieces_dict
+        return dict_to_return
+
+
 
 class PieceTemplate(db.Model, ToDictMixin):
     """Templates for pieces (many-to-one with workout templates)"""
@@ -256,15 +292,15 @@ class PieceTemplate(db.Model, ToDictMixin):
     ordinal = db.Column(db.Integer, nullable=False)
     phase = db.Column(db.Enum("warmup", "main", "cooldown",
                               name="workout_phases"),
-                              nullable=False)
+                      nullable=False)
     piece_type = db.Column(db.Enum("time", "distance", name="piece_types"))
+    zone = db.Column(db.Unicode(32))
     distance = db.Column(db.Integer)
     time_seconds = db.Column(db.Integer)
+    rest = db.Column(db.Unicode(32))
     has_splits = db.Column(db.Boolean)
     default_split_length = db.Column(db.Integer)
-    rest = db.Column(db.Unicode(32))
-    zone = db.Column(db.Unicode(32))
-    description = db.Column(db.UnicodeText)
+    notes = db.Column(db.UnicodeText)
 
     #this makes sure that two different pieces can't be the nth piece in a
     #given workout
@@ -343,6 +379,79 @@ class WorkoutResult(db.Model, ToDictMixin):
                                   user_id=self.user_id,
                                   date=self.date,
                                   time=self.time_of_day)
+
+
+    def to_dict_verbose(self):
+        """Create a dictionary version of self, including workout template
+           and pieces (themselves including results, template, and splits).
+
+           The returned dictionary will have the following structure:
+                returned_dict = {
+                    workout_template: {dict}
+                    workout_result: {dict}
+                    pieces: {
+                        piece 1: {
+                            template: {dict}
+                            results: {dict}
+                            splits: {
+                                split 1: {dict}
+                                split 2: {dict}
+                                ...
+                            }
+                        piece 2: {
+                            ...
+                        }
+                        ...
+                    }
+                }
+        """
+
+        #create a dictionary from self and the associated workout template
+        w_result_dict = self.to_dict()
+        w_template_dict = self.workout_template.to_dict()
+
+        #get the piece results for this workout and create a dictionary of
+        #piece dictionaries (keyed by ordinal)
+        #each piece's dictionary will include dictionary versions of the
+        #template object, results object, and a splits dictionary holding
+        #dictionary versions of the splits (also keyed by ordinal)
+        piece_results = self.piece_results
+        pieces_dict = {}
+        for p in piece_results:
+            #create a dictionary to hold info about this one piece, and add
+            #dictionary versions of this piece's template and results to it
+            p_dict = {}
+            p_dict["template"] = p.piece_template.to_dict()
+            p_dict["results"] = p.to_dict()
+
+            #get split results, if any, for this piece
+            split_results = p.split_results
+
+            #if there are split results, make a dictionary to hold them and add
+            #a dictionary version of each, keyed by its ordinal, then add the
+            #whole splits dictionary to the dictionary for this piece
+            if split_results:
+                splits_dict = {} #to hold info about all this piece's splits
+                for s in split_results:
+                    splits_dict["split " + str(s.ordinal)] = s.to_dict
+                p_dict["splits"] = splits_dict
+
+            #otherwise (if there weren't any split results), reflect that in
+            #the piece dictionary
+            else:
+                p_dict["splits"] = None
+
+            #now that the dictionary for this piece is complete, add it to the
+            #dictionary holding all the pieces, using its ordinal as a key
+            pieces_dict["piece " + str(p.ordinal)] = p_dict
+
+        #add the workout_template, workout_results, and pieces dictionaries to
+        #the overall dictionary, then return it
+        dict_to_return = {}
+        dict_to_return["workout_template"] = w_template_dict
+        dict_to_return["workout_results"] = w_result_dict
+        dict_to_return["pieces"] = pieces_dict
+        return dict_to_return
 
 
 class PieceResult(db.Model, ToDictMixin):

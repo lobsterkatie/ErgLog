@@ -3,7 +3,7 @@
 from jinja2 import StrictUndefined
 from flask import (Flask, render_template, redirect, request, flash, session,
                    jsonify)
-from datetime import datetime
+from datetime import datetime, timedelta
 from model import (connect_to_db, db, User, WorkoutResult, WorkoutTemplate,
                    PieceTemplate)
 from server_utilities import *
@@ -63,6 +63,7 @@ def show_log():
         return render_template("home.html")
 
 
+
 @app.route("/save-workout-template.json", methods=["POST"])
 def save_workout_template():
     """When user submits form creating a new workout, save it in the database,
@@ -112,28 +113,29 @@ def save_workout_template():
     #create a new record in the piece_templates table for each piece template
     num_pieces = new_w_temp.num_pieces
     for i in range(1, num_pieces + 1):
-        ii = str(i) #for convenience, a string version of i
+        #stringify i so it can be used in field names
+        i = str(i)
         new_p_temp = PieceTemplate()
         new_p_temp.workout_template_id = added_w_template.workout_template_id
-        new_p_temp.ordinal = request.form.get("ordinal-piece-" + ii, type=int)
-        new_p_temp.phase = request.form.get("phase-piece-" + ii)
-        new_p_temp.piece_type = request.form.get("type-piece-" + ii)
-        new_p_temp.distance = request.form.get("distance-piece-" + ii, type=int)
+        new_p_temp.ordinal = request.form.get("ordinal-piece-" + i, type=int)
+        new_p_temp.phase = request.form.get("phase-piece-" + i)
+        new_p_temp.piece_type = request.form.get("type-piece-" + i)
+        new_p_temp.distance = request.form.get("distance-piece-" + i, type=int)
         new_p_temp.time_seconds = hms_string_to_seconds(
-                                    request.form.get("time-piece-" + ii))
-        new_p_temp.has_splits = request.form.get("split-bool-piece-" + ii)
+                                    request.form.get("time-piece-" + i))
+        new_p_temp.has_splits = request.form.get("split-bool-piece-" + i)
         if new_p_temp.piece_type == "time":
             new_p_temp.default_split_length = hms_string_to_seconds(
                                                     request.form.get(
                                                         "split-length-piece-" +
-                                                        ii))
+                                                        i))
         else:
             new_p_temp.default_split_length = request.form.get(
-                                                "split-length-piece-" + ii,
+                                                "split-length-piece-" + i,
                                                 type=int)
-        new_p_temp.rest = request.form.get("rest-piece-" + ii)
-        new_p_temp.zone = request.form.get("zone-piece-" + ii)
-        new_p_temp.notes = request.form.get("notes-piece-" + ii)
+        new_p_temp.rest = request.form.get("rest-piece-" + i)
+        new_p_temp.zone = request.form.get("zone-piece-" + i)
+        new_p_temp.notes = request.form.get("notes-piece-" + i)
         db.session.add(new_p_temp)
         db.session.commit()
 
@@ -155,9 +157,54 @@ def get_workout_templates():
 
        The final jsonified data will have the following structure:
             workout_templates = {
-                recent:
+                recent: {
+                    [some_workout_template_id]: {workout_template dict}
+                    [another_workout_template_id]: {workout_template_dict}
+                    ...
+                }
+                no_results: {
+                    [some_workout_template_id]: {workout_template dict}
+                    [another_workout_template_id]: {workout_template_dict}
+                    ...
+                }
             }
        """
+
+    #get all workout templates added in the last week
+    a_week_ago = datetime.now() - timedelta(days=7)
+    recent_templates = (db.session.query(WorkoutTemplate)
+                                  .filter(WorkoutTemplate.date_added >
+                                          a_week_ago)
+                                  .all())
+
+    #create a dictionary (keyed by workout_template_id) to hold dictionary
+    #versions of each recent template and add them all to it
+    recent_dict = {}
+    for template in recent_templates:
+        template_dict = template.to_dict_verbose()
+        template_id = template.workout_template_id
+        recent_dict[template_id] = template_dict
+
+    #do the same for workouts with no results
+    no_results_templates = (db.session.query(WorkoutTemplate)
+                                      .outerjoin(WorkoutTemplate.workout_results)
+                                      .filter(WorkoutResult.workout_result_id ==
+                                              None)
+                                      .all())
+    no_results_dict = {}
+    for template in no_results_templates:
+        template_dict = template.to_dict_verbose()
+        template_id = template.workout_template_id
+        no_results_dict[template_id] = template_dict
+
+    #add both the recent and no-results dictionaries to the overall dictionary,
+    #and then jsonify and return it
+    workout_templates_dict = {}
+    workout_templates_dict["recent"] = recent_dict
+    workout_templates_dict["no_results"] = no_results_dict
+    workout_templates = jsonify(workout_templates_dict)
+    return workout_templates
+
 
 
 

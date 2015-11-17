@@ -152,6 +152,10 @@ def hms_string_to_seconds(hms_string):
     """Takes a string of the form hours:minutes:seconds and parses it,
        returning the number of seconds represented by the string."""
 
+    #f(None) = None
+    if not hms_string:
+        return None
+
     #check to make sure string matches h:m:s, m:s, or :s format (raise an
     #exception if not)
     if not match(r"^(\d*:[0-5]\d:[0-5]\d)|([0-5]?\d:[0-5]\d)|(:[0-5]\d)$",

@@ -151,60 +151,77 @@ def save_workout_template():
 
 @app.route("/get-workout-templates.json")
 def get_workout_templates():
-    """Queries the database for both recently-added workout templates and
-       workout templates with no results. Returns verbose (including pieces)
-       versions of both.
+    """Queries the database for workout templates without results
+       (recently-added and less-recently-added), and workout templates with
+       results. Returns verbose (including pieces) versions of both.
 
        The final jsonified data will have the following structure:
             workout_templates = {
-                recent: {
-                    [some_workout_template_id]: {workout_template dict}
-                    [another_workout_template_id]: {workout_template_dict}
+                no_results_recent: [
+                    {workout_template dict}
+                    {workout_template_dict}
                     ...
-                }
-                no_results: {
-                    [some_workout_template_id]: {workout_template dict}
-                    [another_workout_template_id]: {workout_template_dict}
+                ]
+                no_results_older: [
+                    {workout_template dict}
+                    {workout_template_dict}
                     ...
-                }
+                ]
+                with_results: [
+                    {workout_template dict}
+                    {workout_template_dict}
+                    ...
+                ]
             }
        """
 
-    #get all workout templates added in the last week
+
+    #get all workout templates with no results, splitting them into those
+    #added in the last week and those added earlier
     a_week_ago = datetime.now() - timedelta(days=7)
-    recent_templates = (db.session.query(WorkoutTemplate)
-                                  .filter(WorkoutTemplate.date_added >
+    no_results_recent = (db.session.query(WorkoutTemplate)
+                                    .outerjoin(WorkoutTemplate.workout_results)
+                                    .filter(WorkoutResult.workout_result_id
+                                                         .is_(None))
+                                    .filter(WorkoutTemplate.date_added >
+                                            a_week_ago)
+                                    .all())
+    no_results_older = (db.session.query(WorkoutTemplate)
+                                  .outerjoin(WorkoutTemplate.workout_results)
+                                  .filter(WorkoutResult.workout_result_id
+                                                       .is_(None))
+                                  .filter(WorkoutTemplate.date_added <
                                           a_week_ago)
                                   .all())
 
-    #create a dictionary (keyed by workout_template_id) to hold dictionary
-    #versions of each recent template and add them all to it
-    recent_dict = {}
-    for template in recent_templates:
-        template_dict = template.to_dict_verbose()
-        template_id = template.workout_template_id
-        recent_dict[template_id] = template_dict
+    #get workout templates which *have* have results added (in case the user
+    #wants to redo a workout)
+    with_results = (db.session.query(WorkoutTemplate)
+                              .outerjoin(WorkoutTemplate.workout_results)
+                              .filter(WorkoutResult.workout_result_id
+                                                   .isnot(None))
+                              .all())
 
-    #do the same for workouts with no results
-    no_results_templates = (db.session.query(WorkoutTemplate)
-                                      .outerjoin(WorkoutTemplate.workout_results)
-                                      .filter(WorkoutResult.workout_result_id ==
-                                              None)
-                                      .all())
-    no_results_dict = {}
-    for template in no_results_templates:
-        template_dict = template.to_dict_verbose()
-        template_id = template.workout_template_id
-        no_results_dict[template_id] = template_dict
+    #dictionaryify the results in each case
+    no_results_recent_dicts = []
+    for template in no_results_recent:
+        no_results_recent_dicts += template.to_dict_verbose()
+    no_results_older_dicts = []
+    for template in no_results_older:
+        no_results_older_dicts += template.to_dict_verbose()
+    with_results_dicts = []
+    for template in with_results:
+        with_results_dicts += template.to_dict_verbose()
 
-    #add both the recent and no-results dictionaries to the overall dictionary,
-    #and then jsonify and return it
+    #add each list to an overall dictionary for jsonification
     workout_templates_dict = {}
-    workout_templates_dict["recent"] = recent_dict
-    workout_templates_dict["no_results"] = no_results_dict
+    workout_templates_dict["no_results_recent"] = no_results_recent_dicts
+    workout_templates_dict["no_results_older"] = no_results_older_dicts
+    workout_templates_dict["with_results"] = with_results_dicts
+
+    #jsonify the result and return it
     workout_templates = jsonify(workout_templates_dict)
     return workout_templates
-
 
 
 

@@ -187,6 +187,7 @@ class WorkoutTemplate(db.Model, ToDictMixin):
     user_id = db.Column(db.Integer,
                         db.ForeignKey("users.user_id"),
                         nullable=False)
+    num_pieces = db.Column(db.Integer)
     description = db.Column(db.Unicode(256)) #TODO autogenerate?
     primary_zone = db.Column(db.Unicode(32))
     warmup_format = db.Column(db.Unicode(128)) #same

@@ -4,7 +4,8 @@ from jinja2 import StrictUndefined
 from flask import (Flask, render_template, redirect, request, flash, session,
                    jsonify)
 from datetime import datetime
-from model import connect_to_db, db, User, WorkoutResult
+from model import (connect_to_db, db, User, WorkoutResult, WorkoutTemplate,
+                   PieceTemplate)
 from server_utilities import *
 
 app = Flask(__name__)
@@ -86,6 +87,7 @@ def save_workout_template():
     #create a new record in the workout_templates table with the given inputs
     new_w_temp = WorkoutTemplate()
     new_w_temp.user_id = session["logged_in_user_id"]
+    new_w_temp.num_pieces = request.form.get("num-pieces", type=int)
     new_w_temp.primary_zone = request.form.get("primary-zone")
     new_w_temp.description = request.form.get("workout-description")
     new_w_temp.warmup_format = request.form.get("warmup-format")
@@ -108,8 +110,8 @@ def save_workout_template():
                                   .one())
 
     #create a new record in the piece_templates table for each piece template
-    num_pieces = request.form.get("num-pieces")
-    for i in range(1, num_pieces):
+    num_pieces = new_w_temp.num_pieces
+    for i in range(1, num_pieces + 1):
         ii = str(i) #for convenience, a string version of i
         new_p_temp = PieceTemplate()
         new_p_temp.workout_template_id = added_w_template.workout_template_id
@@ -143,6 +145,19 @@ def save_workout_template():
     new_workout_template_json = jsonify(new_workout_template_dict)
     return new_workout_template_json
 
+
+
+@app.route("/get-workout-templates.json")
+def get_workout_templates():
+    """Queries the database for both recently-added workout templates and
+       workout templates with no results. Returns verbose (including pieces)
+       versions of both.
+
+       The final jsonified data will have the following structure:
+            workout_templates = {
+                recent:
+            }
+       """
 
 
 

@@ -90,7 +90,7 @@
                     </div> <!-- end of modal header -->
 
                     <div class="modal-body">
-                        <form id="create-a-workout-form" class="form-horizontal" role="form" action="/create-workout" method="POST" data-next-piece-num="1">
+                        <form id="create-a-workout-form" class="form-horizontal" role="form" data-next-piece-num="1">
                             <div hidden>
                                 <input id="caw-num-pieces" type="text" name="num-pieces" value="0" readonly>
                             </div>
@@ -472,8 +472,8 @@
                     </div> <!-- end of modal body -->
 
                     <div class="modal-footer">
-                        <input type="submit" id="caw-add-results-now" class="btn btn-default" form="create-a-workout-form" value="Save and add results now">
-                        <input type="submit" id="caw-add-results-later" class="btn btn-default" form="create-a-workout-form" value="Save and add results later">
+                        <input type="button" id="caw-add-results-now" class="btn btn-default" form="create-a-workout-form" value="Save and add results now">
+                        <input type="button" id="caw-add-results-later" class="btn btn-default" form="create-a-workout-form" value="Save and add results later">
                     </div> <!-- end of modal footer -->
 
                 </div> <!-- end of modal content -->
@@ -490,11 +490,15 @@
                             &times;
                         </button>
                         <h4 class="modal-title">
-                            Create a Workout
+                            Input workout results
                         </h4>
                     </div> <!-- end of modal header -->
 
                     <div class="modal-body">
+                        <form method="GET">
+                            <select id="ar-workout-choice" name="workout-choice">
+                            </select>
+                        </form>
 
                     </div> <!-- end of modal body -->
 

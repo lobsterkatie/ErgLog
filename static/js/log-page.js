@@ -358,10 +358,30 @@ $(document).ready(function () {
 
     /****************** save workout for later results-adding *****************/
 
-    $(".caw-add-results-later").click(function(evt) {
+    $("#caw-add-results-later").click(function(evt) {
         evt.preventDefault();
+        var formData = $("#create-a-workout-form").serialize();
+        $.post("/save-workout-template.json",
+               formData,
+               function(data) {console.log(data);});
 
     });
+
+
+
+    /******** load workout template descriptions into add-results modal *******/
+
+
+
+    //pull workout template descriptions and id's and use them to populate
+    //workout-chooser on the add-results modal
+    $("#add-results-modal").on("show.bs.modal", function(evt) {
+        //TODO CODE ME!!!  (populate workouts on add results modal)
+    });
+
+
+
+
 
     /*$(".modal").on("show.bs.modal", function (evt) {
 

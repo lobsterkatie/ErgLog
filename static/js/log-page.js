@@ -362,8 +362,15 @@ $(document).ready(function () {
     /****************** save workout for later results-adding *****************/
 
     $("#caw-add-results-later").click(function(evt) {
-        evt.preventDefault();
+        //TODO DO I STILL NEED THIS???
+        //evt.preventDefault();
+
+        //get data from the form, then hide and clear it
         var formData = $("#create-a-workout-form").serialize();
+        $("#create-a-workout-modal").modal("hide");
+        $("#create-a-workout-form")[0].reset();
+
+        //save the workout to the database
         $.post("/save-workout-template.json",
                formData,
                function(data) {console.log(data);});
@@ -372,48 +379,94 @@ $(document).ready(function () {
 
 
 
-    /******** load workout template descriptions into add-results modal *******/
+    /************** functions dealing with the add-results modal **************/
 
-    //populate and handle user-interaction with the add-results modal
+    //populate, show, and handle user interaction with the add-results modal
     $("#add-results-button").click(function(evt) {
-        //get user's workout templates from the database and populate the
-        //workout-chooser
-        var templates;
+        //get user's workout templates from the database
         $.get("/get-workout-templates.json", function(data) {
-            templates = data;
-            console.log(templates);
+            var templates = data;
+
+            //populate the workout-chooser
             populateARWorkoutChooser(templates);
+
+            //bind click-handlers to the add-results buttons, to populate
+            //the add-results form
+            $(".ar-add-results-button").click(templates, handleARChoice);
+
+            //now that it's all ready, show the add-results modal
+            $('#add-results-modal').modal('show');
         });
 
 
 
-        //populate the workout-chooser
-        //
 
 
-    });
+    }); //end $("#add-results-button").click()
+
+
 
     //pull workout template descriptions and id's and use them to populate
     //workout-chooser on the add-results modal
     function populateARWorkoutChooser (templates) {
         //split templates up based on presence/absence of results and,
         //in the latter case, creation date
-        var noResultsRecent = templates.no_results_recent;
-        var noResultsOlder = templates.no_results_older;
-        var withResults = templates.with_results;
+        var noResultsRecent = getValues(templates.no_results_recent);
+        var noResultsOlder = getValues(templates.no_results_older);
+        var withResults = getValues(templates.with_results);
+
+        //sort each array of templates by date_added
+        noResultsRecent.sort(descByDateAdded);
+        noResultsOlder.sort(descByDateAdded);
+        withResults.sort(descByDateAdded);
 
         //find the spots where the descriptions will get added
         var nrRecentDropdown = $("#ar-workout-choice-no-results-recent");
         var nrOlderDropdown = $("#ar-workout-choice-no-results-older");
         var withResultsDropdown = $("#ar-workout-choice-with-results");
 
+        //empty each of those spots so opening the modal multiple times
+        //won't result in one copy of each workout for every time the modal
+        //is opened
+        nrRecentDropdown.empty();
+        nrOlderDropdown.empty();
+        withResultsDropdown.empty();
+
+        //add 'Choose a workout...' direction to the top of the withResults
+        //dropdown (since the other two are secretly <optgroups> in the same
+        //dropdown, their overall dropdown, with its top direction, is left
+        //intact by the emptying)
+        withResultsDropdown.append($("<option>").append("Choose a workout..."));
+
         //populate each dropdown with the appropriate template descriptions
         addARWorkoutChooserOptions(noResultsRecent, nrRecentDropdown);
         addARWorkoutChooserOptions(noResultsOlder, nrOlderDropdown);
         addARWorkoutChooserOptions(withResults, withResultsDropdown);
+    } //end populateARWorkoutChooser()
 
-    } //end populateARWorkoutChooser(templates)
 
+
+    //Return an array containing the given object's values
+    function getValues (obj) {
+        var values = Object.keys(obj || {}) //in case obj is undefined/null
+                           .map(function (key) {
+                                    return obj[key];
+                                });
+        return values;
+    } //end getValues()
+
+
+
+    //Compare two workout templates for a descending sort on date_added
+    function descByDateAdded(template1, template2) {
+        var date1 = Date.parse(template1.workout_template.date_added);
+        var date2 = Date.parse(template2.workout_template.date_added);
+        return date2 - date1;
+    } //end descByDateAdded()
+
+
+
+    //Add an <option> for each template to the given dropdown
     function addARWorkoutChooserOptions (templates, dropdown) {
         //if templates is an empty list, indicate that in the dropdown menu
         if (templates.length === 0)
@@ -423,7 +476,7 @@ $(document).ready(function () {
                 "disabled": ""
             };
             var optionText = "None";
-            var option = createARWorkoutChooserOption(optionAttributes,
+            var option = createOptionElement(optionAttributes,
                                                       optionText);
             dropdown.append(option);
         }
@@ -438,28 +491,19 @@ $(document).ready(function () {
                 var optionText = template.description;
 
                 //create the <option> and add it to the dropdown
-                var option = createARWorkoutChooserOption(optionAttributes,
-                                                          optionText);
+                var option = createOptionElement(optionAttributes,
+                                                 optionText);
                 dropdown.append(option);
             }
         }
     } //end addARWorkoutChooserOptions()
 
 
-    /*cellContent = $("<a>").append("Delete");
-        contentAttributes = {
-            "href": "#",
-            "aria-label": "delete-piece-" + pieceNum,
-            "data-piece-num": pieceNum
-        };*/
 
-
-
-    /* create and return an <option> with the given attributes and content
-
-       Note that attributes are objects of the form
-       {"attribute": "value", "attribute": "value", ...} */
-    function createARWorkoutChooserOption (optionAttributes, optionText) {
+    // Create and return an <option> element with the given attributes and
+    // content. (Note that 'attributes' is an object of the form
+    // {"attribute": "value", "attribute": "value", ...}.)
+    function createOptionElement (optionAttributes, optionText) {
 
         //create the <option>, and give it attributes, if any
         var option = $("<option>");
@@ -472,29 +516,17 @@ $(document).ready(function () {
 
         //return the completed <option> element
         return option;
-    }
+    } //end createOptionElement()
 
 
 
-
-    /*$(".modal").on("show.bs.modal", function (evt) {
-
-        //
-        $(evt.currentTarget).data("caller", $(evt.relatedTarget));
-
-
-
-    });
-
-    $(".modal").on("hidden.bs.modal", function (evt) {
-
-        //
-        console.log("here");
-        $("#dummy-button").click();
-
-
-
-    });*/
+    //Get the user's workout choice, look it up in the given templates object,
+    //populate the form allowing results-adding, and show the form
+    function handleARChoice (evt) {
+        var templates = evt.data;
+        var workoutID = $(evt.target).siblings("select").val();
+        console.log("workoutID: " + workoutID);
+    } //end handleARChoice()
 
 
 

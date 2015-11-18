@@ -30,7 +30,7 @@
                 <button id="create-a-workout-button" class="btn btn-default" type="button" data-toggle="modal" data-keyboard="false" href="#create-a-workout-modal">
                     Create a Workout
                 </button>
-                <button id="add-results-button" class="btn btn-default" type="button" data-toggle="modal" href="#add-results-modal">
+                <button id="add-results-button" class="btn btn-default" type="button" data-keyboard="false">
                     Add Results to a Workout
                 </button>
             </span>
@@ -472,8 +472,8 @@
                     </div> <!-- end of modal body -->
 
                     <div class="modal-footer">
-                        <input type="button" id="caw-add-results-now" class="btn btn-default" form="create-a-workout-form" value="Save and add results now">
-                        <input type="button" id="caw-add-results-later" class="btn btn-default" form="create-a-workout-form" value="Save and add results later">
+                        <input type="button" id="caw-add-results-now" class="btn btn-default" value="Save and add results now">
+                        <input type="button" id="caw-add-results-later" class="btn btn-default" value="Save and add results later">
                     </div> <!-- end of modal footer -->
 
                 </div> <!-- end of modal content -->
@@ -516,7 +516,7 @@
                                                 <!-- dynamically-added workout template descriptions -->
                                             </optgroup>
                                         </select>
-                                        <input type="button" id="ar-workout-choice-no-results-button" class="btn btn-default" value="Add results">
+                                        <input class="btn btn-default ar-add-results-button" type="button" value="Add results">
                                     </div>
                                     <div class="col-sm-offset-2 col-sm-9">
                                         <p class="help-block text-muted">
@@ -532,10 +532,9 @@
                                     </div>
                                     <div class="col-sm-10">
                                         <select id="ar-workout-choice-with-results" class="form-control ar-workout-choice" name="workout-choice">
-                                            <option>Choose a workout...</option>
                                             <!-- dynamically-added workout template descriptions -->
                                         </select>
-                                        <input type="button" id="ar-workout-choice-with-results-button" class="btn btn-default" value="Add results">
+                                        <input class="btn btn-default ar-add-results-button" type="button" value="Add results">
                                     </div>
                                     <div class="col-sm-offset-2 col-sm-9">
                                         <p class="help-block text-muted">

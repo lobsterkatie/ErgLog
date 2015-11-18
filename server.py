@@ -179,7 +179,7 @@ def get_workout_templates():
     user_id = session["logged_in_user_id"]
 
     #get all workout templates with no results, splitting them into those
-    #added in the last week and those added earlier (sorted by date)
+    #added in the last week and those added earlier
     a_week_ago = datetime.now() - timedelta(days=7)
     no_results_recent = (db.session.query(WorkoutTemplate)
                                     .outerjoin(WorkoutTemplate.workout_results)
@@ -188,8 +188,6 @@ def get_workout_templates():
                                                          .is_(None))
                                     .filter(WorkoutTemplate.date_added >
                                             a_week_ago)
-                                    .order_by(WorkoutTemplate.date_added
-                                                             .desc())
                                     .all())
     no_results_older = (db.session.query(WorkoutTemplate)
                                   .outerjoin(WorkoutTemplate.workout_results)
@@ -198,17 +196,15 @@ def get_workout_templates():
                                                        .is_(None))
                                   .filter(WorkoutTemplate.date_added <
                                           a_week_ago)
-                                  .order_by(WorkoutTemplate.date_added.desc())
                                   .all())
 
     #get workout templates which *have* have results added (in case the user
-    #wants to redo a workout) (sorted by date)
+    #wants to redo a workout)
     with_results = (db.session.query(WorkoutTemplate)
                               .outerjoin(WorkoutTemplate.workout_results)
                               .filter(WorkoutTemplate.user_id == user_id)
                               .filter(WorkoutResult.workout_result_id
                                                    .isnot(None))
-                              .order_by(WorkoutTemplate.date_added.desc())
                               .all())
 
     #dictionaryify the results in each case, using id's as keys

@@ -158,26 +158,25 @@ def get_workout_templates():
        The final jsonified data will have the following structure:
             workout_templates = {
                 no_results_recent: [
-                    {workout_template dict}
+                    {workout_template_dict}
                     {workout_template_dict}
                     ...
                 ]
                 no_results_older: [
-                    {workout_template dict}
+                    {workout_template_dict}
                     {workout_template_dict}
                     ...
                 ]
                 with_results: [
-                    {workout_template dict}
+                    {workout_template_dict}
                     {workout_template_dict}
                     ...
                 ]
             }
        """
 
-
     #get all workout templates with no results, splitting them into those
-    #added in the last week and those added earlier
+    #added in the last week and those added earlier (sorted by date)
     a_week_ago = datetime.now() - timedelta(days=7)
     no_results_recent = (db.session.query(WorkoutTemplate)
                                     .outerjoin(WorkoutTemplate.workout_results)
@@ -185,6 +184,8 @@ def get_workout_templates():
                                                          .is_(None))
                                     .filter(WorkoutTemplate.date_added >
                                             a_week_ago)
+                                    .order_by(WorkoutTemplate.date_added
+                                                             .desc())
                                     .all())
     no_results_older = (db.session.query(WorkoutTemplate)
                                   .outerjoin(WorkoutTemplate.workout_results)
@@ -192,26 +193,28 @@ def get_workout_templates():
                                                        .is_(None))
                                   .filter(WorkoutTemplate.date_added <
                                           a_week_ago)
+                                  .order_by(WorkoutTemplate.date_added.desc())
                                   .all())
 
     #get workout templates which *have* have results added (in case the user
-    #wants to redo a workout)
+    #wants to redo a workout) (sorted by date)
     with_results = (db.session.query(WorkoutTemplate)
                               .outerjoin(WorkoutTemplate.workout_results)
                               .filter(WorkoutResult.workout_result_id
                                                    .isnot(None))
+                              .order_by(WorkoutTemplate.date_added.desc())
                               .all())
 
     #dictionaryify the results in each case
     no_results_recent_dicts = []
     for template in no_results_recent:
-        no_results_recent_dicts += template.to_dict_verbose()
+        no_results_recent_dicts.append(template.to_dict_verbose())
     no_results_older_dicts = []
     for template in no_results_older:
-        no_results_older_dicts += template.to_dict_verbose()
+        no_results_older_dicts.append(template.to_dict_verbose())
     with_results_dicts = []
     for template in with_results:
-        with_results_dicts += template.to_dict_verbose()
+        with_results_dicts.append(template.to_dict_verbose())
 
     #add each list to an overall dictionary for jsonification
     workout_templates_dict = {}

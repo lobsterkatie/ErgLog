@@ -171,3 +171,11 @@ input.caw-repeat {
     border-top: none;
     padding-top: 15px;
 }
+
+.ar-workout-choice {
+    width: 80%;
+    display: inline-block;
+    margin-right: 18px;
+}
+
+

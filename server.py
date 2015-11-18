@@ -45,7 +45,7 @@ def show_log():
        homepage with the login window open.)""" #LOGIN WINDOW OPEN NOT IMPLEMENTED YET
 
     #existence of a user_id in the session signifies that someone's signed in
-    logged_in_user_id = session["logged_in_user_id"]
+    logged_in_user_id = session.get("logged_in_user_id")
     if logged_in_user_id:
         user = (db.session.query(User)
                           .filter(User.user_id == logged_in_user_id)
@@ -157,29 +157,33 @@ def get_workout_templates():
 
        The final jsonified data will have the following structure:
             workout_templates = {
-                no_results_recent: [
-                    {workout_template_dict}
-                    {workout_template_dict}
+                no_results_recent: {
+                    id: {workout_template_dict}
+                    id: {workout_template_dict}
                     ...
-                ]
-                no_results_older: [
-                    {workout_template_dict}
-                    {workout_template_dict}
+                }
+                no_results_older: {
+                    id: {workout_template_dict}
+                    id: {workout_template_dict}
                     ...
-                ]
-                with_results: [
-                    {workout_template_dict}
-                    {workout_template_dict}
+                }
+                with_results: {
+                    id: {workout_template_dict}
+                    id: {workout_template_dict}
                     ...
-                ]
+                }
             }
        """
+
+    #get the id of the logged-in-user from the session
+    user_id = session["logged_in_user_id"]
 
     #get all workout templates with no results, splitting them into those
     #added in the last week and those added earlier (sorted by date)
     a_week_ago = datetime.now() - timedelta(days=7)
     no_results_recent = (db.session.query(WorkoutTemplate)
                                     .outerjoin(WorkoutTemplate.workout_results)
+                                    .filter(WorkoutTemplate.user_id == user_id)
                                     .filter(WorkoutResult.workout_result_id
                                                          .is_(None))
                                     .filter(WorkoutTemplate.date_added >
@@ -189,6 +193,7 @@ def get_workout_templates():
                                     .all())
     no_results_older = (db.session.query(WorkoutTemplate)
                                   .outerjoin(WorkoutTemplate.workout_results)
+                                  .filter(WorkoutTemplate.user_id == user_id)
                                   .filter(WorkoutResult.workout_result_id
                                                        .is_(None))
                                   .filter(WorkoutTemplate.date_added <
@@ -200,23 +205,30 @@ def get_workout_templates():
     #wants to redo a workout) (sorted by date)
     with_results = (db.session.query(WorkoutTemplate)
                               .outerjoin(WorkoutTemplate.workout_results)
+                              .filter(WorkoutTemplate.user_id == user_id)
                               .filter(WorkoutResult.workout_result_id
                                                    .isnot(None))
                               .order_by(WorkoutTemplate.date_added.desc())
                               .all())
 
-    #dictionaryify the results in each case
-    no_results_recent_dicts = []
+    #dictionaryify the results in each case, using id's as keys
+    no_results_recent_dicts = {}
     for template in no_results_recent:
-        no_results_recent_dicts.append(template.to_dict_verbose())
-    no_results_older_dicts = []
+        t_dict = template.to_dict_verbose()
+        t_id = template.workout_template_id
+        no_results_recent_dicts[t_id] = t_dict
+    no_results_older_dicts = {}
     for template in no_results_older:
-        no_results_older_dicts.append(template.to_dict_verbose())
-    with_results_dicts = []
+        t_dict = template.to_dict_verbose()
+        t_id = template.workout_template_id
+        no_results_older_dicts[t_id] = t_dict
+    with_results_dicts = {}
     for template in with_results:
-        with_results_dicts.append(template.to_dict_verbose())
+        t_dict = template.to_dict_verbose()
+        t_id = template.workout_template_id
+        with_results_dicts[t_id] = t_dict
 
-    #add each list to an overall dictionary for jsonification
+    #add each dictionary to an overall dictionary for jsonification
     workout_templates_dict = {}
     workout_templates_dict["no_results_recent"] = no_results_recent_dicts
     workout_templates_dict["no_results_older"] = no_results_older_dicts
@@ -316,14 +328,13 @@ def username_or_email_found():
         return "false"
 
 
-@app.route("/password-matches-credential")
+@app.route("/password-matches-credential", methods=["POST"])
 def check_password():
     """Called by the form validator. Returns true if password matches given
        email or username."""
 
-    credential = request.args.get("credential")
-    password = request.args.get("password")
-    print "got " + credential + password
+    credential = request.form.get("credential")
+    password = request.form.get("password")
 
     if password_is_correct(credential, password):
         return "true"

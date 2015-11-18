@@ -10,7 +10,7 @@ $(document).ready(function () {
     }*/
     $("#registration-form")[0].reset();
     $("#login-form")[0].reset();
-    
+
 
     /* Clear the forms on hide */
     //TODO only clear the form on the modal that was just closed
@@ -34,7 +34,7 @@ $(document).ready(function () {
 
     /* A hash function to hash the passwords */
     /* NOT CURRENTLY BEING USED */
-    /* Based on code from 
+    /* Based on code from
     http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/*/
     var hashString = function(rawString) {
         var hashValue = 0;
@@ -103,7 +103,7 @@ $(document).ready(function () {
             return false;
 
         }, //end submitHandler*/
-        
+
         rules: {
             firstname: "required",
             lastname: "required",
@@ -207,6 +207,7 @@ $(document).ready(function () {
                 required: true,
                 remote: {
                     url: "/password-matches-credential",
+                    type: "POST",
                     data: {
                         credential: function() {
                             return $("#login-credential").val();

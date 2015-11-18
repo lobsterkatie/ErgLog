@@ -250,10 +250,10 @@ class WorkoutTemplate(db.Model, ToDictMixin):
                 returned_dict = {
                     workout_template: {dict}
                     pieces: {
-                        piece 1: {
+                        1: {
                             template: {dict}
                         }
-                        piece 2: {
+                        2: {
                             template: {dict}
                         }
                         ...
@@ -271,7 +271,7 @@ class WorkoutTemplate(db.Model, ToDictMixin):
         for p in self.piece_templates:
             p_dict = {}
             p_dict["template"] = p.to_dict()
-            pieces_dict["piece " + str(p.ordinal)] = p_dict
+            pieces_dict[p.ordinal] = p_dict
 
         #add the pieces dictionary to the main dictionary and return it
         dict_to_return["pieces"] = pieces_dict
@@ -391,15 +391,15 @@ class WorkoutResult(db.Model, ToDictMixin):
                     workout_template: {dict}
                     workout_result: {dict}
                     pieces: {
-                        piece 1: {
+                        1: {
                             template: {dict}
                             results: {dict}
                             splits: {
-                                split 1: {dict}
-                                split 2: {dict}
+                                1: {dict}
+                                2: {dict}
                                 ...
                             }
-                        piece 2: {
+                        2: {
                             ...
                         }
                         ...
@@ -434,7 +434,7 @@ class WorkoutResult(db.Model, ToDictMixin):
             if split_results:
                 splits_dict = {} #to hold info about all this piece's splits
                 for s in split_results:
-                    splits_dict["split " + str(s.ordinal)] = s.to_dict
+                    splits_dict[s.ordinal] = s.to_dict
                 p_dict["splits"] = splits_dict
 
             #otherwise (if there weren't any split results), reflect that in
@@ -444,7 +444,7 @@ class WorkoutResult(db.Model, ToDictMixin):
 
             #now that the dictionary for this piece is complete, add it to the
             #dictionary holding all the pieces, using its ordinal as a key
-            pieces_dict["piece " + str(p.ordinal)] = p_dict
+            pieces_dict[p.ordinal] = p_dict
 
         #add the workout_template, workout_results, and pieces dictionaries to
         #the overall dictionary, then return it

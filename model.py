@@ -307,7 +307,7 @@ class PieceTemplate(db.Model, ToDictMixin):
     #this makes sure that two different pieces can't be the nth piece in a
     #given workout, nor the nth piece in a particular phase of a given workout
     __table_args__ = (schema.UniqueConstraint(workout_template_id, ordinal),)
-    __table_args__ = (schema.UniqueConstraint(workout_template_id,
+    __table_args__ = (schema.UniqueConstraint(workout_template_id, phase,
                                               ordinal_in_phase),)
 
     def __repr__(self):

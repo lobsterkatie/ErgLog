@@ -1,4 +1,19 @@
 ################################################################################
+# TO REMAKE DATABASE #
+
+\c Katie
+DROP DATABASE workoutlog;
+CREATE DATABASE workoutlog;
+\c workoutlog
+\dt
+
+#do the above, then run python -i model.py
+#>>>db.create_all()
+#then paste the functions below into the database
+
+
+
+################################################################################
 # TEMPLATES FOR TRIGGER FUNCTIONS #
 
 
@@ -95,7 +110,7 @@ CREATE OR REPLACE FUNCTION check_against_PRs() RETURNS trigger AS $$
                         "WHERE user_id=" + user_id_str + ";")
         old_PR_dist = plpy.execute(select_query)[0][PR_column_name]
 
-        #if there was no data there, or the new result is better, update 
+        #if there was no data there, or the new result is better, update
         #the user_stat_lists table and set the new_pr flag (column) to true
         if (old_PR_dist is None) or (old_PR_dist < new_piece_dist):
             update_query = ("UPDATE user_stat_lists SET " +
@@ -104,7 +119,7 @@ CREATE OR REPLACE FUNCTION check_against_PRs() RETURNS trigger AS $$
                             user_id_str + ";")
             plpy.execute(update_query)
 
-    #see if the new pices is one of the special distance-pieces, and if so, 
+    #see if the new pices is one of the special distance-pieces, and if so,
     #update the PR list as necessary
     if special_distances.get(new_piece_dist) is not None:
         #figure out which column was matched
@@ -128,7 +143,7 @@ $$ LANGUAGE plpythonu;
 
 
 
-CREATE TRIGGER check_against_PRs_trigger 
+CREATE TRIGGER check_against_PRs_trigger
     AFTER INSERT OR UPDATE ON "piece_results"
     FOR EACH ROW
     EXECUTE PROCEDURE check_against_PRs();
@@ -155,7 +170,7 @@ CREATE OR REPLACE FUNCTION add_piece_dist_to_totals() RETURNS trigger AS $$
     workout_total = plpy.execute(select_query)[0]["total_meters"]
     new_workout_total = workout_total + new_piece_dist
     update_query = ("UPDATE workout_results SET total_meters=" +
-                    str(new_workout_total) + "WHERE user_id=" + user_id_str + 
+                    str(new_workout_total) + "WHERE user_id=" + user_id_str +
                     "AND workout_result_id=" + workout_result_id_str + ";")
     plpy.execute(update_query)
 
@@ -172,7 +187,7 @@ $$ LANGUAGE plpythonu;
 
 
 
-CREATE TRIGGER add_piece_dist_to_totals_trigger 
+CREATE TRIGGER add_piece_dist_to_totals_trigger
     AFTER INSERT ON "piece_results"
     FOR EACH ROW
     EXECUTE PROCEDURE add_piece_dist_to_totals();
@@ -183,7 +198,7 @@ CREATE TRIGGER add_piece_dist_to_totals_trigger
 
 
 CREATE OR REPLACE FUNCTION change_piece_dist_on_totals() RETURNS trigger AS $$
-    """When a piece is updated, reflects the change in meters rowed in the 
+    """When a piece is updated, reflects the change in meters rowed in the
        piece in both the total for the workout and the lifetime total user stat."""
 
     #get the piece's old and new meters
@@ -202,7 +217,7 @@ CREATE OR REPLACE FUNCTION change_piece_dist_on_totals() RETURNS trigger AS $$
     workout_total = plpy.execute(select_query)[0]["total_meters"]
     new_workout_total = workout_total - old_piece_dist + new_piece_dist
     update_query = ("UPDATE workout_results SET total_meters=" +
-                    str(new_workout_total) + "WHERE user_id=" + user_id_str + 
+                    str(new_workout_total) + "WHERE user_id=" + user_id_str +
                     "AND workout_result_id=" + workout_result_id_str + ";")
     plpy.execute(update_query)
 
@@ -219,7 +234,7 @@ $$ LANGUAGE plpythonu;
 
 
 
-CREATE TRIGGER change_piece_dist_on_totals_trigger 
+CREATE TRIGGER change_piece_dist_on_totals_trigger
     AFTER UPDATE ON "piece_results"
     FOR EACH ROW
     EXECUTE PROCEDURE change_piece_dist_on_totals();
@@ -263,7 +278,7 @@ $$ LANGUAGE plpythonu;
 
 
 
-CREATE TRIGGER delete_piece_dist_from_totals_trigger 
+CREATE TRIGGER delete_piece_dist_from_totals_trigger
     AFTER DELETE ON "piece_results"
     FOR EACH ROW
     EXECUTE PROCEDURE delete_piece_dist_from_totals();

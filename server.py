@@ -74,10 +74,10 @@ def save_workout_template():
             new_workout_template = {
                 workout_template: {dict}
                 pieces: {
-                    piece 1: {
+                    1: {
                         template: {dict}
                     }
-                    piece 2: {
+                    2: {
                         template: {dict}
                     }
                     ...
@@ -118,8 +118,8 @@ def save_workout_template():
         new_p_temp = PieceTemplate()
         new_p_temp.workout_template_id = added_w_template.workout_template_id
         new_p_temp.ordinal = request.form.get("ordinal-piece-" + i, type=int)
-        new_p_temp.ordinal = request.form.get("ordinal-in-phase-piece-" + i,
-                                              type=int)
+        new_p_temp.ordinal_in_phase = (
+                request.form.get("ordinal-in-phase-piece-" + i, type=int))
         new_p_temp.phase = request.form.get("phase-piece-" + i)
         new_p_temp.piece_type = request.form.get("type-piece-" + i)
         new_p_temp.distance = request.form.get("distance-piece-" + i, type=int)
@@ -233,8 +233,8 @@ def get_workout_templates():
     workout_templates_dict["with_results"] = with_results_dicts
 
     #jsonify the result and return it
-    workout_templates = jsonify(workout_templates_dict)
-    return workout_templates
+    workout_templates_json = jsonify(workout_templates_dict)
+    return workout_templates_json
 
 
 
@@ -250,15 +250,15 @@ def return_workout_details(workout_result_id):
                 workout_template: {dict}
                 workout_result: {dict}
                 pieces: {
-                    piece 1: {
+                    1: {
                         template: {dict}
                         results: {dict}
                         splits: {
-                            split 1: {dict}
-                            split 2: {dict}
+                            1: {dict}
+                            2: {dict}
                             ...
                         }
-                    piece 2: {
+                    2: {
                         ...
                     }
                     ...

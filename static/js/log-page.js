@@ -76,8 +76,6 @@ $(document).ready(function () {
         }
         var cell, cellAttributes, cellComment, cellContent, contentAttributes;
 
-        //console.log("pieceNum: " + pieceNum, "pieceNumInPhase: " + pieceNumInPhase);
-        //console.log("totalPieces: " + totalPieces, "piecesInPhase: " + piecesInPhase);
 
         //create the new row
         var row = $("<tr>").attr("id", "caw-piece-" + pieceNum + "-row");
@@ -278,9 +276,6 @@ $(document).ready(function () {
         totalPiecesField.val(totalPieces);
         phasePiecesField.val(piecesInPhase);
 
-        //console.log("totalPieces field is now " + totalPiecesField.val());
-        //console.log("piecesInPhase field is now " + phasePiecesField.val());
-
 
         //add the now-complete row to the end of the table body
         parentTableBody.append(row);
@@ -288,7 +283,7 @@ $(document).ready(function () {
         //focus the first input in the new row
         parentTableBody.find("input[name=zone-piece-" + pieceNum + "]")
                        .focus();
-    });
+    }); //end $(".caw-add-piece-button").click()
 
 
 
@@ -303,15 +298,13 @@ $(document).ready(function () {
     /******************** create-a-workout helper functions *******************/
 
 
-    /* create and return a <td> with the given attributes and content (content
-       and its attributes can either be given singly or as arrays)
-
-       Note that even if given singly, attributes are objects of the form
-       {"attribute": "value", "attribute": "value", ...} */
-    function createPieceTableCell (cellAttributes,
-                                   cellComment,
-                                   content,
-                                   contentAttributes) {
+    //Create and return a <td> with the given attributes and content (content
+    //and its attributes can either be given singly or as arrays). Note that
+    //even if given singly, attributes are objects of the form
+    //{"attribute": "value", "attribute": "value", ...}
+    function createPieceTableCell (cellAttributes, cellComment, content,
+                                   contentAttributes)
+    {
 
         //create the cell, and give it attributes and a comment, if any
         var cell = $("<td>");
@@ -350,10 +343,12 @@ $(document).ready(function () {
         }
 
         return cell;
-    }
+    } //end createPieceTableCell()
 
 
     //show or hide input for split length based on checkbox status
+    //(written as a listener on a class-filtered part of the document so that
+    //it will apply to current *and future* instances of the class)
     $(document).on("change", ".caw-split-bool", function() {
         //figure out which row the checkbox is in
         var pieceNum = $(this).data("pieceNum");
@@ -368,7 +363,7 @@ $(document).ready(function () {
         else {
             $("#caw-split-length-piece-" + pieceNum).hide();
         }
-        });
+    }); //end $(".caw-split-bool").change()
 
 
     /****************** save workout for later results-adding *****************/
@@ -407,16 +402,11 @@ $(document).ready(function () {
             //now that it's all ready, show the add-results modal
             $('#add-results-modal').modal('show');
         });
-
-
-
-
-
     }); //end $("#add-results-button").click()
 
 
 
-    //pull workout template descriptions and id's and use them to populate
+    //Pull workout template descriptions and id's and use them to populate
     //workout-chooser on the add-results modal
     function populateARWorkoutChooser (templates) {
         //split templates up based on presence/absence of results and,
@@ -446,7 +436,9 @@ $(document).ready(function () {
         //dropdown (since the other two are secretly <optgroups> in the same
         //dropdown, their overall dropdown, with its top direction, is left
         //intact by the emptying)
-        withResultsDropdown.append($("<option>").append("Choose a workout..."));
+        withResultsDropdown.append(
+            $("<option>").append("Choose a workout...")
+                         .attr({"value": "choose-a-workout"}));
 
         //populate each dropdown with the appropriate template descriptions
         addARWorkoutChooserOptions(noResultsRecent, nrRecentDropdown);
@@ -530,8 +522,9 @@ $(document).ready(function () {
 
 
 
-    //Get the user's workout choice, look it up in the given templates object,
-    //populate the form allowing results-adding, and show the form
+    //On the add-results modal, once the user has chosen a workout to which
+    //to add results, get their choice, look it up in the passed templates
+    //object, populate the form allowing results-adding, and show the form
     function handleARChoice (evt) {
         //the ajax-retrieved templates object was passed into the event
         //handler as .data
@@ -542,6 +535,12 @@ $(document).ready(function () {
         //template's id from the selected option in that dropdown
         var workoutID = $(evt.target).siblings("select").val();
 
+        //if the user hasn't actually selected a workout (the dropdown
+        //is still on the 'Choose a workout...' option), don't do anything
+        if (workoutID === "choose-a-workout") {
+            return;
+        }
+
         //find the workout_template object associated with that id
         //(using the || operator since it will appear in exactly one
         //of no_results_recent, no_results_older, and with_results)
@@ -550,13 +549,41 @@ $(document).ready(function () {
                        allTemplates.with_results[workoutID];
 
         //split the template into its workout template and its piece
-        //templates, and capture the number of pieces, just for convenience
+        //templates for each phase
         var workoutTemplate = template.workout_template;
-        var pieceTemplates = template.pieces;
-        var numPieces = workoutTemplate.num_pieces;
+        var warmupPieceTemplates = pieceTemplatesByPhase(template, "warmup");
+        var mainPieceTemplates = pieceTemplatesByPhase(template, "main");
+        var cooldownPieceTemplates = pieceTemplatesByPhase(template, "cooldown");
 
-        //IN THE MORNING
-        //remake database, add in a workout or two
+        //
+
+
+    } //end handleARChoice()
+
+    //Given a verbose objectified version of a workout template, return an
+    //array containing its piece templates, filtered by the given phase.
+    function pieceTemplatesByPhase (workoutTemplate, phase) {
+
+        var phaseTemplates = [];
+
+        //unpack the layers of the workout template object and go through
+        //the piece templates one by one, adding those with the correct phase
+        //to the phaseTemplates array
+        var piecesObject = workoutTemplate.pieces;
+        var numPieces = Object.keys(piecesObject).length;
+        for (var i = 0; i < numPieces; i++) {
+            var template = piecesObject[i+1].template;
+            if (template.phase === phase)
+            {
+                phaseTemplates.push(template);
+            }
+        }
+
+        return phaseTemplates;
+    } //end splitPieceTemplatesByPhase()
+
+
+//IN THE MORNING
         //input for overall workout results (incl description) which shows
         //the whole time, then:
         //make a div for warmup, incl descriptive stuff and overall description
@@ -568,12 +595,6 @@ $(document).ready(function () {
         //put a note on prev and next buttons that data will be saved
         //button to add notes to any given piece, then show text box and
         //focus it (width of whole table row? notes/piece, notes/phase)
-
-
-    } //end handleARChoice()
-
-
-
 
 
 

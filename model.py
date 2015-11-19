@@ -294,6 +294,7 @@ class PieceTemplate(db.Model, ToDictMixin):
     phase = db.Column(db.Enum("warmup", "main", "cooldown",
                               name="workout_phases"),
                       nullable=False)
+    ordinal_in_phase = db.Column(db.Integer)
     piece_type = db.Column(db.Enum("time", "distance", name="piece_types"))
     zone = db.Column(db.Unicode(32))
     distance = db.Column(db.Integer)
@@ -304,9 +305,10 @@ class PieceTemplate(db.Model, ToDictMixin):
     notes = db.Column(db.UnicodeText)
 
     #this makes sure that two different pieces can't be the nth piece in a
-    #given workout
+    #given workout, nor the nth piece in a particular phase of a given workout
     __table_args__ = (schema.UniqueConstraint(workout_template_id, ordinal),)
-
+    __table_args__ = (schema.UniqueConstraint(workout_template_id,
+                                              ordinal_in_phase),)
 
     def __repr__(self):
         """Output the object's values when it's printed"""
@@ -339,7 +341,10 @@ class WorkoutResult(db.Model, ToDictMixin):
     calories = db.Column(db.Integer)
     goals = db.Column(db.UnicodeText)
     comments = db.Column(db.UnicodeText)
-    public = db.Column(db.Boolean)
+    warmup_comments = db.Column(db.UnicodeText)
+    main_comments = db.Column(db.UnicodeText)
+    cooldown_comments = db.Column(db.UnicodeText)
+    public = db.Column(db.Boolean) #not yet being used
 
 
     #many (piece results) to one (workout result)

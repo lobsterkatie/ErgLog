@@ -52,13 +52,21 @@ $(document).ready(function () {
     /**************** add a piece to the create-a-workout form ****************/
 
     $(".caw-add-piece-button").click(function() {
-        //get data to use in the function
+        //get jquery DOM elements to use in the function
         var parentTable = $(this).closest("table");
         var parentTableBody = parentTable.find("tbody");
+        var totalPiecesField = $("#caw-num-pieces");
+        var phasePiecesField = $("#" + parentTable.data("phasePiecesId"));
+
+        //get data from the DOM to use in the function
         var phase = parentTable.data("phase");
-        var piecesInPhase = parentTable.data("piecesInPhase");
-        var pieceNum = $(this).closest("form").data("nextPieceNum");
         var pieceType = $(this).data("pieceType");
+        var piecesInPhase = Number(phasePiecesField.val()) + 1;
+        var totalPieces = Number(totalPiecesField.val()) + 1;
+
+        //a few more variables for convenience
+        var pieceNum = totalPieces;
+        var pieceNumInPhase = piecesInPhase;
         var placeholderUnits;
         if (pieceType === "time") {
             placeholderUnits = "h:m:s";
@@ -66,18 +74,18 @@ $(document).ready(function () {
         else if (pieceType === "distance") {
             placeholderUnits = "m";
         }
-
-        //console.log("nextPieceNum: " + pieceNum, "piecesInPhase: " + piecesInPhase);
-
-        //create some variables to hold the pieces out of which we'll build
-        //the new row
-        var row = $("<tr>").attr("data-piece-num", pieceNum);
         var cell, cellAttributes, cellComment, cellContent, contentAttributes;
+
+        //console.log("pieceNum: " + pieceNum, "pieceNumInPhase: " + pieceNumInPhase);
+        //console.log("totalPieces: " + totalPieces, "piecesInPhase: " + piecesInPhase);
+
+        //create the new row
+        var row = $("<tr>").attr("id", "caw-piece-" + pieceNum + "-row");
 
 
         row.append("<!-- hidden info fields -->");
 
-        //phase cell
+        //phase cell (hidden but submitted with the form)
         cellAttributes = {"hidden": ""};
         cellComment = "<!-- phase -->";
         cellContent = $("<input>");
@@ -88,15 +96,12 @@ $(document).ready(function () {
             "aria-label": "phase-piece-" + pieceNum,
             "readonly": ""
         };
-        //inputElement = $("<input>").attr(inputAttributes);
-        //cell = $("<td>").attr(cellAttributes);
-        //cell.append(inputElement);
         cell = createPieceTableCell(cellAttributes, cellComment,
                                     cellContent, contentAttributes);
         row.append(cell);
 
 
-        //piece type cell
+        //piece type cell (hidden but submitted with the form)
         cellAttributes = {"hidden": ""};
         cellComment = "<!-- type -->";
         cellContent = $("<input>");
@@ -107,20 +112,14 @@ $(document).ready(function () {
             "aria-label": "type-piece-" + pieceNum,
             "readonly": ""
         };
-        //inputElement = $("<input>").attr(inputAttributes);
-        //cell = $("<td>").attr(cellAttributes);
-        //cell.append(inputElement);
         cell = createPieceTableCell(cellAttributes, cellComment,
                                     cellContent, contentAttributes);
         row.append(cell);
 
 
-        row.append("<!-- input fields for piece " + pieceNum + " -->");
-
-
-        //ordinal cell
-        cellAttributes = undefined;
-        cellComment = "<!-- ordinal -->";
+        //overall ordinal cell (hidden but submitted with the form)
+        cellAttributes = {"hidden": ""};
+        cellComment = "<!-- overall ordinal -->";
         cellContent = $("<input>");
         contentAttributes = {
             "class": "caw-ordinal",
@@ -128,6 +127,25 @@ $(document).ready(function () {
             "name": "ordinal-piece-" + pieceNum,
             "value": pieceNum,
             "aria-label": "ordinal-piece-" + pieceNum,
+            "readonly": ""
+        };
+        cell = createPieceTableCell(cellAttributes, cellComment,
+                                    cellContent, contentAttributes);
+        row.append(cell);
+
+        row.append("<!-- input fields for piece " + pieceNum + " -->");
+
+
+        //ordinal-in-phase cell
+        cellAttributes = undefined;
+        cellComment = "<!-- ordinal in phase -->";
+        cellContent = $("<input>");
+        contentAttributes = {
+            "class": "caw-ordinal",
+            "type": "text",
+            "name": "ordinal-in-phase-piece-" + pieceNum,
+            "value": pieceNumInPhase,
+            "aria-label": "ordinal-in-phase-piece-" + pieceNum,
             "onfocus": "this.blur()",
             "readonly": ""
         };
@@ -249,25 +267,19 @@ $(document).ready(function () {
 
         //if this is the first piece in the phase, the table header and the
         //table footer row allowing repeats will be hidden, so show them
-        if (piecesInPhase === 0) {
+        if (piecesInPhase === 1) {
             parentTable.find("thead").show();
             parentTable.find(".caw-footer-repeat").show();
         }
 
 
         //update the count of both total pieces in the workout and pieces in
-        //the current phase, each in the relevant place in the DOM and jquery's
-        //cache
-        var nextPieceNum = pieceNum + 1;
-        var newPiecesInPhase = piecesInPhase + 1;
-        var totalPieces = $("#caw-num-pieces").val();
-        $(this).closest("form").attr("data-next-piece-num", nextPieceNum);
-        $(this).closest("form").data("nextPieceNum", nextPieceNum);
-        parentTable.attr("data-pieces-in-phase", newPiecesInPhase);
-        parentTable.data("piecesInPhase", newPiecesInPhase);
-        $("#caw-num-pieces").val(++totalPieces);
-        console.log("numPieces is now " + (totalPieces));
+        //the current phase, each in the relevant place in the DOM
+        totalPiecesField.val(totalPieces);
+        phasePiecesField.val(piecesInPhase);
 
+        //console.log("totalPieces field is now " + totalPiecesField.val());
+        //console.log("piecesInPhase field is now " + phasePiecesField.val());
 
 
         //add the now-complete row to the end of the table body
@@ -362,8 +374,6 @@ $(document).ready(function () {
     /****************** save workout for later results-adding *****************/
 
     $("#caw-add-results-later").click(function(evt) {
-        //TODO DO I STILL NEED THIS???
-        //evt.preventDefault();
 
         //get data from the form, then hide and clear it
         var formData = $("#create-a-workout-form").serialize();
@@ -523,10 +533,50 @@ $(document).ready(function () {
     //Get the user's workout choice, look it up in the given templates object,
     //populate the form allowing results-adding, and show the form
     function handleARChoice (evt) {
-        var templates = evt.data;
+        //the ajax-retrieved templates object was passed into the event
+        //handler as .data
+        var allTemplates = evt.data;
+
+        //given that this code can run on either 'add results' button,
+        //figure out which dropdown it was next to and pull the workout
+        //template's id from the selected option in that dropdown
         var workoutID = $(evt.target).siblings("select").val();
-        console.log("workoutID: " + workoutID);
+
+        //find the workout_template object associated with that id
+        //(using the || operator since it will appear in exactly one
+        //of no_results_recent, no_results_older, and with_results)
+        var template = allTemplates.no_results_recent[workoutID] ||
+                       allTemplates.no_results_older[workoutID] ||
+                       allTemplates.with_results[workoutID];
+
+        //split the template into its workout template and its piece
+        //templates, and capture the number of pieces, just for convenience
+        var workoutTemplate = template.workout_template;
+        var pieceTemplates = template.pieces;
+        var numPieces = workoutTemplate.num_pieces;
+
+        //IN THE MORNING
+        //remake database, add in a workout or two
+        //input for overall workout results (incl description) which shows
+        //the whole time, then:
+        //make a div for warmup, incl descriptive stuff and overall description
+        //pattern the above on the create-a-workout modal
+        //do the same for main and cooldown?
+        //or for the moment, put it all in one div and see how long it is
+        //have a total distance field which is a dummy input but which
+        //updates on blur of distance fields
+        //put a note on prev and next buttons that data will be saved
+        //button to add notes to any given piece, then show text box and
+        //focus it (width of whole table row? notes/piece, notes/phase)
+
+
     } //end handleARChoice()
+
+
+
+
+
+
 
 
 

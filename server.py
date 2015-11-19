@@ -118,11 +118,13 @@ def save_workout_template():
         new_p_temp = PieceTemplate()
         new_p_temp.workout_template_id = added_w_template.workout_template_id
         new_p_temp.ordinal = request.form.get("ordinal-piece-" + i, type=int)
+        new_p_temp.ordinal = request.form.get("ordinal-in-phase-piece-" + i,
+                                              type=int)
         new_p_temp.phase = request.form.get("phase-piece-" + i)
         new_p_temp.piece_type = request.form.get("type-piece-" + i)
         new_p_temp.distance = request.form.get("distance-piece-" + i, type=int)
         new_p_temp.time_seconds = hms_string_to_seconds(
-                                    request.form.get("time-piece-" + i))
+                                        request.form.get("time-piece-" + i))
         new_p_temp.has_splits = request.form.get("split-bool-piece-" + i)
         if new_p_temp.piece_type == "time":
             new_p_temp.default_split_length = hms_string_to_seconds(

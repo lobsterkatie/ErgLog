@@ -90,8 +90,9 @@
                     </div> <!-- end of modal header -->
 
                     <div class="modal-body">
-                        <form id="create-a-workout-form" class="form-horizontal" role="form" data-next-piece-num="1">
+                        <form id="create-a-workout-form" class="form-horizontal" role="form">
                             <div hidden>
+                                <!-- total number of pieces in the workout -->
                                 <input id="caw-num-pieces" type="text" name="num-pieces" value="0" readonly>
                             </div>
                             <div id="caw-overall-description">
@@ -226,6 +227,10 @@
                                 </div>
                             </div>
                             <div id="caw-warmup" hidden>
+                                <div hidden>
+                                    <!-- number of warmup pieces -->
+                                    <input id="caw-num-warmup-pieces" type="text" name="num-warmup-pieces" value="0" readonly>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <h3>Warmup</h3>
@@ -237,7 +242,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <table id="caw-table-warmup" class="table table-condensed caw-piece-table" data-phase="warmup" data-pieces-in-phase="0">
+                                    <table id="caw-table-warmup" class="table table-condensed caw-piece-table" data-phase="warmup" data-phase-pieces-id="caw-num-warmup-pieces">
                                         <thead hidden>
                                             <tr>
                                                 <th class="caw-ordinal">
@@ -308,6 +313,10 @@
                                 </div>
                             </div>
                             <div id="caw-main" hidden>
+                                <div hidden>
+                                    <!-- number of main pieces -->
+                                    <input id="caw-num-main-pieces" type="text" name="num-main-pieces" value="0" readonly>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <h3>Main Workout</h3>
@@ -319,7 +328,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <table id="caw-table-main" class="table table-condensed caw-piece-table" data-phase="main" data-pieces-in-phase="0">
+                                    <table id="caw-table-main" class="table table-condensed caw-piece-table" data-phase="main" data-phase-pieces-id="caw-num-main-pieces">
                                         <thead hidden>
                                             <tr>
                                                 <th class="caw-ordinal">
@@ -390,6 +399,10 @@
                                 </div>
                             </div>
                             <div id="caw-cooldown" hidden>
+                                <div hidden>
+                                    <!-- number of cooldown pieces -->
+                                    <input id="caw-num-cooldown-pieces" type="text" name="num-cooldown-pieces" value="0" readonly>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <h3>Cooldown</h3>
@@ -401,7 +414,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <table id="caw-table-cooldown" class="table table-condensed caw-piece-table" data-phase="cooldown" data-pieces-in-phase="0">
+                                    <table id="caw-table-cooldown" class="table table-condensed caw-piece-table" data-phase="cooldown" data-phase-pieces-id="caw-num-cooldown-pieces">
                                         <thead hidden>
                                             <tr>
                                                 <th class="caw-ordinal">
@@ -496,9 +509,16 @@
 
                     <div class="modal-body">
                         <div id="ar-choose-workout">
-                            <p>
-                                Please choose a workout to which to add results.
-                            </p>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3>Choose a workout</h3>
+                                    <h4>
+                                        <small class="text-muted">
+                                            Please choose a workout to which to add results.
+                                        </small>
+                                    </h4>
+                                </div>
+                            </div>
                             <form class="form-horizontal" role="form">
                                 <div class="form-group">
                                     <div class="col-sm-2 text-right">
@@ -544,8 +564,18 @@
                                 </div>
                             </form>
                         </div>
+                        <div id="ar-overall-results">
 
+                        </div>
+                        <div id="ar-warmup-results">
 
+                        </div>
+                        <div id="ar-main-results">
+
+                        </div>
+                        <div id="ar-cooldown-results">
+
+                        </div>
                     </div> <!-- end of modal body -->
 
                     <div class="modal-footer">

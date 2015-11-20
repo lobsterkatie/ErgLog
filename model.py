@@ -13,7 +13,7 @@ db = SQLAlchemy()
 ##############################################################################
 # Helper functions, ToDict mixin
 
-def format_time_from_seconds(sec):
+def seconds_to_hms_string(sec):
     """return a string in the form D:H:M:S given a number of seconds"""
 
     if sec < 0:
@@ -161,7 +161,7 @@ class UserStatList(db.Model, ToDictMixin):
 
                 #format the values
                 if attr.endswith("time"):
-                    value = format_time_from_seconds(value)
+                    value = seconds_to_hms_string(value)
                 else:
                     value = str(value) + " m"
 
@@ -299,9 +299,12 @@ class PieceTemplate(db.Model, ToDictMixin):
     zone = db.Column(db.Unicode(32))
     distance = db.Column(db.Integer)
     time_seconds = db.Column(db.Integer)
+    time_string = db.Column(db.Unicode(32))
     rest = db.Column(db.Unicode(32))
     has_splits = db.Column(db.Boolean)
     default_split_length = db.Column(db.Integer)
+    split_length_string = db.Column(db.Unicode(16))
+    label = db.Column(db.Unicode(64))
     notes = db.Column(db.UnicodeText)
 
     #this makes sure that two different pieces can't be the nth piece in a
@@ -474,22 +477,22 @@ class PieceResult(db.Model, ToDictMixin):
                                   db.ForeignKey("piece_templates.piece_template_id"),
                                   nullable=False)
     ordinal = db.Column(db.Integer, nullable=False)
-    goal_split_seconds = db.Column(db.Integer)
-    goal_sr = db.Column(db.Integer)
-    goal_hr = db.Column(db.Integer)
-    goal_watts = db.Column(db.Integer)
     total_time_seconds = db.Column(db.Integer)
     total_meters = db.Column(db.Integer)
-    has_splits = db.Column(db.Boolean)
-    split_length = db.Column(db.Integer)
     avg_split_seconds = db.Column(db.Integer)
     avg_sr = db.Column(db.Integer)
     avg_watts = db.Column(db.Integer)
     avg_hr = db.Column(db.Integer)
-    drag_factor = db.Column(db.Integer)
-    comments = db.Column(db.UnicodeText)
+    has_splits = db.Column(db.Boolean)
+    split_length = db.Column(db.Integer)
     completed = db.Column(db.Boolean)
-    exclude_from_prs = db.Column(db.Boolean)
+    goal_split_seconds = db.Column(db.Integer) #not currently in use
+    goal_sr = db.Column(db.Integer) #not currently in use
+    goal_hr = db.Column(db.Integer) #not currently in use
+    goal_watts = db.Column(db.Integer) #not currently in use
+    drag_factor = db.Column(db.Integer) #not currently in use
+    comments = db.Column(db.UnicodeText) #not currently in use
+    exclude_from_prs = db.Column(db.Boolean) #not currently in use
 
     #one (piece template) to many (piece results)
     piece_template = db.relationship("PieceTemplate", backref="piece_results")

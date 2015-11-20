@@ -125,19 +125,30 @@ def save_workout_template():
         new_p_temp.distance = request.form.get("distance-piece-" + i, type=int)
         new_p_temp.time_seconds = hms_string_to_seconds(
                                         request.form.get("time-piece-" + i))
-        new_p_temp.has_splits = request.form.get("split-bool-piece-" + i)
-        if new_p_temp.piece_type == "time":
-            new_p_temp.default_split_length = hms_string_to_seconds(
-                                                    request.form.get(
-                                                        "split-length-piece-" +
-                                                        i))
-        else:
-            new_p_temp.default_split_length = request.form.get(
-                                                "split-length-piece-" + i,
-                                                type=int)
+        new_p_temp.time_string = request.form.get("time-piece-" + i)
+        new_p_temp.has_splits = request.form.get("split-bool-piece-" + i,
+                                                 False)
         new_p_temp.rest = request.form.get("rest-piece-" + i)
         new_p_temp.zone = request.form.get("zone-piece-" + i)
         new_p_temp.notes = request.form.get("notes-piece-" + i)
+        if new_p_temp.piece_type == "time":
+            new_p_temp.default_split_length = (
+                    hms_string_to_seconds(
+                            request.form.get("split-length-piece-" + i)))
+            new_p_temp.split_length_string = (
+                    request.form.get("split-length-piece-" + i))
+            new_p_temp.label = make_piece_label("time",
+                                                new_p_temp.time_seconds,
+                                                new_p_temp.zone)
+        elif new_p_temp.piece_type == "distance":
+            new_p_temp.default_split_length = request.form.get(
+                                                "split-length-piece-" + i,
+                                                type=int)
+            new_p_temp.split_length_string = (
+                    request.form.get("split-length-piece-" + i) + "m")
+            new_p_temp.label = make_piece_label("distance",
+                                                new_p_temp.distance,
+                                                new_p_temp.zone)
         db.session.add(new_p_temp)
         db.session.commit()
 

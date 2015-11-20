@@ -2,9 +2,10 @@
 
 /*.modal-header {
     border-bottom: none;
-}
+    background-color: #E5E5FF;
+}*/
 
-.modal-footer {
+/*.modal-footer {
     border-top: none;
 }*/
 
@@ -53,7 +54,7 @@ input.validation-error {
     text-align: center;
 }
 
-/* log.html */
+/* log.html create-a-workout modal */
 
 #log-owner-name {
     text-align: center;
@@ -88,9 +89,9 @@ input.validation-error {
     table-layout: fixed;
 }
 
-/* make the inputs fit in their cells */
+
 .caw-piece-table input {
-    width: 100%;
+    width: 100%; /* make the inputs fit in their cells */
     border-bottom: 1px black;
     border-style: none none solid none;
 }
@@ -154,8 +155,9 @@ input.caw-split-bool {
     text-align: center;
 }
 
-.caw-repeat-row {
-    border-top: 2px;
+.table > tfoot > tr > td.caw-repeat-row {
+    /*border-top: 2px solid;*/
+    padding-top: 15px;
 }
 
 input.caw-repeat {
@@ -172,10 +174,86 @@ input.caw-repeat {
     padding-top: 15px;
 }
 
+
+/* log.html add-results modal */
+
 .ar-workout-choice {
     width: 80%;
     display: inline-block;
     margin-right: 18px;
 }
 
+#ar-total-meters-num {
+    border: none;
+}
+
+#add-results-form input {
+    width: 100%; /* make the inputs fit in their cells */
+    border-bottom: 1px black;
+    border-style: none none solid none;
+}
+
+.fixed-textarea {
+    resize: none;
+    width: 100%;
+    border: none;
+    box-shadow: none;
+}
+
+.ar-fsrn-table {
+    width: 50%;
+}
+
+.ar-fsrn-table > tbody > tr > th {
+    border: none;
+    width: 15%;
+    text-align: right;
+}
+
+.ar-fsrn-table > tbody > tr > td {
+    border: none;
+    width: 85%;
+    text-align: left;
+}
+
+.ar-piece-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.ar-ordinal-col {
+    width: 5%;
+}
+
+.ar-label-col {
+    width: 15%;
+}
+
+.ar-dist-time-col {
+    width: 12%;
+}
+
+.ar-split-col {
+    width: 12%;
+}
+
+.ar-sr-col {
+    width: 12%;
+}
+
+.ar-watts-col {
+    width: 12%;
+}
+
+.ar-hr-col {
+    width: 12%;
+}
+
+.ar-splits-col {
+    width: 12%;
+}
+
+.ar-completed-col {
+    width: 8%;
+}
 

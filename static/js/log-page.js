@@ -1,9 +1,24 @@
 "use strict";
 $(document).ready(function () {
 
-    /**************** reset all forms on the page (on pageload) ***************/
+
+    /*************** things that actually *happen* on page load ***************/
+
+    //everything else (below this section) is functions and event listeners
+
+
+    //reset all forms
     resetForms();
 
+    //capture the initial states of the create-a-workout and add-results modals
+    var cawModalInitial = $("#create-a-workout-modal").html();
+    var arModalInitial = $("#add-results-modal").html();
+
+
+
+    /*********************** reset all forms on the page **********************/
+
+    //reset all forms on the page
     function resetForms () {
         //get all the forms
         var forms = $("form");
@@ -12,7 +27,13 @@ $(document).ready(function () {
         for (var i = 0; i < forms.length; i++) {
             forms[i].reset();
         }
-    }
+    } //end resetForms()
+
+
+
+
+
+
 
 
     /*********** navigate between panes in the create-a-workout form **********/
@@ -47,6 +68,21 @@ $(document).ready(function () {
         $("#caw-main").show();
     });
 
+
+    /*********** reset create-a-workout modal to first pane on close **********/
+
+    $("#create-a-workout-modal").on("hidden.bs.modal", function (evt) {
+
+        //navigate to the first pane
+        $("#caw-warmup").hide();
+        $("#caw-main").hide();
+        $("#caw-cooldown").hide();
+        $("#caw-overall-description").show();
+
+        //reset the other panes to their empty states
+        //TODO CODE ME!! (empty create-a-workout panes on close - also on
+                          //submit)
+    });
 
 
     /**************** add a piece to the create-a-workout form ****************/
@@ -120,7 +156,6 @@ $(document).ready(function () {
         cellComment = "<!-- overall ordinal -->";
         cellContent = $("<input>");
         contentAttributes = {
-            "class": "caw-ordinal",
             "type": "text",
             "name": "ordinal-piece-" + pieceNum,
             "value": pieceNum,
@@ -316,8 +351,8 @@ $(document).ready(function () {
         }
 
         //see if the content was passed in as an array, and if so, loop over
-        //its elements, adding any given attributes, then adding each element
-        //to the cell, in order
+        //its elements, adding any attributes, then adding each element to
+        //the cell in order
         if (Array.isArray(content))
         {
             //if any attributes were given for the content, add them
@@ -353,8 +388,6 @@ $(document).ready(function () {
         //figure out which row the checkbox is in
         var pieceNum = $(this).data("pieceNum");
 
-        console.log("pieceNum: " + pieceNum);
-
         //based on the checkbox's checked-ness, show or hide input for
         //split length
         if ($(this).prop("checked")) {
@@ -386,7 +419,16 @@ $(document).ready(function () {
 
     /************** functions dealing with the add-results modal **************/
 
-    //populate, show, and handle user interaction with the add-results modal
+
+    //Make is so that closing the add-results modal resets it to its
+    //initial state
+    $("#add-results-modal").on("hidden.bs.modal", function (evt) {
+
+        $("#add-results-modal").html(arModalInitial);
+    });
+
+
+    //Populate the first pane of the add-results modal and show the modal
     $("#add-results-button").click(function(evt) {
         //get user's workout templates from the database
         $.get("/get-workout-templates.json", function(data) {
@@ -544,54 +586,489 @@ $(document).ready(function () {
         //find the workout_template object associated with that id
         //(using the || operator since it will appear in exactly one
         //of no_results_recent, no_results_older, and with_results)
-        var template = allTemplates.no_results_recent[workoutID] ||
-                       allTemplates.no_results_older[workoutID] ||
-                       allTemplates.with_results[workoutID];
+        var templateObj = allTemplates.no_results_recent[workoutID] ||
+                         allTemplates.no_results_older[workoutID] ||
+                         allTemplates.with_results[workoutID];
 
         //split the template into its workout template and its piece
-        //templates for each phase
-        var workoutTemplate = template.workout_template;
-        var warmupPieceTemplates = pieceTemplatesByPhase(template, "warmup");
-        var mainPieceTemplates = pieceTemplatesByPhase(template, "main");
-        var cooldownPieceTemplates = pieceTemplatesByPhase(template, "cooldown");
+        //templates for each phase (grouped by type, sorted by ordinal)
+        var workoutTemplate = templateObj.workout_template;
+        var warmupTemplates = pieceTemplatesByPhase(templateObj, "warmup");
+        var mainTemplates = pieceTemplatesByPhase(templateObj, "main");
+        var cooldownTemplates = pieceTemplatesByPhase(templateObj, "cooldown");
 
-        //
+        //add the workout description, primary zone, and total distance
+        //to the header
+        var workoutDescription = workoutTemplate.description;
+        var primaryZone = workoutTemplate.primary_zone;
+        $("#ar-workout-description").append(workoutDescription);
+        if (primaryZone) {
+            $("#ar-workout-description").append(" (" + primaryZone + ")");
+        }
+        $("#ar-total-meters").show();
 
+        //populate a table for each phase with descriptive data (format,
+        //stroke rates, and notes) given when the workout was created
+        populateARDescData(workoutTemplate, "warmup");
+        populateARDescData(workoutTemplate, "main");
+        populateARDescData(workoutTemplate, "cooldown");
+
+        //find the distance and time piece tables for each phase and
+        //populate (or hide) them appropriately
+        var warmupTimeTable = $("#ar-warmup-time-table");
+        var warmupDistTable = $("#ar-warmup-distance-table");
+        var mainTimeTable = $("#ar-main-time-table");
+        var mainDistTable = $("#ar-main-distance-table");
+        var cooldownTimeTable = $("#ar-cooldown-time-table");
+        var cooldownDistTable = $("#ar-cooldown-distance-table");
+        populateARPieceTable(warmupTimeTable, warmupTemplates);
+        populateARPieceTable(warmupDistTable, warmupTemplates);
+        populateARPieceTable(mainTimeTable, mainTemplates);
+        populateARPieceTable(mainDistTable, mainTemplates);
+        populateARPieceTable(cooldownTimeTable, cooldownTemplates);
+        populateARPieceTable(cooldownDistTable, cooldownTemplates);
+
+
+        //now that all distance pieces have been added to the form, update
+        //the total-meters field in the header
+        updateTotalMeters();
+
+
+
+
+
+
+
+        //now that the adding-results panes are fully populated, show the first
+        //one and hide the workout-chooser pane
+        $("#ar-choose-workout").hide();
+        $("#ar-overall-results").show();
 
     } //end handleARChoice()
 
-    //Given a verbose objectified version of a workout template, return an
-    //array containing its piece templates, filtered by the given phase.
-    function pieceTemplatesByPhase (workoutTemplate, phase) {
 
-        var phaseTemplates = [];
+
+    //Given a verbose objectified version of a workout template, return an
+    //object containing its piece templates, filtered by the given phase,
+    //grouped by type (distance or time), and sorted by ordinal.
+    function pieceTemplatesByPhase (templateObj, phase) {
+
+        var distTemplates = [];
+        var timeTemplates = [];
 
         //unpack the layers of the workout template object and go through
         //the piece templates one by one, adding those with the correct phase
         //to the phaseTemplates array
-        var piecesObject = workoutTemplate.pieces;
+        var piecesObject = templateObj.pieces;
         var numPieces = Object.keys(piecesObject).length;
         for (var i = 0; i < numPieces; i++) {
             var template = piecesObject[i+1].template;
             if (template.phase === phase)
             {
-                phaseTemplates.push(template);
+                if (template.piece_type === "distance") {
+                    distTemplates.push(template);
+                }
+                else if (template.piece_type === "time") {
+                    timeTemplates.push(template);
+                }
             }
         }
+        //note that since piecesObject is keyed by ordinal, and pieces are
+        //added to distTemplates or timeTemplates [arrays, so they preserve
+        //order] in increasing order by key, no additional sort is needed
 
+        //create the object to be returned, add the templates to it, and
+        //return it
+        var phaseTemplates = {};
+        phaseTemplates.distance = distTemplates;
+        phaseTemplates.time = timeTemplates;
         return phaseTemplates;
-    } //end splitPieceTemplatesByPhase()
+    } //end pieceTemplatesByPhase()
+
+
+
+    //Populate the appropriate tables on the add-results modal with descriptive
+    //data (format, stroke rates, and notes) given when the workout was created
+    function populateARDescData (workoutTemplate, phase) {
+
+        //if format data was given for this phase, add that data to the row
+        //and unhide it
+        var phaseFormat = workoutTemplate[phase + "_format"];
+        if (phaseFormat) {
+                $("#ar-" + phase + "-format").text(phaseFormat);
+                $("#ar-" + phase + "-format-row").show();
+        }
+
+        //if stroke rate data was given for this phase, add that data to the
+        //row and unhide it
+        var phaseSR = workoutTemplate[phase + "_stroke_rates"];
+        if (phaseSR) {
+                $("#ar-" + phase + "-sr").text(phaseSR);
+                $("#ar-" + phase + "-sr-row").show();
+        }
+
+        //if notes data was given for this phase, add that data to the row
+        //and unhide it
+        var phaseNotes = workoutTemplate[phase + "_notes"];
+        if (phaseNotes) {
+                $("#ar-" + phase + "-notes").text(phaseNotes);
+                $("#ar-" + phase + "-notes-row").show();
+        }
+    } //end populateARDescData()
+
+
+    //Event handler to show the datepicker on the add-results modal
+    $("#ar-date").datepicker({
+        format: "D M d, yyyy",
+        endDate: "0d",
+        todayBtn: true,
+        autoclose: true,
+        todayHighlight: true
+    });
+
+
+    //Pull the appropriate pieces out of the given templates object and use
+    //them to populate the given table on the add-results modal
+    //If there are no appropriate pieces, hide the table instead
+    function populateARPieceTable (table, phaseTemplates) {
+
+        //first, check if we have any pieces to work with, and if we don't,
+        //hide the table and be done
+        var pieceType = table.data("pieceType");
+        if (phaseTemplates[pieceType].length === 0) {
+            $("#" + table.data("divId")).hide();
+            return;
+        }
+
+        //now that we know we have pieces to work with, create some variables
+        //for convenience
+        var tableBody = table.find("tbody");
+        var templates = phaseTemplates[pieceType];
+        var placeholderUnits;
+        if (pieceType === "time") {
+            placeholderUnits = "m";
+        }
+        else if (pieceType === "distance") {
+            placeholderUnits = "h:m:s";
+        }
+
+        //loop through the templates, creating a row for each one and then
+        //adding it to the table
+        for (var i = 0; i < templates.length; i++) {
+
+            //a few more variables for convenience
+            var template = templates[i];
+            var pieceNum = template.ordinal;
+            var cell, cellAttributes, cellComment;
+            var cellContent, contentAttributes;
+
+
+            //create the new row
+            var row = $("<tr>");
+            row.attr({"id": "ar-piece-result-row-piece-" + pieceNum});
+
+
+            row.append("<!-- hidden info fields -->");
+
+
+            //piece template id cell (hidden but submitted with the form)
+            cellAttributes = {"hidden": ""};
+            cellComment = "<!-- piece template id -->";
+            cellContent = $("<input>");
+            contentAttributes = {
+                "type": "text",
+                "name": "piece-template-id-piece-" + pieceNum,
+                "value": template.piece_template_id,
+                "aria-label": "piece-template-id-piece-" + pieceNum,
+                "readonly": ""
+            };
+            cell = createPieceTableCell(cellAttributes, cellComment,
+                                        cellContent, contentAttributes);
+            row.append(cell);
+
+
+            //overall ordinal cell (hidden but submitted with the form)
+            cellAttributes = {"hidden": ""};
+            cellComment = "<!-- overall ordinal -->";
+            cellContent = $("<input>");
+            contentAttributes = {
+                "type": "text",
+                "name": "ordinal-piece-" + pieceNum,
+                "value": pieceNum,
+                "aria-label": "ordinal-piece-" + pieceNum,
+                "readonly": ""
+            };
+            cell = createPieceTableCell(cellAttributes, cellComment,
+                                        cellContent, contentAttributes);
+            row.append(cell);
+
+
+            //both time and distance will get submitted with the form, but
+            //only the non-predetermined one will be visible to the user
+            //(the predetermined one will be used to create a label for the
+            //piece, but that's separate from the <input> holding it)
+            //therefore, create both cells now and append the correct one
+            //here in the hidden-field section, and the other where the user
+            //can see it
+
+            //time cell
+            cellAttributes = undefined;
+            cellComment = "<!-- time -->";
+            contentAttributes = {
+                "class": "ar-dist-time",
+                "type": "text",
+                "name": "time-piece-" + pieceNum,
+                "value": template.time_seconds,
+                "placeholder": placeholderUnits,
+                "aria-label": "time-piece-" + pieceNum
+            };
+            cellContent = $("<input>");
+            var timeCell = createPieceTableCell(cellAttributes, cellComment,
+                                                cellContent, contentAttributes);
+
+
+            //distance cell
+            cellAttributes = undefined;
+            cellComment = "<!-- distance -->";
+            contentAttributes = {
+                "class": "ar-dist-time ar-dist-field",
+                "type": "text",
+                "name": "distance-piece-" + pieceNum,
+                "value": template.distance,
+                "placeholder": placeholderUnits,
+                "aria-label": "distance-piece-" + pieceNum
+            };
+            cellContent = $("<input>");
+            var distanceCell = createPieceTableCell(cellAttributes,
+                                                    cellComment,
+                                                    cellContent,
+                                                    contentAttributes);
+
+
+            //make the correct cell readonly and hidden, and append it here
+            if (pieceType === "time") {
+                timeCell.find("input").attr({"readonly": ""});
+                timeCell.attr({"hidden": ""});
+                row.append(timeCell);
+            }
+            else if (pieceType === "distance") {
+                distanceCell.find("input").attr({"readonly": ""});
+                distanceCell.attr({"hidden": ""});
+                row.append(distanceCell);
+            }
+
+
+            row.append("<!-- input fields for piece " + pieceNum + " -->");
+
+
+            //ordinal-in-phase cell
+            cellAttributes = undefined;
+            cellComment = "<!-- ordinal in phase -->";
+            cellContent = $("<input>");
+            contentAttributes = {
+                "class": "ar-ordinal",
+                "type": "text",
+                "name": "ordinal-in-phase-piece-" + pieceNum,
+                "value": template.ordinal_in_phase,
+                "aria-label": "ordinal-in-phase-piece-" + pieceNum,
+                "onfocus": "this.blur()",
+                "readonly": ""
+            };
+            cell = createPieceTableCell(cellAttributes, cellComment,
+                                        cellContent, contentAttributes);
+            row.append(cell);
+
+
+            //label cell
+            cellAttributes = undefined;
+            cellComment = "<!-- label -->";
+            cellContent = $("<input>");
+            contentAttributes = {
+                "class": "ar-label",
+                "type": "text",
+                "value": template.label,
+                "aria-label": "label-piece-" + pieceNum,
+                "onfocus": "this.blur()",
+                "readonly": ""
+            };
+            cell = createPieceTableCell(cellAttributes, cellComment,
+                                        cellContent, contentAttributes);
+            row.append(cell);
+
+
+            //here's where we add the other, non-hidden distance or time cell
+            if (pieceType === "time") {
+                row.append(distanceCell);
+            }
+            else if (pieceType === "distance") {
+                row.append(timeCell);
+            }
+
+
+            //avg split cell
+            cellAttributes = undefined;
+            cellComment = "<!-- avg split -->";
+            cellContent = $("<input>");
+            contentAttributes = {
+                "class": "ar-split",
+                "type": "text",
+                "name": "avg-split-piece-" + pieceNum,
+                "aria-label": "avg-split-piece-" + pieceNum
+            };
+            cell = createPieceTableCell(cellAttributes, cellComment,
+                                        cellContent, contentAttributes);
+            row.append(cell);
+
+
+            //avg stroke rate cell
+            cellAttributes = undefined;
+            cellComment = "<!-- avg SR -->";
+            cellContent = $("<input>");
+            contentAttributes = {
+                "class": "ar-sr",
+                "type": "text",
+                "name": "avg-sr-piece-" + pieceNum,
+                "aria-label": "avg-sr-piece-" + pieceNum
+            };
+            cell = createPieceTableCell(cellAttributes, cellComment,
+                                        cellContent, contentAttributes);
+            row.append(cell);
+
+
+            //avg watts cell
+            cellAttributes = undefined;
+            cellComment = "<!-- avg watts -->";
+            cellContent = $("<input>");
+            contentAttributes = {
+                "class": "ar-watts",
+                "type": "text",
+                "name": "avg-watts-piece-" + pieceNum,
+                "aria-label": "avg-watts-piece-" + pieceNum
+            };
+            cell = createPieceTableCell(cellAttributes, cellComment,
+                                        cellContent, contentAttributes);
+            row.append(cell);
+
+
+            //avg heart rate cell
+            cellAttributes = undefined;
+            cellComment = "<!-- avg HR -->";
+            cellContent = $("<input>");
+            contentAttributes = {
+                "class": "ar-hr",
+                "type": "text",
+                "name": "avg-hr-piece-" + pieceNum,
+                "aria-label": "avg-hr-piece-" + pieceNum
+            };
+            cell = createPieceTableCell(cellAttributes, cellComment,
+                                        cellContent, contentAttributes);
+            row.append(cell);
+
+
+            //add splits cell
+            cellAttributes = undefined;
+            cellComment = "<!-- add splits -->";
+            cellContent = $("<a>").append(template.split_length_string ||
+                                          "Add");
+            contentAttributes = {
+                "class": "ar-add-splits",
+                "href": "#",
+                "aria-label": "add-splits-piece-" + pieceNum
+            };
+            cell = createPieceTableCell(cellAttributes, cellComment,
+                                        cellContent, contentAttributes);
+            row.append(cell);
+
+
+            //delete button cell
+            cellAttributes = undefined;
+            cellComment = "<!-- skipped checkbox -->";
+            cellContent = $("<input>");
+            contentAttributes = {
+                "class": "ar-skipped-bool",
+                "type": "checkbox",
+                "name": "skipped-bool-piece-" + pieceNum,
+                "value": "false",
+                "aria-label": "if-skipped-piece-" + pieceNum,
+                "data-piece-num": pieceNum
+            };
+            cell = createPieceTableCell(cellAttributes, cellComment,
+                                        cellContent, contentAttributes);
+            row.append(cell);
+
+
+            //add the now-complete row to the end of the table body
+            tableBody.append(row);
+        }
+    } //end addPieceResultsRow()
+
+
+    //if the user indicates that they skipped a piece, disable the inputs
+    //in that row and gray it out
+    $(document).on("change", ".ar-skipped-bool", function() {
+        //figure out which row the checkbox is in
+        var pieceNum = $(this).data("pieceNum");
+        var row = $("#ar-piece-result-row-piece-" + pieceNum);
+
+        //based on the checkbox's checked-ness, enable or disable inputs
+        if ($(this).prop("checked")) {
+            //TODO CODE ME (skipped piece on add-results modal)
+        }
+        else {
+            //ME, TOO!
+        }
+    }); //end $(".caw-split-bool").change()
+
+
+    //every time a user enters meters on the add-results modal, update
+    //the total-meter field in the header
+    //(written as a listener on a class-filtered part of the document so that
+    //it will apply to current *and future* instances of the class)
+    $(document).on("blur", ".ar-dist-field", updateTotalMeters);
+
+
+    //event handler called whenever meters are entered (also called when
+    //add-results modal is first populated with workout-specific fields)
+    function updateTotalMeters () {
+
+        var total = 0;
+
+        //find all distance results fields (both pre-supplied for distance
+        //pieces and user-inputted for time pieces) and loop over them to
+        //find their sum
+        var fields = $(".ar-dist-field");
+        for (var i = 0; i < fields.length; i++) {
+            total += Number($(fields[i]).val());
+        }
+
+        //update the field in the add-results header
+        $("#ar-total-meters-num").val(total);
+    } //end updateTotalMeters()
+
+
+    //Show the comments input for that phase when the user clicks on 'Add notes'
+    //on the add-results modal
+    $(".ar-add-comments").click(function() {
+        var commentsDivID = $(this).data("commentsDivId");
+        $(this).hide();
+        $("#" + commentsDivID).show();
+    });
+
+
 
 
 //IN THE MORNING
+        //in event handler for save results button, calculate total meters
+        //before form is serialized (input id="ar-total-meters-num") (in case
+        //user is still in a distance field (hasn't blurred it) when they hit
+        //submit; make sure hitting submit doesn't count as blurring, in which
+        //case this will be unnecessary)
         //input for overall workout results (incl description) which shows
         //the whole time, then:
         //make a div for warmup, incl descriptive stuff and overall description
         //pattern the above on the create-a-workout modal
         //do the same for main and cooldown?
         //or for the moment, put it all in one div and see how long it is
-        //have a total distance field which is a dummy input but which
-        //updates on blur of distance fields
         //put a note on prev and next buttons that data will be saved
         //button to add notes to any given piece, then show text box and
         //focus it (width of whole table row? notes/piece, notes/phase)

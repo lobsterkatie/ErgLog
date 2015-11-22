@@ -119,6 +119,19 @@ class User(db.Model, ToDictMixin):
                                   lastname=self.lastname, email=self.email)
 
 
+    def to_dict_verbose(self):
+        """Return a dictionary version of this object, including PR table.
+
+           The returned dictionary will have only one level, since the tables
+           are one-to-one and have no conflicting column names.
+        """
+
+        self_dict = self.to_dict()
+        stats_dict = self.stat_list.to_dict()
+        self_dict.update(stats_dict)
+        return self_dict
+
+
 
 class UserStatList(db.Model, ToDictMixin):
     """Stats for a given user, mostly PR's (one-to-one with Users)"""

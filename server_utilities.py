@@ -1,5 +1,7 @@
 from datetime import date
 from re import match
+from flask.json import JSONEncoder
+from decimal import Decimal
 from model import db, User
 
 
@@ -239,6 +241,27 @@ def make_piece_label(piece_type, piece_length, zone):
         piece_label = str(piece_length) + "m"
 
     if zone:
-        piece_label += ("(" + zone + ")")
+        piece_label += (" (" + zone + ")")
 
     return piece_label
+
+
+class CustomJSONEncoder(JSONEncoder):
+    # def default(self, obj):
+    #     try:
+    #         if isinstance(obj, date):
+    #             return obj.isoformat()
+    #         iterable = iter(obj)
+    #     except TypeError:
+    #         pass
+    #     else:
+    #         return list(iterable)
+    #     return JSONEncoder.default(self, obj)
+
+    def default(self, obj):
+        if isinstance(obj, date):
+            return obj.isoformat()
+        elif isinstance(obj, Decimal):
+            return str(obj)
+        else:
+            return JSONEncoder.default(self, obj)

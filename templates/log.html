@@ -30,7 +30,7 @@
                 <button id="create-a-workout-button" class="btn btn-default" type="button" data-toggle="modal" data-keyboard="false" href="#create-a-workout-modal">
                     Create a Workout
                 </button>
-                <button id="add-results-button" class="btn btn-default" type="button" data-keyboard="false">
+                <button id="open-add-results-modal" class="btn btn-default" type="button">
                     Add Results to a Workout
                 </button>
             </span>
@@ -57,8 +57,9 @@
                         <tr>
                             <td>
                                 <a href="#workout-details-modal" data-toggle="modal" data-workout-id={{ workout.workout_result_id }}>
-                                    {{workout.date | date_filter }}</td>
+                                    {{workout.date | date_filter }}
                                 </a>
+                            </td>
                             <td>{{workout.workout_template.description}}</td>
                             <td>{{workout.total_meters}} m</td>
                             <!-- TODO PROGRAM EDIT AND DELETE -->
@@ -485,8 +486,8 @@
                     </div> <!-- end of modal body -->
 
                     <div class="modal-footer">
-                        <input type="button" id="caw-add-results-now" class="btn btn-default" value="Save and add results now">
-                        <input type="button" id="caw-add-results-later" class="btn btn-default" value="Save and add results later">
+                        <input type="button" class="btn btn-default caw-save-button" value="Save and add results now" data-when="now">
+                        <input type="button" class="btn btn-default caw-save-button" value="Save and add results later" data-when="later">
                     </div> <!-- end of modal footer -->
 
                 </div> <!-- end of modal content -->
@@ -494,7 +495,7 @@
         </div> <!-- END OF CREATE A WORKOUT MODAL -->
 
         <!-- ADD RESULTS MODAL -->
-        <div class="modal fade" id="add-results-modal" tabindex="-1" role="dialog">
+        <div class="modal fade" id="add-results-modal" tabindex="-1" role="dialog" data-keyboard="false">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
 
@@ -580,7 +581,7 @@
                             </form>
                         </div> <!-- end workout-chooser pane -->
 
-                        <form id="add-results-form">
+                        <form id="add-results-form" class="form-horizontal" role="form">
                             <!-- overall results pane -->
                             <div id="ar-overall-results" hidden>
                                 <div class="row">
@@ -596,7 +597,7 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         Date*
-                                        <input id="ar-date" class="text-center" type="text" name="date">
+                                        <input id="ar-date" class="text-center" type="text" name="date" data-provide="datepicker">
                                     </div>
                                     <div class="col-sm-offset-6 col-sm-6">
                                         Time
@@ -625,13 +626,24 @@
                                         <textarea id="ar-workout-comments" class="form-control fixed-textarea" rows="4" cols="100" name="workout-comments" placeholder="(add comments here)"></textarea>
                                     </div>
                                 </div>
+                                <!-- pane navigation buttons -->
+                                <div class="form-group">
+                                    <div class="col-sm-10 col-sm-offset-2 text-right">
+                                        <!-- <button type="button" id="ar-overall-previous-button" class="btn btn-default">
+                                            Previous
+                                        </button> -->
+                                        <button type="button" id="ar-overall-next-button" class="btn btn-default">
+                                            Next
+                                        </button>
+                                    </div>
+                                </div> <!-- end pane navigation buttons -->
                             </div> <!-- end overall results pane -->
 
                             <!-- warmup results pane -->
-                            <div id="ar-warmup-results">
+                            <div id="ar-warmup-results" hidden>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <span class="ar-phase-title">
+                                        <span class="ar-phase-title h3">
                                             Warmup
                                         </span>
                                     </div>
@@ -671,7 +683,9 @@
                                 <!-- time pieces table -->
                                 <div id="ar-warmup-time-pieces" class="row">
                                     <div class="col-md-12">
-                                        Time-based Pieces:
+                                        <span class="ar-table-title h4">
+                                            Time-based Pieces:
+                                        </span>
                                         <table id="ar-warmup-time-table" class="table table-condensed ar-piece-table" data-piece-type="time" data-div-id="ar-warmup-time-pieces">
                                             <colgroup>
                                                 <col class="ar-ordinal-col">
@@ -722,7 +736,9 @@
                                 <!-- distance pieces table -->
                                 <div id="ar-warmup-distance-pieces" class="row">
                                     <div class="col-md-12">
-                                        Distance-based Pieces:
+                                        <span class="ar-table-title h4">
+                                            Distance-based Pieces:
+                                        </span>
                                         <table id="ar-warmup-distance-table" class="table table-condensed ar-piece-table" data-piece-type="distance" data-div-id="ar-warmup-distance-pieces">
                                             <colgroup>
                                                 <col class="ar-ordinal-col">
@@ -783,13 +799,25 @@
                                     </div>
                                 </div> <!-- end comments div -->
 
+                                <!-- pane navigation buttons -->
+                                <div class="form-group">
+                                    <div class="col-sm-10 col-sm-offset-2 text-right">
+                                        <button type="button" id="ar-warmup-previous-button" class="btn btn-default">
+                                            Previous
+                                        </button>
+                                        <button type="button" id="ar-warmup-next-button" class="btn btn-default">
+                                            Next
+                                        </button>
+                                    </div>
+                                </div> <!-- end pane navigation buttons -->
+
                             </div> <!-- end warmup results pane -->
 
                             <!-- main results pane -->
-                            <div id="ar-main-results">
+                            <div id="ar-main-results" hidden>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <span class="ar-phase-title">
+                                        <span class="ar-phase-title h3">
                                             Main Workout
                                         </span>
                                     </div>
@@ -829,7 +857,9 @@
                                 <!-- time pieces table -->
                                 <div id="ar-main-time-pieces" class="row">
                                     <div class="col-md-12">
-                                        Time-based Pieces:
+                                        <span class="ar-table-title h4">
+                                            Time-based Pieces:
+                                        </span>
                                         <table id="ar-main-time-table" class="table table-condensed ar-piece-table" data-piece-type="time" data-div-id="ar-main-time-pieces">
                                             <colgroup>
                                                 <col class="ar-ordinal-col">
@@ -880,7 +910,9 @@
                                 <!-- distance pieces table -->
                                 <div id="ar-main-distance-pieces" class="row">
                                     <div class="col-md-12">
-                                        Distance-based Pieces:
+                                        <span class="ar-table-title h4">
+                                            Distance-based Pieces:
+                                        </span>
                                         <table id="ar-main-distance-table" class="table table-condensed ar-piece-table" data-piece-type="distance" data-div-id="ar-main-distance-pieces">
                                             <colgroup>
                                                 <col class="ar-ordinal-col">
@@ -941,13 +973,25 @@
                                     </div>
                                 </div> <!-- end comments div -->
 
+                                <!-- pane navigation buttons -->
+                                <div class="form-group">
+                                    <div class="col-sm-10 col-sm-offset-2 text-right">
+                                        <button type="button" id="ar-main-previous-button" class="btn btn-default">
+                                            Previous
+                                        </button>
+                                        <button type="button" id="ar-main-next-button" class="btn btn-default">
+                                            Next
+                                        </button>
+                                    </div>
+                                </div> <!-- end pane navigation buttons -->
+
                             </div> <!-- end main results pane -->
 
                             <!-- cooldown results pane -->
-                            <div id="ar-cooldown-results">
+                            <div id="ar-cooldown-results" hidden>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <span class="ar-phase-title">
+                                        <span class="ar-phase-title h3">
                                             Cooldown
                                         </span>
                                     </div>
@@ -987,7 +1031,9 @@
                                 <!-- time pieces table -->
                                 <div id="ar-cooldown-time-pieces" class="row">
                                     <div class="col-md-12">
-                                        Time-based Pieces:
+                                        <span class="ar-table-title h4">
+                                            Time-based Pieces:
+                                        </span>
                                         <table id="ar-cooldown-time-table" class="table table-condensed ar-piece-table" data-piece-type="time" data-div-id="ar-cooldown-time-pieces">
                                             <colgroup>
                                                 <col class="ar-ordinal-col">
@@ -1038,7 +1084,9 @@
                                 <!-- distance pieces table -->
                                 <div id="ar-cooldown-distance-pieces" class="row">
                                     <div class="col-md-12">
-                                        Distance-based Pieces:
+                                        <span class="ar-table-title h4">
+                                            Distance-based Pieces:
+                                        </span>
                                         <table id="ar-cooldown-distance-table" class="table table-condensed ar-piece-table" data-piece-type="distance" data-div-id="ar-cooldown-distance-pieces">
                                             <colgroup>
                                                 <col class="ar-ordinal-col">
@@ -1099,12 +1147,24 @@
                                     </div>
                                 </div> <!-- end comments div -->
 
+                                <!-- pane navigation buttons -->
+                                <div class="form-group">
+                                    <div class="col-sm-10 col-sm-offset-2 text-right">
+                                        <button type="button" id="ar-cooldown-previous-button" class="btn btn-default">
+                                            Previous
+                                        </button>
+                                    </div>
+                                </div> <!-- end pane navigation buttons -->
+
                             </div> <!-- end cooldown results pane -->
                         </form>
                     </div> <!-- end of modal body -->
 
-                    <div class="modal-footer">
-
+                    <div id="ar-save-results-buttons" class="modal-footer" hidden>
+                        <div>
+                            <input type="button" id="ar-save-add-another" class="btn btn-default" value="Save and add another">
+                            <input type="button" id="ar-save-results" class="btn btn-primary" value="Save results">
+                        </div>
                     </div> <!-- end of modal footer -->
 
                 </div> <!-- end of modal content -->

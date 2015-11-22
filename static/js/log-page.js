@@ -6,13 +6,37 @@ $(document).ready(function () {
 
     //everything else (below this section) is functions and event listeners
 
+    //pull user's data from the database for quick reference later on
+    var gUser = {}, gTemplates = {}, gResults = {};
+    gUser.upToDate = gTemplates.upToDate = gResults.upToDate = false;
+    $.get("/get-user-and-stats.json", function(data) {
+        gUser = data;
+        gUser.upToDate = true;
+    });
+    $.get("/get-workout-templates.json", function(data) {
+        gTemplates = data;
+        gTemplates.upToDate = true;
+    });
+    $.get("/get-workout-results.json", function(data) {
+        gResults = data;
+        gResults.upToDate = true;
+    });
 
-    //reset all forms
+ //reset all forms
     resetForms();
 
     //capture the initial states of the create-a-workout and add-results modals
-    var cawModalInitial = $("#create-a-workout-modal").html();
-    var arModalInitial = $("#add-results-modal").html();
+    var gCAWModalInitial = $("#create-a-workout-modal").html();
+    var gARModalInitial = $("#add-results-modal").html();
+
+    //set defaults for datepickers
+    $.fn.datepicker.defaults.format = "D M d, yyyy";
+    $.fn.datepicker.defaults.endDate = "0d";
+    $.fn.datepicker.defaults.todayBtn = true;
+    $.fn.datepicker.defaults.autoclose = true;
+    $.fn.datepicker.defaults.todayHighlight = true;
+    $.fn.datepicker.defaults.orientation = "right";
+
 
 
 
@@ -36,57 +60,46 @@ $(document).ready(function () {
 
 
 
-    /*********** navigate between panes in the create-a-workout form **********/
+    /************ functions dealing with the create-a-workout modal ***********/
 
-    $("#caw-overall-next-button").click(function() {
+    //navigate between panes in the create-a-workout modal
+    $(document).on("click", "#caw-overall-next-button", function() {
         $("#caw-overall-description").hide();
         $("#caw-warmup").show();
     });
-
-    $("#caw-warmup-previous-button").click(function() {
+    $(document).on("click", "#caw-warmup-previous-button", function() {
         $("#caw-warmup").hide();
         $("#caw-overall-description").show();
     });
-
-    $("#caw-warmup-next-button").click(function() {
+    $(document).on("click", "#caw-warmup-next-button", function() {
         $("#caw-warmup").hide();
         $("#caw-main").show();
     });
-
-    $("#caw-main-previous-button").click(function() {
+    $(document).on("click", "#caw-main-previous-button", function() {
         $("#caw-main").hide();
         $("#caw-warmup").show();
     });
-
-    $("#caw-main-next-button").click(function() {
+    $(document).on("click", "#caw-main-next-button", function() {
         $("#caw-main").hide();
         $("#caw-cooldown").show();
     });
-
-    $("#caw-cooldown-previous-button").click(function() {
+    $(document).on("click", "#caw-cooldown-previous-button", function() {
         $("#caw-cooldown").hide();
         $("#caw-main").show();
     });
 
 
-    /*********** reset create-a-workout modal to first pane on close **********/
 
+    //Make is so that closing the create-a-workout modal resets it to its
+    //initial state
     $("#create-a-workout-modal").on("hidden.bs.modal", function (evt) {
 
-        //navigate to the first pane
-        $("#caw-warmup").hide();
-        $("#caw-main").hide();
-        $("#caw-cooldown").hide();
-        $("#caw-overall-description").show();
-
-        //reset the other panes to their empty states
-        //TODO CODE ME!! (empty create-a-workout panes on close - also on
-                          //submit)
+        $("#create-a-workout-modal").html(gCAWModalInitial);
+        $("#create-a-workout-form")[0].reset();
     });
 
 
-    /**************** add a piece to the create-a-workout form ****************/
-
+    //add a piece to the create-a-workout form
     $(".caw-add-piece-button").click(function() {
         //get jquery DOM elements to use in the function
         var parentTable = $(this).closest("table");
@@ -322,15 +335,10 @@ $(document).ready(function () {
 
 
 
-    /*********** repeat pieces x through y on create-a-workout form ***********/
-
+    //repeat pieces x through y on create-a-workout form
     $(".caw-repeat-go-button").click(function() {
         //TODO CODE ME! (repeat go button on CAW modal)
     });
-
-
-
-    /******************** create-a-workout helper functions *******************/
 
 
     //Create and return a <td> with the given attributes and content (content
@@ -399,63 +407,133 @@ $(document).ready(function () {
     }); //end $(".caw-split-bool").change()
 
 
-    /****************** save workout for later results-adding *****************/
+    //save a new workout in the database
+    $(document).on("click", ".caw-save-button", function() {
 
-    $("#caw-add-results-later").click(function(evt) {
+        //figure out which save button was clicked, so we know what to do
+        //once we've saved the workout
+        var whenToAddResults = $(this).data("when");
+
+        //we're about to change the set of all workout templates for this
+        //user, so unset the upToDate flag on our front-side store thereof
+        gTemplates.upToDate = false;
 
         //get data from the form, then hide and clear it
         var formData = $("#create-a-workout-form").serialize();
         $("#create-a-workout-modal").modal("hide");
+        $("#create-a-workout-modal").html(gCAWModalInitial);
         $("#create-a-workout-form")[0].reset();
 
-        //save the workout to the database
-        $.post("/save-workout-template.json",
-               formData,
-               function(data) {console.log(data);});
-            //TODO finish me!
-    });
+        //save the workout to the database, update gTemplates, and redirect
+        //to adding results, if requested
+        $.post("/save-workout-template.json", formData, function(data) {
+
+            //update our client-side storage of workout templates
+            gTemplates = data;
+            gTemplates.upToDate = true;
+
+            //if the user has asked to add results now, open the add-results
+            //modal with blanks for the just-added workout pre-loaded
+            if (whenToAddResults === "now") {
+                //get the id of the just-added workout and pass it to the
+                //function which populates the form
+                var workoutID = (gTemplates.newest.workout_template
+                                                  .workout_template_id);
+                populateAddResultsForm(workoutID);
+
+                //the workout-chooser pane of the add-results modal is what's
+                //showing by default, so hide it and show the correct pane
+                $("#ar-choose-workout").hide();
+                $("#ar-overall-results").show();
+
+                //now that everything's ready, show the modal
+                $('#add-results-modal').modal('show');
+            }
+        });
+
+
+    }); //end $(".caw-save-button").click()
 
 
 
     /************** functions dealing with the add-results modal **************/
 
-
     //Make is so that closing the add-results modal resets it to its
     //initial state
     $("#add-results-modal").on("hidden.bs.modal", function (evt) {
 
-        $("#add-results-modal").html(arModalInitial);
+        $("#add-results-modal").html(gARModalInitial);
+        $("#add-results-form")[0].reset();
     });
 
 
+
+    //navigate between panes in the add-results modal
+    $(document).on("click", "#ar-overall-next-button", function() {
+        $("#ar-overall-results").hide();
+        $("#ar-warmup-results").show();
+    });
+
+    $(document).on("click", "#ar-warmup-previous-button", function() {
+        $("#ar-warmup-results").hide();
+        $("#ar-overall-results").show();
+    });
+
+    $(document).on("click", "#ar-warmup-next-button", function() {
+        $("#ar-warmup-results").hide();
+        $("#ar-main-results").show();
+    });
+
+    $(document).on("click", "#ar-main-previous-button", function() {
+        $("#ar-main-results").hide();
+        $("#ar-warmup-results").show();
+    });
+
+    $(document).on("click", "#ar-main-next-button", function() {
+        $("#ar-main-results").hide();
+        $("#ar-cooldown-results").show();
+        $("#ar-save-results-buttons").show();
+    });
+
+    $(document).on("click", "#ar-cooldown-previous-button", function() {
+        $("#ar-save-results-buttons").hide();
+        $("#ar-cooldown-results").hide();
+        $("#ar-main-results").show();
+    });
+
+
+
+
     //Populate the first pane of the add-results modal and show the modal
-    $("#add-results-button").click(function(evt) {
-        //get user's workout templates from the database
-        $.get("/get-workout-templates.json", function(data) {
-            var templates = data;
+    $("#open-add-results-modal").click(function(evt) {
 
-            //populate the workout-chooser
-            populateARWorkoutChooser(templates);
+        //if our stored set of workout templates is up to date, use them to
+        //populate the first pane of the modal, and then show it
+        if (gTemplates.upToDate) {
+            populateAndShowARWorkoutChooser();
+        }
 
-            //bind click-handlers to the add-results buttons, to populate
-            //the add-results form
-            $(".ar-add-results-button").click(templates, handleARChoice);
-
-            //now that it's all ready, show the add-results modal
-            $('#add-results-modal').modal('show');
-        });
+        //otherwise, get the current set from the database, update our
+        //stored version, and then populate and show the modal
+        else {
+            $.get("/get-workout-templates.json", function(data) {
+                gTemplates = data;
+                gTemplates.upToDate = true;
+                populateAndShowARWorkoutChooser();
+            });
+        }
     }); //end $("#add-results-button").click()
 
 
 
-    //Pull workout template descriptions and id's and use them to populate
-    //workout-chooser on the add-results modal
-    function populateARWorkoutChooser (templates) {
+    //Pull workout template descriptions and id's, use them to populate
+    //workout-chooser on the add-results modal, and show it
+    function populateAndShowARWorkoutChooser() {
         //split templates up based on presence/absence of results and,
         //in the latter case, creation date
-        var noResultsRecent = getValues(templates.no_results_recent);
-        var noResultsOlder = getValues(templates.no_results_older);
-        var withResults = getValues(templates.with_results);
+        var noResultsRecent = getValues(gTemplates.no_results_recent);
+        var noResultsOlder = getValues(gTemplates.no_results_older);
+        var withResults = getValues(gTemplates.with_results);
 
         //sort each array of templates by date_added
         noResultsRecent.sort(descByDateAdded);
@@ -486,6 +564,15 @@ $(document).ready(function () {
         addARWorkoutChooserOptions(noResultsRecent, nrRecentDropdown);
         addARWorkoutChooserOptions(noResultsOlder, nrOlderDropdown);
         addARWorkoutChooserOptions(withResults, withResultsDropdown);
+
+        //make sure the first pane is the one showing
+        $("#ar-choose-workout").show();
+        $("#ar-warmup-results").hide();
+        $("#ar-main-results").hide();
+        $("#ar-cooldown-results").hide();
+
+        //now that it's all ready, show the add-results modal
+        $('#add-results-modal').modal('show');
     } //end populateARWorkoutChooser()
 
 
@@ -565,12 +652,9 @@ $(document).ready(function () {
 
 
     //On the add-results modal, once the user has chosen a workout to which
-    //to add results, get their choice, look it up in the passed templates
-    //object, populate the form allowing results-adding, and show the form
-    function handleARChoice (evt) {
-        //the ajax-retrieved templates object was passed into the event
-        //handler as .data
-        var allTemplates = evt.data;
+    //to add results, get their choice, then populate the form accordingly
+    //and show it
+    $(document).on("click", ".ar-add-results-button", function(evt) {
 
         //given that this code can run on either 'add results' button,
         //figure out which dropdown it was next to and pull the workout
@@ -578,17 +662,33 @@ $(document).ready(function () {
         var workoutID = $(evt.target).siblings("select").val();
 
         //if the user hasn't actually selected a workout (the dropdown
-        //is still on the 'Choose a workout...' option), don't do anything
+        //is still on the 'Choose a workout...' option), show an error
         if (workoutID === "choose-a-workout") {
+            alert("Please choose a workout to which to add results.");
             return;
         }
 
-        //find the workout_template object associated with that id
+        //popualate the form for adding results
+        populateAddResultsForm(workoutID);
+
+        //now that the adding-results panes are fully populated, show the first
+        //one and hide the workout-chooser pane
+        $("#ar-choose-workout").hide();
+        $("#ar-overall-results").show();
+
+    }); //end $(".ar-add-results-button").click()
+
+
+    //Given a workout template ID, populate the add-results form with
+    //the right blanks
+    function populateAddResultsForm (workoutID) {
+
+        //find the workout template object associated with the given ID
         //(using the || operator since it will appear in exactly one
         //of no_results_recent, no_results_older, and with_results)
-        var templateObj = allTemplates.no_results_recent[workoutID] ||
-                         allTemplates.no_results_older[workoutID] ||
-                         allTemplates.with_results[workoutID];
+        var templateObj = gTemplates.no_results_recent[workoutID] ||
+                         gTemplates.no_results_older[workoutID] ||
+                         gTemplates.with_results[workoutID];
 
         //split the template into its workout template and its piece
         //templates for each phase (grouped by type, sorted by ordinal)
@@ -628,24 +728,10 @@ $(document).ready(function () {
         populateARPieceTable(cooldownTimeTable, cooldownTemplates);
         populateARPieceTable(cooldownDistTable, cooldownTemplates);
 
-
         //now that all distance pieces have been added to the form, update
         //the total-meters field in the header
         updateTotalMeters();
-
-
-
-
-
-
-
-        //now that the adding-results panes are fully populated, show the first
-        //one and hide the workout-chooser pane
-        $("#ar-choose-workout").hide();
-        $("#ar-overall-results").show();
-
-    } //end handleARChoice()
-
+    } //end populateAddResultsForm()
 
 
     //Given a verbose objectified version of a workout template, return an
@@ -716,15 +802,6 @@ $(document).ready(function () {
         }
     } //end populateARDescData()
 
-
-    //Event handler to show the datepicker on the add-results modal
-    $("#ar-date").datepicker({
-        format: "D M d, yyyy",
-        endDate: "0d",
-        todayBtn: true,
-        autoclose: true,
-        todayHighlight: true
-    });
 
 
     //Pull the appropriate pieces out of the given templates object and use
@@ -1048,7 +1125,7 @@ $(document).ready(function () {
 
     //Show the comments input for that phase when the user clicks on 'Add notes'
     //on the add-results modal
-    $(".ar-add-comments").click(function() {
+    $(document).on("click", ".ar-add-comments", function() {
         var commentsDivID = $(this).data("commentsDivId");
         $(this).hide();
         $("#" + commentsDivID).show();
@@ -1073,7 +1150,12 @@ $(document).ready(function () {
         //button to add notes to any given piece, then show text box and
         //focus it (width of whole table row? notes/piece, notes/phase)
 
-
+        //it's possible a different ajax call might have updated them while
+        //this one was in process, so only update if that hasn't happened
+        /*if (!gResults.upToDate) {
+            gResults = data;
+            gResults.upToDate = true;
+        }*/
 
 
 

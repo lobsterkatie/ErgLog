@@ -5,9 +5,13 @@
     background-color: #E5E5FF;
 }*/
 
-/*.modal-footer {
+.modal-footer {
     border-top: none;
-}*/
+}
+
+.modal {
+    overflow-y:auto;
+}
 
 /* forms */
 
@@ -187,6 +191,11 @@ input.caw-repeat {
     border: none;
 }
 
+/*.ar-table-title {
+    size: 2em;
+
+}*/
+
 #add-results-form input {
     width: 100%; /* make the inputs fit in their cells */
     border-bottom: 1px black;
@@ -201,7 +210,8 @@ input.caw-repeat {
 }
 
 .ar-fsrn-table {
-    width: 50%;
+    width: 75%;
+    margin: auto;
 }
 
 .ar-fsrn-table > tbody > tr > th {

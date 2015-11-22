@@ -1,8 +1,7 @@
 """I control everything."""
 
 from jinja2 import StrictUndefined
-from flask import (Flask, render_template, redirect, request, flash, session,
-                   jsonify)
+from flask import Flask, render_template, redirect, request, session, jsonify
 from datetime import datetime, timedelta
 from model import (connect_to_db, db, User, WorkoutResult, WorkoutTemplate,
                    PieceTemplate)
@@ -27,9 +26,12 @@ def date_filter(value, format="Mon Jan 1, 2000"):
 #add custom date filter to jinja's repertoire
 app.jinja_env.filters["date_filter"] = date_filter
 
+#make jsonify able to work its magic on dates, too
+app.json_encoder = CustomJSONEncoder
 
 
-##################### ROUTES TO SHOW HOMEPAGE AND LOG PAGE #####################
+
+########################### ROUTES TO DISPLAY PAGES ###########################
 
 
 @app.route("/")
@@ -61,6 +63,220 @@ def show_log():
     else:
         #TODO make login window open when home is rendered
         return render_template("home.html")
+
+
+
+############################# ROUTES TO RETURN DATA ############################
+
+@app.route("/get-user-and-stats.json")
+def get_user_and_stats():
+    """Returns jsonified versions of the User and UserStatList objects
+       for the logged-in user.
+
+       The final jsonified data will have only one level, since the tables
+       are one-to-one and have no conflicting column names.
+    """
+
+    #check to make sure there's a user logged in (if there isn't, return
+    #none)
+    user_id = session.get("logged_in_user_id")
+    if not user_id:
+        return None
+    else:
+        #get the user record from the database, and then jsonify and return
+        #its verbose (including stats list) dictionaryified version.
+        user = db.session.query(User).filter(User.user_id == user_id).one()
+        return jsonify(user.to_dict_verbose())
+
+
+
+@app.route("/get-workout-templates.json")
+def get_workout_templates():
+    """Queries the database for workout templates without results
+       (recently-added and less-recently-added), and workout templates with
+       results. Returns verbose (including pieces) versions of both.
+
+       The final jsonified data will have the following structure:
+            workout_templates = {
+                no_results_recent: {
+                    id: {workout_template_dict}
+                    id: {workout_template_dict}
+                    ...
+                }
+                no_results_older: {
+                    id: {workout_template_dict}
+                    id: {workout_template_dict}
+                    ...
+                }
+                with_results: {
+                    id: {workout_template_dict}
+                    id: {workout_template_dict}
+                    ...
+                }
+                newest: {workout_template_dict}
+            }
+       """
+
+    #get the id of the logged-in-user from the session
+    user_id = session["logged_in_user_id"]
+
+    #get all workout templates with no results, splitting them into those
+    #added in the last week and those added earlier
+    a_week_ago = datetime.now() - timedelta(days=7)
+    no_results_recent = (db.session.query(WorkoutTemplate)
+                                   .outerjoin(WorkoutTemplate.workout_results)
+                                   .filter(WorkoutTemplate.user_id == user_id)
+                                   .filter(WorkoutResult.workout_result_id
+                                                        .is_(None))
+                                   .filter(WorkoutTemplate.date_added >
+                                           a_week_ago)
+                                   .all())
+    no_results_older = (db.session.query(WorkoutTemplate)
+                                  .outerjoin(WorkoutTemplate.workout_results)
+                                  .filter(WorkoutTemplate.user_id == user_id)
+                                  .filter(WorkoutResult.workout_result_id
+                                                       .is_(None))
+                                  .filter(WorkoutTemplate.date_added <
+                                          a_week_ago)
+                                  .all())
+
+    #get workout templates which *have* have results added (in case the user
+    #wants to redo a workout)
+    with_results = (db.session.query(WorkoutTemplate)
+                              .outerjoin(WorkoutTemplate.workout_results)
+                              .filter(WorkoutTemplate.user_id == user_id)
+                              .filter(WorkoutResult.workout_result_id
+                                                   .isnot(None))
+                              .all())
+
+    #get the newest workout template
+    newest = (db.session.query(WorkoutTemplate)
+                        .filter(WorkoutTemplate.user_id == user_id)
+                        .order_by(WorkoutTemplate.date_added.desc())
+                        .first())
+
+    #dictionaryify the results in each case, using id's as keys
+    no_results_recent_dicts = {}
+    for template in no_results_recent:
+        t_dict = template.to_dict_verbose()
+        t_id = template.workout_template_id
+        no_results_recent_dicts[t_id] = t_dict
+    no_results_older_dicts = {}
+    for template in no_results_older:
+        t_dict = template.to_dict_verbose()
+        t_id = template.workout_template_id
+        no_results_older_dicts[t_id] = t_dict
+    with_results_dicts = {}
+    for template in with_results:
+        t_dict = template.to_dict_verbose()
+        t_id = template.workout_template_id
+        with_results_dicts[t_id] = t_dict
+    newest_dict = newest.to_dict_verbose()
+
+    #add each dictionary to an overall dictionary for jsonification
+    workout_templates_dict = {}
+    workout_templates_dict["no_results_recent"] = no_results_recent_dicts
+    workout_templates_dict["no_results_older"] = no_results_older_dicts
+    workout_templates_dict["with_results"] = with_results_dicts
+    workout_templates_dict["newest"] = newest_dict
+
+    #jsonify the result and return it
+    workout_templates_json = jsonify(workout_templates_dict)
+    return workout_templates_json
+
+
+@app.route("/get-workout-results.json")
+def get_workout_results():
+    """Return a jsonified version of the current user's workout results,
+       including the workout template, piece templates, workout result, piece
+       results, and split results.
+
+       The final jsonified data will have the following structure:
+           results = {
+                workout_result_id: {
+                    workout_template: {dict}
+                    workout_result: {dict}
+                    pieces: {
+                        1: {
+                            template: {dict}
+                            results: {dict}
+                            splits: {
+                                1: {dict}
+                                2: {dict}
+                                ...
+                            }
+                        2: {
+                            ...
+                        }
+                        ...
+                    }
+                }
+                workout_result_id: {
+                    ...
+                }
+                ...
+            }
+    """
+
+    #get the id of the logged-in-user from the session
+    user_id = session["logged_in_user_id"]
+
+    #pull all of that user's results from the database
+    results_from_db = (db.session.query(WorkoutResult)
+                                 .filter(WorkoutResult.user_id == user_id)
+                                 .all())
+
+    #create a dictionary of (verbose) workout results, keyed by id
+    results = {}
+    for result in results_from_db:
+        result_id = result.workout_result_id
+        results[result_id] = result.to_dict_verbose()
+
+    #jsonify the resulting dictionary and return it
+    return jsonify(results)
+
+
+@app.route("/get-workout-details/<int:workout_result_id>.json")
+def return_workout_details(workout_result_id):
+    """Given a workout_result_id, return a jsonified version of the workout
+       details, including the workout template, piece templates, workout
+       result, piece results, and split results.
+
+       The final jsonified data will have the following structure:
+           workout_details = {
+                workout_template: {dict}
+                workout_result: {dict}
+                pieces: {
+                    1: {
+                        template: {dict}
+                        results: {dict}
+                        splits: {
+                            1: {dict}
+                            2: {dict}
+                            ...
+                        }
+                    2: {
+                        ...
+                    }
+                    ...
+                }
+            }
+    """
+
+    #get the workout_result object associated with the given id and
+    #dictionaryify it (verbosely, which means it will include the template
+    #and the pieces)
+    workout_result = (db.session.query(WorkoutResult)
+                                .filter(WorkoutResult.workout_result_id ==
+                                        workout_result_id)
+                                .one())
+    workout_details_dict = workout_result.to_dict_verbose()
+
+    #jsonify the result and return it
+    workout_details_json = jsonify(workout_details_dict)
+    return workout_details_json
+
+
 
 
 
@@ -152,143 +368,9 @@ def save_workout_template():
         db.session.add(new_p_temp)
         db.session.commit()
 
-    #create a dictionary version of the new workout template (verbosely, which
-    #means it will include the just-added piece templates)
-    new_workout_template_dict = added_w_template.to_dict_verbose()
-
-    #jsonify the result and return it
-    new_workout_template_json = jsonify(new_workout_template_dict)
-    return new_workout_template_json
-
-
-
-@app.route("/get-workout-templates.json")
-def get_workout_templates():
-    """Queries the database for workout templates without results
-       (recently-added and less-recently-added), and workout templates with
-       results. Returns verbose (including pieces) versions of both.
-
-       The final jsonified data will have the following structure:
-            workout_templates = {
-                no_results_recent: {
-                    id: {workout_template_dict}
-                    id: {workout_template_dict}
-                    ...
-                }
-                no_results_older: {
-                    id: {workout_template_dict}
-                    id: {workout_template_dict}
-                    ...
-                }
-                with_results: {
-                    id: {workout_template_dict}
-                    id: {workout_template_dict}
-                    ...
-                }
-            }
-       """
-
-    #get the id of the logged-in-user from the session
-    user_id = session["logged_in_user_id"]
-
-    #get all workout templates with no results, splitting them into those
-    #added in the last week and those added earlier
-    a_week_ago = datetime.now() - timedelta(days=7)
-    no_results_recent = (db.session.query(WorkoutTemplate)
-                                    .outerjoin(WorkoutTemplate.workout_results)
-                                    .filter(WorkoutTemplate.user_id == user_id)
-                                    .filter(WorkoutResult.workout_result_id
-                                                         .is_(None))
-                                    .filter(WorkoutTemplate.date_added >
-                                            a_week_ago)
-                                    .all())
-    no_results_older = (db.session.query(WorkoutTemplate)
-                                  .outerjoin(WorkoutTemplate.workout_results)
-                                  .filter(WorkoutTemplate.user_id == user_id)
-                                  .filter(WorkoutResult.workout_result_id
-                                                       .is_(None))
-                                  .filter(WorkoutTemplate.date_added <
-                                          a_week_ago)
-                                  .all())
-
-    #get workout templates which *have* have results added (in case the user
-    #wants to redo a workout)
-    with_results = (db.session.query(WorkoutTemplate)
-                              .outerjoin(WorkoutTemplate.workout_results)
-                              .filter(WorkoutTemplate.user_id == user_id)
-                              .filter(WorkoutResult.workout_result_id
-                                                   .isnot(None))
-                              .all())
-
-    #dictionaryify the results in each case, using id's as keys
-    no_results_recent_dicts = {}
-    for template in no_results_recent:
-        t_dict = template.to_dict_verbose()
-        t_id = template.workout_template_id
-        no_results_recent_dicts[t_id] = t_dict
-    no_results_older_dicts = {}
-    for template in no_results_older:
-        t_dict = template.to_dict_verbose()
-        t_id = template.workout_template_id
-        no_results_older_dicts[t_id] = t_dict
-    with_results_dicts = {}
-    for template in with_results:
-        t_dict = template.to_dict_verbose()
-        t_id = template.workout_template_id
-        with_results_dicts[t_id] = t_dict
-
-    #add each dictionary to an overall dictionary for jsonification
-    workout_templates_dict = {}
-    workout_templates_dict["no_results_recent"] = no_results_recent_dicts
-    workout_templates_dict["no_results_older"] = no_results_older_dicts
-    workout_templates_dict["with_results"] = with_results_dicts
-
-    #jsonify the result and return it
-    workout_templates_json = jsonify(workout_templates_dict)
-    return workout_templates_json
-
-
-
-
-@app.route("/get-workout-details/<int:workout_result_id>.json")
-def return_workout_details(workout_result_id):
-    """Given a workout_result_id, return a jsonified version of the workout
-       details, including the workout template, piece templates, workout
-       result, piece results, and split results.
-
-       The final jsonified data will have the following structure:
-           workout_details = {
-                workout_template: {dict}
-                workout_result: {dict}
-                pieces: {
-                    1: {
-                        template: {dict}
-                        results: {dict}
-                        splits: {
-                            1: {dict}
-                            2: {dict}
-                            ...
-                        }
-                    2: {
-                        ...
-                    }
-                    ...
-                }
-            }
-    """
-
-    #get the workout_result object associated with the given id and
-    #dictionaryify it (verbosely, which means it will include the template
-    #and the pieces)
-    workout_result = (db.session.query(WorkoutResult)
-                                .filter(WorkoutResult.workout_result_id ==
-                                        workout_result_id)
-                                .one())
-    workout_details_dict = workout_result.to_dict_verbose()
-
-    #jsonify the result and return it
-    workout_details_json = jsonify(workout_details_dict)
-    return workout_details_json
+    #since this has changed the set of all workout templates for this user,
+    #send back the new set
+    return redirect("/get-workout-templates.json")
 
 
 

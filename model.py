@@ -4,6 +4,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import schema
 from datetime import date
+from server_utilities import seconds_to_hms_string
 
 # This is the connection to the SQLite database; we're getting this through
 # the Flask-SQLAlchemy helper library. On this, we can find the `session`
@@ -11,50 +12,7 @@ from datetime import date
 db = SQLAlchemy()
 
 ##############################################################################
-# Helper functions, ToDict mixin
-
-def seconds_to_hms_string(sec):
-    """return a string in the form D:H:M:S given a number of seconds"""
-
-    if sec < 0:
-        raise Exception("Non-negative seconds value expected.")
-
-    time_string = ""
-    remaining_seconds = sec
-
-    # calculate and subtract off days
-    days = remaining_seconds / 86400
-    remaining_seconds = remaining_seconds - days*86400
-
-    # calculate and subtract off hours
-    hours = remaining_seconds / 3600
-    remaining_seconds = remaining_seconds - hours*3600
-
-    #calculate and subtract off minutes
-    minutes = remaining_seconds / 60
-    remaining_seconds = remaining_seconds - minutes*60
-
-    #seconds are what remains
-    seconds = remaining_seconds
-
-    #create the string, avoiding leading zeros
-    if days != 0:
-        time_string = time_string + str(days) + ":"
-        time_string = time_string + str(hours) + ":"
-        time_string = time_string + str(minutes) + ":"
-        time_string = time_string + str(seconds)
-    elif hours != 0:
-        time_string = time_string + str(hours) + ":"
-        time_string = time_string + str(minutes) + ":"
-        time_string = time_string + str(seconds)
-    elif minutes != 0:
-        time_string = time_string + str(minutes) + ":"
-        time_string = time_string + str(seconds)
-    else:
-        time_string = ":" + str(seconds)
-
-    #return the string
-    return time_string
+# ToDict mixin
 
 
 class ToDictMixin(object):

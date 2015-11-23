@@ -3,8 +3,8 @@
 from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, session, jsonify
 from datetime import datetime, timedelta
-from model import (connect_to_db, db, User, WorkoutResult, WorkoutTemplate,
-                   PieceTemplate)
+from model import (connect_to_db, db, User, WorkoutTemplate, PieceTemplate,
+                   WorkoutResult, PieceResult, SplitResult)
 from server_utilities import *
 
 app = Flask(__name__)
@@ -21,6 +21,9 @@ def date_filter(value, format="Mon Jan 1, 2000"):
 
     if format == "Mon Jan 1, 2000":
         date_string = "{date:%a} {date:%b} {date.day}, {date.year}"
+        return date_string.format(date=value)
+    elif format == "Jan 1, 2000":
+        date_string = "{date:%b} {date.day}, {date.year}"
         return date_string.format(date=value)
 
 #add custom date filter to jinja's repertoire
@@ -171,7 +174,10 @@ def get_workout_templates():
         t_dict = template.to_dict_verbose()
         t_id = template.workout_template_id
         with_results_dicts[t_id] = t_dict
-    newest_dict = newest.to_dict_verbose()
+    newest_dict = None
+    if newest:
+        newest_dict = newest.to_dict_verbose()
+
 
     #add each dictionary to an overall dictionary for jsonification
     workout_templates_dict = {}
@@ -215,6 +221,9 @@ def get_workout_results():
                     ...
                 }
                 ...
+                newest: {
+                    ...
+                }
             }
     """
 
@@ -224,6 +233,8 @@ def get_workout_results():
     #pull all of that user's results from the database
     results_from_db = (db.session.query(WorkoutResult)
                                  .filter(WorkoutResult.user_id == user_id)
+                                 .order_by(WorkoutResult.workout_result_id
+                                                        .desc())
                                  .all())
 
     #create a dictionary of (verbose) workout results, keyed by id
@@ -231,6 +242,12 @@ def get_workout_results():
     for result in results_from_db:
         result_id = result.workout_result_id
         results[result_id] = result.to_dict_verbose()
+
+    #since workout_result_id's are auto-assigned, auto-incrementing integers,
+    #the highest one must belong to the most-recently-added set of results
+    #so, since results_from_db is in descending order of id, the first element
+    #must the newest
+    results["newest"] = results_from_db[0].to_dict_verbose()
 
     #jsonify the resulting dictionary and return it
     return jsonify(results)
@@ -277,7 +294,7 @@ def return_workout_details(workout_result_id):
     return workout_details_json
 
 
-
+############################# ROUTES TO STORE DATA #############################
 
 
 @app.route("/save-workout-template.json", methods=["POST"])
@@ -322,6 +339,8 @@ def save_workout_template():
 
     #get the newly added workout template record from the database
     added_w_template = (db.session.query(WorkoutTemplate)
+                                  .filter(WorkoutTemplate.user_id ==
+                                          new_w_temp.user_id)
                                   .filter(WorkoutTemplate.date_added ==
                                                 new_w_temp.date_added)
                                   .one())
@@ -332,6 +351,7 @@ def save_workout_template():
         #stringify i so it can be used in field names
         i = str(i)
         new_p_temp = PieceTemplate()
+        new_p_temp.user_id = session["logged_in_user_id"]
         new_p_temp.workout_template_id = added_w_template.workout_template_id
         new_p_temp.ordinal = request.form.get("ordinal-piece-" + i, type=int)
         new_p_temp.ordinal_in_phase = (
@@ -348,29 +368,98 @@ def save_workout_template():
         new_p_temp.zone = request.form.get("zone-piece-" + i)
         new_p_temp.notes = request.form.get("notes-piece-" + i)
         if new_p_temp.piece_type == "time":
-            new_p_temp.default_split_length = (
-                    hms_string_to_seconds(
-                            request.form.get("split-length-piece-" + i)))
-            new_p_temp.split_length_string = (
-                    request.form.get("split-length-piece-" + i))
             new_p_temp.label = make_piece_label("time",
                                                 new_p_temp.time_seconds,
                                                 new_p_temp.zone)
+            if new_p_temp.has_splits:
+                new_p_temp.default_split_length = (
+                    hms_string_to_seconds(request.form.get(
+                                                "split-length-piece-" + i)))
+                new_p_temp.split_length_string = (
+                    request.form.get("split-length-piece-" + i))
         elif new_p_temp.piece_type == "distance":
-            new_p_temp.default_split_length = request.form.get(
-                                                "split-length-piece-" + i,
-                                                type=int)
-            new_p_temp.split_length_string = (
-                    request.form.get("split-length-piece-" + i) + "m")
             new_p_temp.label = make_piece_label("distance",
                                                 new_p_temp.distance,
                                                 new_p_temp.zone)
+            if new_p_temp.has_splits:
+                new_p_temp.default_split_length = (
+                    request.form.get("split-length-piece-" + i, type=int))
+                new_p_temp.split_length_string = (
+                    request.form.get("split-length-piece-" + i) + "m")
         db.session.add(new_p_temp)
         db.session.commit()
 
     #since this has changed the set of all workout templates for this user,
     #send back the new set
     return redirect("/get-workout-templates.json")
+
+
+@app.route("/save-workout-results.json", methods=["POST"])
+def save_workout_results():
+    """Save workout results to the database, and redirect to
+       /get-workout-results route to update front-end storage.
+    """
+
+    #create a new record in the workout_results table with the given inputs
+    new_w_result = WorkoutResult()
+    new_w_result.user_id = session["logged_in_user_id"]
+    new_w_result.workout_template_id = request.form.get("workout-template-id",
+                                                        type=int)
+    new_w_result.total_meters = request.form.get("total-meters", type=int)
+    new_w_result.date = (datetime.strptime(request.form.get("date"),
+                                           "%a %b %d, %Y")
+                                 .date())
+    new_w_result.avg_hr = request.form.get("overall-avg-hr", type=int)
+    new_w_result.calories = request.form.get("calories", type=int)
+    new_w_result.goals = request.form.get("workout-goals")
+    new_w_result.comments = request.form.get("workout-comments")
+    new_w_result.warmup_comments = request.form.get("warmup-comments")
+    new_w_result.main_comments = request.form.get("main-comments")
+    new_w_result.cooldown_comments = request.form.get("cooldown-comments")
+    if request.form.get("time"):
+        new_w_result.time_of_day = (
+            datetime.strptime(request.form.get("time"), "%I:%M %p").time())
+    db.session.add(new_w_result)
+    db.session.commit()
+
+    #get the newly-added workout results record from the database
+    added_w_result = (db.session.query(WorkoutResult)
+                                .filter(WorkoutResult.workout_template_id ==
+                                        new_w_result.workout_template_id)
+                                .order_by(WorkoutResult.workout_result_id
+                                                       .desc())
+                                .first())
+
+    #create a new record in the piece_results table for each piece result
+    num_pieces = request.form.get("num-pieces", type=int)
+    for i in range(1, num_pieces + 1):
+        #stringify i so it can be used in field names
+        i = str(i)
+        new_p_result = PieceResult()
+        new_p_result.user_id = session["logged_in_user_id"]
+        new_p_result.workout_result_id = added_w_result.workout_result_id
+        new_p_result.piece_template_id = (
+            request.form.get("piece-template-id-piece-" + i, type=int))
+        new_p_result.ordinal = request.form.get("ordinal-piece-" + i, type=int)
+        new_p_result.total_time_seconds = (
+            hms_string_to_seconds(request.form.get("time-piece-" + i)))
+        new_p_result.total_meters = request.form.get("distance-piece-" + i,
+                                                     type=int)
+        new_p_result.avg_split_seconds = (
+            hms_string_to_seconds(request.form.get("avg-split-piece-" + i)))
+        new_p_result.avg_sr = request.form.get("avg-sr-piece-" + i, type=int)
+        new_p_result.avg_watts = request.form.get("avg-watts-piece-" + i,
+                                                  type=int)
+        new_p_result.avg_hr = request.form.get("avg-hr-piece-" + i, type=int)
+        new_p_result.completed = (
+            not request.form.get("skipped-bool-piece-" + i, False, type=bool))
+        db.session.add(new_p_result)
+        db.session.commit()
+
+    #since this has changed the set of all workout results for this user,
+    #send back the new set
+    return redirect("/get-workout-results.json")
+
 
 
 

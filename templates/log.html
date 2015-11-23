@@ -27,7 +27,7 @@
     <div class="row">
         <div class="col-xs-12">
             <span id="log-buttons" class="center-block">
-                <button id="create-a-workout-button" class="btn btn-default" type="button" data-toggle="modal" data-keyboard="false" href="#create-a-workout-modal">
+                <button id="create-a-workout-button" class="btn btn-default" type="button" data-toggle="modal" href="#create-a-workout-modal">
                     Create a Workout
                 </button>
                 <button id="open-add-results-modal" class="btn btn-default" type="button">
@@ -75,7 +75,7 @@
     <!-- MODALS -->
     <div class="row">
         <!-- CREATE-A-WORKOUT MODAL -->
-        <div class="modal fade" id="create-a-workout-modal" tabindex="-1" role="dialog">
+        <div class="modal fade" id="create-a-workout-modal" tabindex="-1" role="dialog" data-keyboard="false">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -500,28 +500,26 @@
                 <div class="modal-content">
 
                     <!-- modal header -->
-                    <div class="modal-header">
+                    <div id="ar-modal-header" class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">
                             &times;
                         </button>
                         <h1 class="modal-title">
                             Input workout results
                         </h1>
-                        <h3 id="ar-workout-description">
-                        </h3>
-                        <h4 id="ar-total-meters" hidden>
-                            Total meters:
-                            <input id="ar-total-meters-num" name="total-meters" value="0" form="add-results-form" onfocus="this.blur()" readonly>
-                            </input>
-                        </h4>
+                        <div id="ar-header-while-adding-results" hidden>
+                            <h3 id="ar-workout-description">
+                            </h3>
+                            <h4 id="ar-total-meters">
+                                Total meters:
+                                <input id="ar-total-meters-num" name="total-meters" value="0" form="add-results-form" onfocus="this.blur()" readonly>
+                                </input>
+                            </h4>
+                        </div>
                     </div> <!-- end of modal header -->
 
                     <!-- modal body -->
                     <div class="modal-body">
-                        <!-- hidden info -->
-                        <div hidden>
-                            <input id="ar-workout-template-id" type="text" name="workout-template-id" form="add-results-form">
-                        </div>
 
                         <!-- workout-chooser pane -->
                         <div id="ar-choose-workout">
@@ -568,6 +566,7 @@
                                     </div>
                                     <div class="col-sm-10">
                                         <select id="ar-workout-choice-with-results" class="form-control ar-workout-choice" name="workout-choice">
+                                            <option value="choose-a-workout">Choose a workout...</option>
                                             <!-- dynamically-added workout template descriptions -->
                                         </select>
                                         <input class="btn btn-default ar-add-results-button" type="button" value="Add results">
@@ -582,6 +581,10 @@
                         </div> <!-- end workout-chooser pane -->
 
                         <form id="add-results-form" class="form-horizontal" role="form">
+                            <!-- hidden info -->
+                            <input id="ar-workout-template-id" type="hidden" name="workout-template-id">
+                            <input id="ar-num-pieces" type="hidden" name="num-pieces">
+
                             <!-- overall results pane -->
                             <div id="ar-overall-results" hidden>
                                 <div class="row">
@@ -601,13 +604,13 @@
                                     </div>
                                     <div class="col-sm-offset-6 col-sm-6">
                                         Time
-                                        <input id="ar-time" class="text-center" type="text" name="time">
+                                        <input id="ar-time" class="text-center" type="text" name="time" placeholder="H:MM AM/PM">
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-6">
                                         Average HR
-                                        <input id="ar-overall-HR" class="text-center" type="text" name="overall-avg-HR">
+                                        <input id="ar-overall-HR" class="text-center" type="text" name="overall-avg-hr">
                                     </div>
                                     <div class="col-sm-offset-6 col-sm-6">
                                         Calories Burned
@@ -1160,10 +1163,11 @@
                         </form>
                     </div> <!-- end of modal body -->
 
-                    <div id="ar-save-results-buttons" class="modal-footer" hidden>
-                        <div>
-                            <input type="button" id="ar-save-add-another" class="btn btn-default" value="Save and add another">
-                            <input type="button" id="ar-save-results" class="btn btn-primary" value="Save results">
+                    <!-- modal footer -->
+                    <div class="modal-footer">
+                        <div id="ar-save-results-buttons" hidden>
+                            <input type="button" id="ar-save-and-add-another" class="btn btn-default ar-save-button" value="Save and add another" data-add-another="true" style="display:none">
+                            <input type="button" id="ar-save-results" class="btn btn-primary ar-save-button" value="Save results" data-add-another="false">
                         </div>
                     </div> <!-- end of modal footer -->
 
@@ -1172,7 +1176,7 @@
         </div> <!-- END OF ADD RESULTS MODAL -->
 
         <!-- WORKOUT DETAILS MODAL -->
-        <div class="modal fade" id="workout-details-modal" tabindex="-1" role="dialog">
+        <div class="modal fade" id="workout-details-modal" tabindex="-1" role="dialog" data-keyboard="false">
             <div class="modal-dialog modal-sm">
                 <div class="modal-content">
 

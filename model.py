@@ -300,6 +300,9 @@ class PieceTemplate(db.Model, ToDictMixin):
     piece_template_id = db.Column(db.Integer,
                                   primary_key=True,
                                   autoincrement=True)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("users.user_id"),
+                        nullable=False)
     workout_template_id = db.Column(db.Integer,
                                     db.ForeignKey("workout_templates.workout_template_id"),
                                     nullable=False)
@@ -344,12 +347,12 @@ class WorkoutResult(db.Model, ToDictMixin):
     workout_result_id = db.Column(db.Integer,
                                   primary_key=True,
                                   autoincrement=True)
-    workout_template_id = db.Column(db.Integer,
-                                    db.ForeignKey("workout_templates.workout_template_id"),
-                                    nullable=False)
     user_id = db.Column(db.Integer,
                         db.ForeignKey("users.user_id"),
                         nullable=False)
+    workout_template_id = db.Column(db.Integer,
+                                    db.ForeignKey("workout_templates.workout_template_id"),
+                                    nullable=False)
     total_meters = db.Column(db.Integer, default=0, nullable=False)
     date = db.Column(db.Date, nullable=False)
     time_of_day = db.Column(db.Time)
@@ -483,6 +486,9 @@ class PieceResult(db.Model, ToDictMixin):
     __tablename__ = "piece_results"
 
     piece_result_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("users.user_id"),
+                        nullable=False)
     workout_result_id = db.Column(db.Integer,
                                   db.ForeignKey("workout_results.workout_result_id"),
                                   nullable=False)
@@ -496,9 +502,9 @@ class PieceResult(db.Model, ToDictMixin):
     avg_sr = db.Column(db.Integer)
     avg_watts = db.Column(db.Integer)
     avg_hr = db.Column(db.Integer)
-    has_splits = db.Column(db.Boolean)
-    split_length = db.Column(db.Integer)
     completed = db.Column(db.Boolean)
+    has_splits = db.Column(db.Boolean) #not currently in use
+    split_length = db.Column(db.Integer) #not currently in use
     goal_split_seconds = db.Column(db.Integer) #not currently in use
     goal_sr = db.Column(db.Integer) #not currently in use
     goal_hr = db.Column(db.Integer) #not currently in use
@@ -537,7 +543,11 @@ class SplitResult(db.Model, ToDictMixin):
 
     __tablename__ = "split_results"
 
-    split_result_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    split_result_id = db.Column(db.Integer, primary_key=True,
+                                autoincrement=True)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("users.user_id"),
+                        nullable=False)
     piece_result_id = db.Column(db.Integer,
                                 db.ForeignKey("piece_results.piece_result_id"),
                                 nullable=False)

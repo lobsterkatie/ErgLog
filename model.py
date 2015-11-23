@@ -4,7 +4,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import schema
 from datetime import date
-from server_utilities import seconds_to_hms_string
+from utilities import seconds_to_hms_string
 
 # This is the connection to the SQLite database; we're getting this through
 # the Flask-SQLAlchemy helper library. On this, we can find the `session`

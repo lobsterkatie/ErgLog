@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, time
 from re import match
 from flask.json import JSONEncoder
 from decimal import Decimal
@@ -153,15 +153,14 @@ def hms_string_to_seconds(hms_string):
     """Takes a string of the form hours:minutes:seconds and parses it,
        returning the number of seconds represented by the string."""
 
-    #f(None) = None
+    #handle corner cases
     if not hms_string:
         return None
-
-    #check to make sure string matches h:m:s, m:s, or :s format (raise an
-    #exception if not)
     if not match(r"^(\d*:[0-5]\d:[0-5]\d)|([0-5]?\d:[0-5]\d)|(:[0-5]\d)$",
                  hms_string):
-        raise ValueError("expected string of the format [[h:]m]:s.")
+        error_msg = ("expected string of the form [[h:]m]:s. Got " +
+                     str(hms_string) + ".")
+        raise ValueError(error_msg)
 
     #now that we know the string is of the right format, split it on ":",
     #figure out whether we have h:m:s, m:s, or :s, and do the appropriate math
@@ -207,21 +206,31 @@ def seconds_to_hms_string(sec):
     #seconds are what remains
     seconds = remaining_seconds
 
+    #make strings of each time quantity, both padded with zeros and unpadded
+    #(except days (which never gets padded) and seconds (which always gets
+    #padded))
+    days_str = str(days)
+    hours_str = str(hours)
+    hours_str_padded = "{hours:0>2d}".format(hours=hours)
+    minutes_str = str(minutes)
+    minutes_str_padded = "{minutes:0>2d}".format(minutes=minutes)
+    seconds_str_padded = "{seconds:0>2d}".format(seconds=seconds)
+
     #create the string, avoiding leading zeros
     if days != 0:
-        time_string = time_string + str(days) + ":"
-        time_string = time_string + str(hours) + ":"
-        time_string = time_string + str(minutes) + ":"
-        time_string = time_string + str(seconds)
+        time_string = time_string + days_str + ":"
+        time_string = time_string + hours_str_padded + ":"
+        time_string = time_string + minutes_str_padded + ":"
+        time_string = time_string + seconds_str_padded
     elif hours != 0:
-        time_string = time_string + str(hours) + ":"
-        time_string = time_string + str(minutes) + ":"
-        time_string = time_string + str(seconds)
+        time_string = time_string + hours_str + ":"
+        time_string = time_string + minutes_str_padded + ":"
+        time_string = time_string + seconds_str_padded
     elif minutes != 0:
-        time_string = time_string + str(minutes) + ":"
-        time_string = time_string + str(seconds)
+        time_string = time_string + minutes_str + ":"
+        time_string = time_string + seconds_str_padded
     else:
-        time_string = ":" + str(seconds)
+        time_string = ":" + seconds_str_padded
 
     #return the string
     return time_string
@@ -248,9 +257,9 @@ def make_piece_label(piece_type, piece_length, zone):
 
 class CustomJSONEncoder(JSONEncoder):
     # def default(self, obj):
+    #     if isinstance(obj, date):
+    #         return obj.isoformat()
     #     try:
-    #         if isinstance(obj, date):
-    #             return obj.isoformat()
     #         iterable = iter(obj)
     #     except TypeError:
     #         pass
@@ -259,7 +268,7 @@ class CustomJSONEncoder(JSONEncoder):
     #     return JSONEncoder.default(self, obj)
 
     def default(self, obj):
-        if isinstance(obj, date):
+        if isinstance(obj, (date, time)):
             return obj.isoformat()
         elif isinstance(obj, Decimal):
             return str(obj)

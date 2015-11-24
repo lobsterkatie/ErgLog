@@ -2,6 +2,7 @@ from datetime import date, time
 from flask.json import JSONEncoder
 from decimal import Decimal
 from model import db, User
+from utilities import seconds_to_hms_string
 
 
 

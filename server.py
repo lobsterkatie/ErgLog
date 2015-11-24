@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from model import (connect_to_db, db, User, WorkoutTemplate, PieceTemplate,
                    WorkoutResult, PieceResult, SplitResult)
 from server_utilities import *
+from utilities import *
 
 app = Flask(__name__)
 
@@ -20,7 +21,7 @@ def date_filter(value, format="Mon Jan 1, 2000"):
     """A custom Jinja filter to format dates"""
 
     if format == "Mon Jan 1, 2000":
-        date_string = "{date:%a} {date:%b} {date.day}, {date.year}"
+        date_string = "{date:%a}, {date:%b} {date.day}, {date.year}"
         return date_string.format(date=value)
     elif format == "Jan 1, 2000":
         date_string = "{date:%b} {date.day}, {date.year}"
@@ -57,7 +58,8 @@ def show_log():
                           .one())
         days_until_HOCR = days_til_HOCR()
         workouts = (db.session.query(WorkoutResult)
-                              .filter(WorkoutResult.user_id == logged_in_user_id)
+                              .filter(WorkoutResult.user_id ==
+                                      logged_in_user_id)
                               .order_by(WorkoutResult.date.desc())
                               .all())
         return render_template("log.html", user=user,
@@ -205,7 +207,7 @@ def get_workout_results():
                     pieces: {
                         1: {
                             template: {dict}
-                            results: {dict}
+                            result: {dict}
                             splits: {
                                 1: {dict}
                                 2: {dict}
@@ -247,7 +249,10 @@ def get_workout_results():
     #the highest one must belong to the most-recently-added set of results
     #so, since results_from_db is in descending order of id, the first element
     #must the newest
-    results["newest"] = results_from_db[0].to_dict_verbose()
+    if results:
+        results["newest"] = results_from_db[0].to_dict_verbose()
+    else:
+        results["newest"] = None
 
     #jsonify the resulting dictionary and return it
     return jsonify(results)
@@ -345,11 +350,17 @@ def save_workout_template():
                                                 new_w_temp.date_added)
                                   .one())
 
-    #create a new record in the piece_templates table for each piece template
+    #create a new record in the piece_templates table for each piece template,
+    #keeping track of a boolean has_xxx_pieces for each phase xxx
     num_pieces = new_w_temp.num_pieces
+    has_warmup_pieces = False
+    has_main_pieces = False
+    has_cooldown_pieces = False
     for i in range(1, num_pieces + 1):
         #stringify i so it can be used in field names
         i = str(i)
+
+        #get info from the form
         new_p_temp = PieceTemplate()
         new_p_temp.user_id = session["logged_in_user_id"]
         new_p_temp.workout_template_id = added_w_template.workout_template_id
@@ -386,8 +397,25 @@ def save_workout_template():
                     request.form.get("split-length-piece-" + i, type=int))
                 new_p_temp.split_length_string = (
                     request.form.get("split-length-piece-" + i) + "m")
+
+        #add the new piece template to the database
         db.session.add(new_p_temp)
         db.session.commit()
+
+        #update the appropriate phase flag
+        if new_p_temp.phase == "warmup":
+            has_warmup_pieces = True
+        elif new_p_temp.phase == "main":
+            has_main_pieces = True
+        elif new_p_temp.phase == "cooldown":
+            has_cooldown_pieces = True
+
+    #update the workout template with the values of the phase flags
+    added_w_template.has_warmup_pieces = has_warmup_pieces
+    added_w_template.has_main_pieces = has_main_pieces
+    added_w_template.has_cooldown_pieces = has_cooldown_pieces
+    db.session.add(added_w_template)
+    db.session.commit()
 
     #since this has changed the set of all workout templates for this user,
     #send back the new set
@@ -405,10 +433,11 @@ def save_workout_results():
     new_w_result.user_id = session["logged_in_user_id"]
     new_w_result.workout_template_id = request.form.get("workout-template-id",
                                                         type=int)
-    new_w_result.total_meters = request.form.get("total-meters", type=int)
+    #new_w_result.total_meters = request.form.get("total-meters", type=int)
     new_w_result.date = (datetime.strptime(request.form.get("date"),
-                                           "%a %b %d, %Y")
+                                           "%a, %b %d, %Y")
                                  .date())
+    new_w_result.date_string = request.form.get("date");
     new_w_result.avg_hr = request.form.get("overall-avg-hr", type=int)
     new_w_result.calories = request.form.get("calories", type=int)
     new_w_result.goals = request.form.get("workout-goals")
@@ -419,6 +448,7 @@ def save_workout_results():
     if request.form.get("time"):
         new_w_result.time_of_day = (
             datetime.strptime(request.form.get("time"), "%I:%M %p").time())
+        new_w_result.time_string = request.form.get("time");
     db.session.add(new_w_result)
     db.session.commit()
 

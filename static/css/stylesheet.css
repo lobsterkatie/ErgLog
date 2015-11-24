@@ -10,8 +10,24 @@
 }
 
 .modal {
-    overflow-y:auto;
+    overflow-y: auto;
 }
+
+#navbar {
+    background-color: #ada4b4;
+    border: none;
+    color: #f6efd6;
+}
+
+#navbar a {
+    color: #702822;
+}
+
+#navbar a:hover {
+    color: #f6efd6;
+}
+
+
 
 /* forms */
 
@@ -32,7 +48,7 @@ input.validation-error {
 /* base.html */
 
 #everything-else {
-    padding-top: 70px;
+    padding-top: 50px;
 }
 
 .close {
@@ -56,6 +72,37 @@ input.validation-error {
 
 #homepage-image {
     text-align: center;
+}
+
+/*#homepage-body {
+html {
+  background: url(../../static/img/background-home-full.jpg) no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  background-image: url(../../static/img/background-home-full.jpg);
+  overflow-y: auto;
+  min-height: 100%;
+}*/
+body {
+    overflow-y: auto;
+    background-color: #f6efd6;
+}
+
+#homepage-bg-img {
+  /* Set rules to fill background */
+  min-height: 100%;
+  min-width: 300px;
+
+  /* Set up proportionate scaling */
+  width: 100%;
+  height: auto;
+
+  /* Set up positioning */
+  position: absolute;
+  top: -15px;
+  left: 0;
 }
 
 /* log.html create-a-workout modal */
@@ -263,7 +310,14 @@ input.caw-repeat {
     width: 12%;
 }
 
-.ar-completed-col {
+.ar-skipped-col {
     width: 8%;
+}
+
+
+
+
+.wd-header-info {
+
 }
 

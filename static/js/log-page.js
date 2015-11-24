@@ -1,6 +1,6 @@
 "use strict";
 $(document).ready(function () {
-
+    /* globals strftime: false */
 
     /*************** things that actually *happen* on page load ***************/
 
@@ -31,9 +31,10 @@ $(document).ready(function () {
     var gARModalHeaderInitial = $("#ar-modal-header").html();
     var gARModalChooserInitial = $("#ar-choose-workout").html();
     var gARModalFormInitial = $("#add-results-form").html();
+    var gWDModalInitial = $("#workout-details-modal").html();
 
     //set defaults for datepickers
-    $.fn.datepicker.defaults.format = "D M d, yyyy";
+    $.fn.datepicker.defaults.format = "D, M d, yyyy";
     $.fn.datepicker.defaults.endDate = "0d";
     $.fn.datepicker.defaults.todayBtn = true;
     $.fn.datepicker.defaults.autoclose = true;
@@ -66,7 +67,52 @@ $(document).ready(function () {
         return values;
     } //end getValues()
 
+    //Create and return a <td> with the given attributes and content (content
+    //and its attributes can either be given singly or as arrays). Note that
+    //even if given singly, attributes are objects of the form
+    //{"attribute": "value", "attribute": "value", ...}
+    function createTableCell(cellAttributes, cellComment, content,
+                                   contentAttributes)
+    {
 
+        //create the cell, and give it attributes and a comment, if any
+        var cell = $("<td>");
+        if (cellAttributes) {
+            cell.attr(cellAttributes);
+        }
+        if (cellComment) {
+            cell.append(cellComment);
+        }
+
+        //see if the content was passed in as an array, and if so, loop over
+        //its elements, adding any attributes, then adding each element to
+        //the cell in order
+        if (Array.isArray(content))
+        {
+            //if any attributes were given for the content, add them
+            if (contentAttributes) {
+                for (var i = 0; i < content.length; i++) {
+                    content[i].attr(contentAttributes[i]);
+                }
+            }
+
+            //add each content element to the cell
+            for (var i = 0; i < content.length; i++) {
+                cell.append(content[i]);
+            }
+        }
+        //if it's not an array, see if it exits at all
+        //if it does, add the given attributes (if any), and add it to the cell
+        else if (content)
+        {
+            if (contentAttributes) {
+                content.attr(contentAttributes);
+            }
+            cell.append(content);
+        }
+
+        return cell;
+    } //end createTableCell()
 
 
 
@@ -153,7 +199,7 @@ $(document).ready(function () {
             "aria-label": "phase-piece-" + pieceNum,
             "readonly": ""
         };
-        cell = createPieceTableCell(cellAttributes, cellComment,
+        cell = createTableCell(cellAttributes, cellComment,
                                     cellContent, contentAttributes);
         row.append(cell);
 
@@ -169,7 +215,7 @@ $(document).ready(function () {
             "aria-label": "type-piece-" + pieceNum,
             "readonly": ""
         };
-        cell = createPieceTableCell(cellAttributes, cellComment,
+        cell = createTableCell(cellAttributes, cellComment,
                                     cellContent, contentAttributes);
         row.append(cell);
 
@@ -185,7 +231,7 @@ $(document).ready(function () {
             "aria-label": "ordinal-piece-" + pieceNum,
             "readonly": ""
         };
-        cell = createPieceTableCell(cellAttributes, cellComment,
+        cell = createTableCell(cellAttributes, cellComment,
                                     cellContent, contentAttributes);
         row.append(cell);
 
@@ -205,7 +251,7 @@ $(document).ready(function () {
             "onfocus": "this.blur()",
             "readonly": ""
         };
-        cell = createPieceTableCell(cellAttributes, cellComment,
+        cell = createTableCell(cellAttributes, cellComment,
                                     cellContent, contentAttributes);
         row.append(cell);
 
@@ -219,7 +265,7 @@ $(document).ready(function () {
             "name": "zone-piece-" + pieceNum,
             "aria-label": "zone-piece-" + pieceNum
         };
-        cell = createPieceTableCell(cellAttributes, cellComment,
+        cell = createTableCell(cellAttributes, cellComment,
                                     cellContent, contentAttributes);
         row.append(cell);
 
@@ -247,7 +293,7 @@ $(document).ready(function () {
             };
         }
         cellContent = $("<input>");
-        cell = createPieceTableCell(cellAttributes, cellComment,
+        cell = createTableCell(cellAttributes, cellComment,
                                     cellContent, contentAttributes);
         row.append(cell);
 
@@ -261,7 +307,7 @@ $(document).ready(function () {
             "name": "rest-piece-" + pieceNum,
             "aria-label": "rest-piece-" + pieceNum
         };
-        cell = createPieceTableCell(cellAttributes, cellComment,
+        cell = createTableCell(cellAttributes, cellComment,
                                     cellContent, contentAttributes);
         row.append(cell);
 
@@ -288,7 +334,7 @@ $(document).ready(function () {
                 "data-piece-num": pieceNum
             }
         ];
-        cell = createPieceTableCell(cellAttributes, cellComment,
+        cell = createTableCell(cellAttributes, cellComment,
                                     cellContent, contentAttributes);
         row.append(cell);
 
@@ -302,7 +348,7 @@ $(document).ready(function () {
             "name": "notes-piece-" + pieceNum,
             "aria-label": "notes-piece-" + pieceNum
         };
-        cell = createPieceTableCell(cellAttributes, cellComment,
+        cell = createTableCell(cellAttributes, cellComment,
                                     cellContent, contentAttributes);
         row.append(cell);
 
@@ -316,7 +362,7 @@ $(document).ready(function () {
             "aria-label": "delete-piece-" + pieceNum,
             "data-piece-num": pieceNum
         };
-        cell = createPieceTableCell(cellAttributes, cellComment,
+        cell = createTableCell(cellAttributes, cellComment,
                                     cellContent, contentAttributes);
         row.append(cell);
 
@@ -344,60 +390,11 @@ $(document).ready(function () {
     }); //end $(".caw-add-piece-button").click()
 
 
-
     //repeat pieces x through y on create-a-workout form
     $(document).on("click", ".caw-repeat-go-button", function() {
 
         //TODO CODE ME! (repeat go button on CAW modal)
     }); //end $(".caw-repeat-go-button").click()
-
-
-    //Create and return a <td> with the given attributes and content (content
-    //and its attributes can either be given singly or as arrays). Note that
-    //even if given singly, attributes are objects of the form
-    //{"attribute": "value", "attribute": "value", ...}
-    function createPieceTableCell (cellAttributes, cellComment, content,
-                                   contentAttributes)
-    {
-
-        //create the cell, and give it attributes and a comment, if any
-        var cell = $("<td>");
-        if (cellAttributes) {
-            cell.attr(cellAttributes);
-        }
-        if (cellComment) {
-            cell.append(cellComment);
-        }
-
-        //see if the content was passed in as an array, and if so, loop over
-        //its elements, adding any attributes, then adding each element to
-        //the cell in order
-        if (Array.isArray(content))
-        {
-            //if any attributes were given for the content, add them
-            if (contentAttributes) {
-                for (var i = 0; i < content.length; i++) {
-                    content[i].attr(contentAttributes[i]);
-                }
-            }
-
-            //add each content element to the cell
-            for (var i = 0; i < content.length; i++) {
-                cell.append(content[i]);
-            }
-        }
-        //if it's not an array, see if it exits at all
-        //if it does, add the given attributes (if any), and add it to the cell
-        else if (content)
-        {
-            if (contentAttributes) {
-                content.attr(contentAttributes);
-            }
-            cell.append(content);
-        }
-
-        return cell;
-    } //end createPieceTableCell()
 
 
     //show or hide input for split length based on checkbox status
@@ -721,7 +718,7 @@ $(document).ready(function () {
 
         //now that all distance pieces have been added to the form, update
         //the total-meters field in the header
-        updateTotalMeters();
+        updateTotalMeters(false);
     } //end populateAddResultsForm()
 
 
@@ -850,7 +847,7 @@ $(document).ready(function () {
                 "aria-label": "piece-template-id-piece-" + pieceNum,
                 "readonly": ""
             };
-            cell = createPieceTableCell(cellAttributes, cellComment,
+            cell = createTableCell(cellAttributes, cellComment,
                                         cellContent, contentAttributes);
             row.append(cell);
 
@@ -866,7 +863,7 @@ $(document).ready(function () {
                 "aria-label": "ordinal-piece-" + pieceNum,
                 "readonly": ""
             };
-            cell = createPieceTableCell(cellAttributes, cellComment,
+            cell = createTableCell(cellAttributes, cellComment,
                                         cellContent, contentAttributes);
             row.append(cell);
 
@@ -891,7 +888,7 @@ $(document).ready(function () {
                 "aria-label": "time-piece-" + pieceNum
             };
             cellContent = $("<input>");
-            var timeCell = createPieceTableCell(cellAttributes, cellComment,
+            var timeCell = createTableCell(cellAttributes, cellComment,
                                                 cellContent, contentAttributes);
 
 
@@ -907,7 +904,7 @@ $(document).ready(function () {
                 "aria-label": "distance-piece-" + pieceNum
             };
             cellContent = $("<input>");
-            var distanceCell = createPieceTableCell(cellAttributes,
+            var distanceCell = createTableCell(cellAttributes,
                                                     cellComment,
                                                     cellContent,
                                                     contentAttributes);
@@ -942,7 +939,7 @@ $(document).ready(function () {
                 "onfocus": "this.blur()",
                 "readonly": ""
             };
-            cell = createPieceTableCell(cellAttributes, cellComment,
+            cell = createTableCell(cellAttributes, cellComment,
                                         cellContent, contentAttributes);
             row.append(cell);
 
@@ -959,7 +956,7 @@ $(document).ready(function () {
                 "onfocus": "this.blur()",
                 "readonly": ""
             };
-            cell = createPieceTableCell(cellAttributes, cellComment,
+            cell = createTableCell(cellAttributes, cellComment,
                                         cellContent, contentAttributes);
             row.append(cell);
 
@@ -983,7 +980,7 @@ $(document).ready(function () {
                 "name": "avg-split-piece-" + pieceNum,
                 "aria-label": "avg-split-piece-" + pieceNum
             };
-            cell = createPieceTableCell(cellAttributes, cellComment,
+            cell = createTableCell(cellAttributes, cellComment,
                                         cellContent, contentAttributes);
             row.append(cell);
 
@@ -998,7 +995,7 @@ $(document).ready(function () {
                 "name": "avg-sr-piece-" + pieceNum,
                 "aria-label": "avg-sr-piece-" + pieceNum
             };
-            cell = createPieceTableCell(cellAttributes, cellComment,
+            cell = createTableCell(cellAttributes, cellComment,
                                         cellContent, contentAttributes);
             row.append(cell);
 
@@ -1013,7 +1010,7 @@ $(document).ready(function () {
                 "name": "avg-watts-piece-" + pieceNum,
                 "aria-label": "avg-watts-piece-" + pieceNum
             };
-            cell = createPieceTableCell(cellAttributes, cellComment,
+            cell = createTableCell(cellAttributes, cellComment,
                                         cellContent, contentAttributes);
             row.append(cell);
 
@@ -1028,7 +1025,7 @@ $(document).ready(function () {
                 "name": "avg-hr-piece-" + pieceNum,
                 "aria-label": "avg-hr-piece-" + pieceNum
             };
-            cell = createPieceTableCell(cellAttributes, cellComment,
+            cell = createTableCell(cellAttributes, cellComment,
                                         cellContent, contentAttributes);
             row.append(cell);
 
@@ -1043,7 +1040,7 @@ $(document).ready(function () {
                 "href": "#",
                 "aria-label": "add-splits-piece-" + pieceNum
             };
-            cell = createPieceTableCell(cellAttributes, cellComment,
+            cell = createTableCell(cellAttributes, cellComment,
                                         cellContent, contentAttributes);
             row.append(cell);
 
@@ -1060,7 +1057,7 @@ $(document).ready(function () {
                 "aria-label": "if-skipped-piece-" + pieceNum,
                 "data-piece-num": pieceNum
             };
-            cell = createPieceTableCell(cellAttributes, cellComment,
+            cell = createTableCell(cellAttributes, cellComment,
                                         cellContent, contentAttributes);
             row.append(cell);
 
@@ -1092,12 +1089,17 @@ $(document).ready(function () {
     //the total-meter field in the header
     //(written as a listener on a class-filtered part of the document so that
     //it will apply to current *and future* instances of the class)
-    $(document).on("blur", ".ar-dist-field", updateTotalMeters);
+    $(document).on("blur", ".ar-dist-field",
+                   {"highlight": true}, updateTotalMetersHandler);
 
+    function updateTotalMetersHandler (evt) {
+        var highlight = evt.data.highlight;
+        updateTotalMeters(highlight);
+    } //end updateTotalMetersHandler()
 
     //event handler called whenever meters are entered (also called when
     //add-results modal is first populated with workout-specific fields)
-    function updateTotalMeters () {
+    function updateTotalMeters (highlight) {
 
         var total = 0;
 
@@ -1110,7 +1112,14 @@ $(document).ready(function () {
         }
 
         //update the field in the add-results header
-        $("#ar-total-meters-num").val(total);
+        $("#ar-total-meters").val(total);
+
+        //if the highlight option is chosen, highlight the change
+        if (highlight) {
+            $("#ar-total-meters").effect("highlight",
+                                             {color: "#ff0000"},
+                                             400);
+        }
     } //end updateTotalMeters()
 
 
@@ -1121,7 +1130,7 @@ $(document).ready(function () {
         $(this).hide();
         $("#" + commentsDivID).show();
         $("#" + commentsDivID).find("textarea").focus();
-    });
+    }); //end $(".ar-add-comments").click()
 
 
     //Save workout results and, if user has requested to do so, go back to
@@ -1151,7 +1160,10 @@ $(document).ready(function () {
             gResults = data;
             gResults.upToDate = true;
 
-            //TODO MAKE NEW RESULTS SHOW UP ON MAIN LOG TABLE
+            //make the new result appear in the log table, in the
+            //right spot given its date
+            var newRow = createLogTableRow(gResults.newest);
+            insertLogTableRow(newRow);
         });
 
         //if the user has asked to add more results, flip back to the
@@ -1190,30 +1202,201 @@ $(document).ready(function () {
 
 
 
+    //given a workoutResult object, create a filled-in <tr> representing
+    //which can then be added to the log table
+    function createLogTableRow(resultObj) {
+
+        //grab data from the given result object for storage in and
+        //on the row
+        var resultID = resultObj.workout_result.workout_result_id;
+        var resultDistance = resultObj.workout_result.total_meters;
+        var resultDescription = resultObj.workout_template.description;
+
+        //grab and format the date
+        var resultDate = resultObj.workout_result.date;
+        //var dateAsDate = new Date(Date.parse(resultDate));
+        //var dateString = strftime("%a, %b %-d, %Y", dateAsDate);
+        var dateString = resultObj.workout_result.date_string;
+
+        //create a new row and give the required data
+        var row = $("<tr>").data({
+            "date": resultDate,
+            "workout-id": resultID
+        });
+
+        //define some variables for convenience
+        var cell, cellAttributes, cellComment, cellContent, contentAttributes;
+
+        //date/click-for-details cell
+        cellAttributes = undefined;
+        cellComment = undefined;
+        cellContent = $("<a>").append(dateString);
+        contentAttributes = {"class": "log-table-date-link"};
+        cell = createTableCell(cellAttributes, cellComment,
+                               cellContent, contentAttributes);
+        row.append(cell);
+
+        //description cell
+        cellAttributes = {"class": "log-table-description"};
+        cellComment = undefined;
+        cellContent = resultDescription;
+        contentAttributes = undefined;
+        cell = createTableCell(cellAttributes, cellComment,
+                               cellContent, contentAttributes);
+        row.append(cell);
+
+        //distance cell
+        cellAttributes = {"class": "log-table-meters"};
+        cellComment = undefined;
+        cellContent = resultDistance + " m";
+        contentAttributes = undefined;
+        cell = createTableCell(cellAttributes, cellComment,
+                               cellContent, contentAttributes);
+        row.append(cell);
+
+        //edit cell
+        cellAttributes = undefined;
+        cellComment = undefined;
+        cellContent = $("<a>").append("Edit");
+        contentAttributes = {"class": "log-table-edit-link"};
+        cell = createTableCell(cellAttributes, cellComment,
+                               cellContent, contentAttributes);
+        row.append(cell);
+
+        //delete cell
+        cellAttributes = undefined;
+        cellComment = undefined;
+        cellContent = $("<a>").append("Delete");
+        contentAttributes = {"class": "log-table-delete-link"};
+        cell = createTableCell(cellAttributes, cellComment,
+                               cellContent, contentAttributes);
+        row.append(cell);
+
+        //now that the row's finished, return it
+        return row;
+    } //end createLogTableRow()
 
 
+    //given a filled out row of the log table, insert it into the table,
+    //preserving reverse chronological order
+    function insertLogTableRow(rowToInsert) {
 
+        //find the body of the log table and figure out how many rows
+        //it currently has
+        var tableBody = $("#main-log-table-body");
+        var numRows = tableBody.find("tr").length;
 
+        //get the date of the result we're trying to insert
+        var resultDate = Date.parse(rowToInsert.data("date"));
 
-    //event listener/handler to populate workout details modal
-    $("#workout-details-modal").on("show.bs.modal", function (evt) {
+        //loop through each row, checking its date against that of the
+        //given result; when a date less than given result's date is found,
+        //make a note of it and break out of the loop
+        var rowBelow;
+        for (var i = 1; i <= numRows; i++) {
+            //get the date of the current row
+            var ithRow = tableBody.find("tr:nth-of-type(" + i + ")");
+            var ithRowDate = Date.parse(ithRow.data("date"));
 
-        //get data-workout-id attribute of the clicked date
-        var workoutID = $(evt.relatedTarget).data("workoutId");
+            //if it's less (earlier) than the given result's date,
+            //grab this row and exit the loop
+            if (ithRowDate < resultDate) {
+                    rowBelow = ithRow;
+                    break;
+            }
+        }
 
-        //do an ajax request to get workout details based on id
-        var request_string = "/get-workout-details" + workoutID + ".json";
-        $.get(request_string, displayWorkoutDetails);
+        //if we've found a row with an earlier date, insert the new
+        //row above it
+        if (rowBelow) {
+            rowToInsert.insertBefore(rowBelow);
+        }
+        //otherwise, add the new row to the end of the table
+        else {
+            tableBody.append(rowToInsert);
+        }
+    } //end insertLogTableRow()
+
+    $("#testtest").click(function() {
 
     });
 
-    //add workout details to the modal's DOM
-    function displayWorkoutDetails (data) {
-        // TODO CODE ME!!! (displayWorkoutDetails)
 
-    }
+    /************ functions dealing with the workout details modal ************/
+
+    //When a date in the log table is clicked, populate the workout details
+    //modal with the details of the corresponding workout and show it
+    $(document).on("click", ".log-table-date-link", function() {
+
+        //get the workout id for the workout the user chose, and pull the
+        //corresponding result object from local storage
+        var workoutID = $(this).closest("tr").data("workoutId");
+        var resultObj = gResults[workoutID];
+
+        //unpack the result object
+        var workoutTemplate = resultObj.workout_template;
+        var workoutResult = resultObj.workout_result;
+        var pieces = resultObj.pieces;
+
+        //create a title for the modal (description and primary zone) and
+        //add it in the appropriate place
+        var description = resultObj.workout_template.description;
+        var primaryZone = resultObj.workout_template.primary_zone;
+        var title = description;
+        if (primaryZone) {
+            title = title + "(" + primaryZone + ")";
+        }
+        $("#wd-workout-title").append(title);
+
+        //add the date, time, and total meters to the header
+        var dateString = workoutResult.date_string;
+        var timeString = workoutResult.time_string;
+        var totalMeters = workoutResult.total_meters;
+        $("#wd-date").val(dateString);
+        $("#wd-time-of-day").val(timeString);
+        $("#wd-total-meters").val(totalMeters);
 
 
+
+
+        //now that it's all ready, show the modal
+        $('#workout-details-modal').modal('show');
+    });
+
+
+    //Given a verbose objectified version of a workout result, return an
+    //array containing its verbose (including templlates and splits) piece
+    //results, filtered by the given phase and sorted by ordinal.
+    function pieceResultsByPhase (resultObj, phase) {
+
+        var phaseResults = [];
+
+        //unpack the layers of the workout results object and go through
+        //the pieces one by one, adding those with the correct phase
+        //to the phaseResults array
+        var piecesObject = resultObj.pieces;
+        var numPieces = Object.keys(piecesObject).length;
+        for (var i = 0; i < numPieces; i++) {
+            var template = piecesObject[i+1].template;
+            if (template.phase === phase)
+            {
+                phaseResults.push(piecesObject[i+1]);
+            }
+        }
+        //note that since piecesObject is keyed by ordinal, and pieces are
+        //added to phaseResults [an array, so it preserves order] in
+        //increasing order by key, no additional sort is needed
+
+        return phaseResults;
+    } //end pieceTemplatesByPhase()
+
+
+
+    // onfocus="this.blur()" readonly
+
+
+    //TODO trigger all modals via javascript to avoid weird post-modal focusing
+    //behavior; make inserted row flash when its inserted
 
 
 });

@@ -164,12 +164,15 @@ class WorkoutTemplate(db.Model, ToDictMixin):
     warmup_format = db.Column(db.Unicode(128)) #same
     warmup_stroke_rates = db.Column(db.Unicode(128)) #same
     warmup_notes = db.Column(db.UnicodeText)
+    has_warmup_pieces = db.Column(db.Boolean)
     main_format = db.Column(db.Unicode(128)) #same
     main_stroke_rates = db.Column(db.Unicode(128)) #same
     main_notes = db.Column(db.UnicodeText)
+    has_main_pieces = db.Column(db.Boolean)
     cooldown_format = db.Column(db.Unicode(128)) #same
     cooldown_stroke_rates = db.Column(db.Unicode(128)) #same
     cooldown_notes = db.Column(db.UnicodeText)
+    has_cooldown_pieces = db.Column(db.Boolean)
     date_added = db.Column(db.DateTime)
 
     #many (workout results) to one (workout template)
@@ -313,7 +316,9 @@ class WorkoutResult(db.Model, ToDictMixin):
                                     nullable=False)
     total_meters = db.Column(db.Integer, default=0, nullable=False)
     date = db.Column(db.Date, nullable=False)
+    date_string = db.Column(db.Unicode(32))
     time_of_day = db.Column(db.Time)
+    time_string = db.Column(db.Unicode(32))
     avg_hr = db.Column(db.Integer)
     calories = db.Column(db.Integer)
     goals = db.Column(db.UnicodeText)
@@ -375,7 +380,7 @@ class WorkoutResult(db.Model, ToDictMixin):
                     pieces: {
                         1: {
                             template: {dict}
-                            results: {dict}
+                            result: {dict}
                             splits: {
                                 1: {dict}
                                 2: {dict}
@@ -405,7 +410,7 @@ class WorkoutResult(db.Model, ToDictMixin):
             #dictionary versions of this piece's template and results to it
             p_dict = {}
             p_dict["template"] = p.piece_template.to_dict()
-            p_dict["results"] = p.to_dict()
+            p_dict["result"] = p.to_dict()
 
             #get split results, if any, for this piece
             split_results = p.split_results
@@ -432,7 +437,7 @@ class WorkoutResult(db.Model, ToDictMixin):
         #the overall dictionary, then return it
         dict_to_return = {}
         dict_to_return["workout_template"] = w_template_dict
-        dict_to_return["workout_results"] = w_result_dict
+        dict_to_return["workout_result"] = w_result_dict
         dict_to_return["pieces"] = pieces_dict
         return dict_to_return
 

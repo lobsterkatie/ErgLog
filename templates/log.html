@@ -3,7 +3,6 @@
 
 {% block page_specific_script_tag %}
     <script src="/static/js/log-page.js"></script>
-    <script src="/static/js/strftime.js"></script>
 {% endblock %}
 
 
@@ -1204,10 +1203,15 @@
                         <div class="row">
                             <input id="wd-date" class="wd-field wd-header-info"type="text" name="date" form="wd-edit-results-form">
                             <input id="wd-time-of-day" class="wd-field wd-header-info" type="text" name="time-of-day" form="wd-edit-results-form">
-                            <span class="wd-header-info">
-                                Total meters:
-                            </span>
-                            <input id="wd-total-meters" class="wd-field wd-header-info" type="text" name="total-meters" form="wd-edit-results-form">
+                            <div id="wd-total-distance">
+                                <span class="wd-header-info">
+                                    Total meters:
+                                </span>
+                                <input id="wd-total-meters" class="wd-field wd-header-info" type="text" name="total-meters" form="wd-edit-results-form">
+                                <span id="wd-total-meters-util" class="wd-header-info" style="display:none">
+                                    <!-- here to help right-align the distance -->
+                                </span>
+                            </div>
                         </div>
                     </div> <!-- end of modal header -->
 
@@ -1219,7 +1223,7 @@
                             <!-- hidden info -->
                             <input id="wd-workout-results-id" type="hidden" name="workout-results-id">
 
-                            <!-- warmup results -->
+                            <!-- warmup section -->
                             <div id="wd-warmup-results" class="wd-section">
 
                                 <!-- warmup section headings -->
@@ -1237,7 +1241,7 @@
                                 <!-- warmup piece results -->
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table id="wd-warmup-table" class="table table-condensed wd-piece-table">
+                                        <table id="wd-warmup-table" class="table table-condensed wd-piece-table" data-section-div-id="wd-warmup-results">
                                             <colgroup>
                                                 <col class="ar-ordinal-col">
                                                 <col class="ar-label-col">
@@ -1255,7 +1259,7 @@
                                                         Piece
                                                     </th>
                                                     <th>
-                                                        Time/Meters
+                                                        Time or Meters
                                                     </th>
                                                     <th>
                                                         Avg/500m
@@ -1272,7 +1276,7 @@
                                                     <th>
                                                         Splits
                                                     </th>
-                                                    <th>
+                                                    <th class="wd-skipped">
                                                         Skipped
                                                     </th>
                                                 </tr>
@@ -1290,24 +1294,24 @@
                                         <a id="wd-add-warmup-comments" class="ar-add-comments" href="#" data-comments-div-id="wd-warmup-comments-div" hidden>
                                             Add notes
                                         </a>
-                                        <div id="wd-warmup-comments-div">
+                                        <div id="wd-warmup-comments-div"  hidden>
                                             <span class="wd-subsection-heading">
                                                 Notes:
                                             </span>
-                                            <textarea id="wd-warmup-comments" class="form-control fixed-textarea" rows="4" cols="100" name="warmup-comments" placeholder="(add comments here)"></textarea>
+                                            <textarea id="wd-warmup-comments" class="form-control fixed-textarea  wd-field" rows="4" cols="100" name="warmup-comments" placeholder="(add comments here)"></textarea>
                                         </div>
                                     </div>
                                 </div> <!-- end warmup comments -->
-                            </div> <!-- end warmup results -->
+                            </div> <!-- end warmup section -->
 
-                            <!-- main results -->
+                            <!-- main section -->
                             <div id="wd-main-results" class="wd-section">
 
                                 <!-- main section headings -->
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="wd-section-heading">
-                                            Main
+                                            Main Workout
                                         </div>
                                         <div id="wd-main-phase-info" class="wd-phase-info">
                                             <!-- format, stroke rates, notes -->
@@ -1318,7 +1322,7 @@
                                 <!-- main piece results -->
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table id="wd-main-table" class="table table-condensed wd-piece-table">
+                                        <table id="wd-main-table" class="table table-condensed wd-piece-table" data-section-div-id="wd-main-results">
                                             <colgroup>
                                                 <col class="ar-ordinal-col">
                                                 <col class="ar-label-col">
@@ -1336,7 +1340,7 @@
                                                         Piece
                                                     </th>
                                                     <th>
-                                                        Time/Meters
+                                                        Time or Meters
                                                     </th>
                                                     <th>
                                                         Avg/500m
@@ -1371,17 +1375,17 @@
                                         <a id="wd-add-main-comments" class="ar-add-comments" href="#" data-comments-div-id="wd-main-comments-div" hidden>
                                             Add notes
                                         </a>
-                                        <div id="wd-main-comments-div">
+                                        <div id="wd-main-comments-div" hidden>
                                             <span class="wd-subsection-heading">
                                                 Notes:
                                             </span>
-                                            <textarea id="wd-main-comments" class="form-control fixed-textarea" rows="4" cols="100" name="main-comments" placeholder="(add comments here)"></textarea>
+                                            <textarea id="wd-main-comments" class="form-control fixed-textarea wd-field" rows="4" cols="100" name="main-comments" placeholder="(add comments here)"></textarea>
                                         </div>
                                     </div>
                                 </div> <!-- end main comments -->
-                            </div> <!-- end main results -->
+                            </div> <!-- end main section -->
 
-                            <!-- cooldown results -->
+                            <!-- cooldown section -->
                             <div id="wd-cooldown-results" class="wd-section">
 
                                 <!-- cooldown section headings -->
@@ -1399,7 +1403,7 @@
                                 <!-- cooldown piece results -->
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table id="wd-cooldown-table" class="table table-condensed wd-piece-table">
+                                        <table id="wd-cooldown-table" class="table table-condensed wd-piece-table" data-section-div-id="wd-cooldown-results">
                                             <colgroup>
                                                 <col class="ar-ordinal-col">
                                                 <col class="ar-label-col">
@@ -1417,7 +1421,7 @@
                                                         Piece
                                                     </th>
                                                     <th>
-                                                        Time/Meters
+                                                        Time or Meters
                                                     </th>
                                                     <th>
                                                         Avg/500m
@@ -1452,15 +1456,15 @@
                                         <a id="wd-add-cooldown-comments" class="ar-add-comments" href="#" data-comments-div-id="wd-cooldown-comments-div" hidden>
                                             Add notes
                                         </a>
-                                        <div id="wd-cooldown-comments-div">
+                                        <div id="wd-cooldown-comments-div" hidden>
                                             <span class="wd-subsection-heading">
                                                 Notes:
                                             </span>
-                                            <textarea id="wd-cooldown-comments" class="form-control fixed-textarea" rows="4" cols="100" name="cooldown-comments" placeholder="(add comments here)"></textarea>
+                                            <textarea id="wd-cooldown-comments" class="form-control fixed-textarea wd-field" rows="4" cols="100" name="cooldown-comments" placeholder="(add comments here)"></textarea>
                                         </div>
                                     </div>
                                 </div> <!-- end cooldown comments -->
-                            </div> <!-- end cooldown results -->
+                            </div> <!-- end cooldown section -->
 
                             <!-- notes -->
                             <div id="wd-notes" class="wd-section">

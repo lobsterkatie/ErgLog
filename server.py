@@ -473,10 +473,13 @@ def save_workout_results():
         new_p_result.ordinal = request.form.get("ordinal-piece-" + i, type=int)
         new_p_result.total_time_seconds = (
             hms_string_to_seconds(request.form.get("time-piece-" + i)))
+        new_p_result.total_time_string = request.form.get("time-piece-" + i)
         new_p_result.total_meters = request.form.get("distance-piece-" + i,
                                                      type=int)
         new_p_result.avg_split_seconds = (
             hms_string_to_seconds(request.form.get("avg-split-piece-" + i)))
+        new_p_result.avg_split_string = (
+            request.form.get("avg-split-piece-" + i))
         new_p_result.avg_sr = request.form.get("avg-sr-piece-" + i, type=int)
         new_p_result.avg_watts = request.form.get("avg-watts-piece-" + i,
                                                   type=int)

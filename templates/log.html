@@ -560,66 +560,59 @@
 
                         <!-- workout-chooser form -->
                         <div id="ar-choose-workout">
-                            <!-- <div class="row">
-                                <div class="col-md-12"> -->
-                                    <!-- <div class="ar-wd-section-heading">
-                                        Choose a workout
-                                    </div> -->
-                                    <!-- <div class="ar-wd-phase-info">
-                                        Please choose a workout to which to add results.
-                                    </div> -->
-                                    <!-- <h3>Choose a workout</h3>
-                                    <h4>
-                                        <small class="text-muted">
-                                            Please choose a workout to which to add results.
-                                        </small>
-                                    </h4> -->
-                                <!-- </div>
-                            </div> -->
-                            <form class="form-horizontal" role="form">
-                                <div class="form-group">
-                                    <div class="col-sm-2 text-right">
-                                        <label for="ar-workout-choice-no-results" class="control-label">
-                                            Workouts without results
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-10">
-                                        <select id="ar-workout-choice-no-results" class="form-control ar-workout-choice" name="workout-choice">
-                                            <option value="choose-a-workout">Choose a workout...</option>
-                                            <optgroup id="ar-workout-choice-no-results-recent" label="Recently-added">
-                                                <!-- dynamically-added workout template descriptions -->
-                                            </optgroup>
-                                            <optgroup id="ar-workout-choice-no-results-older" label="Older">
-                                                <!-- dynamically-added workout template descriptions -->
-                                            </optgroup>
-                                        </select>
-                                        <input class="btn btn-default ar-add-results-button" type="button" value="Add results">
-                                    </div>
-                                    <div class="col-sm-offset-2 col-sm-9">
-                                        <p class="help-block text-muted">
+                            <div class="row ar-chooser-row">
+                                <div class="col-md-12">
+                                    <div class="ar-wd-phase-info">
+                                        <b>
                                             Workouts to which you haven't yet added results.
-                                        </p>
+                                        </b>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <div class="col-sm-2 text-right">
-                                        <label for="ar-workout-choice-with-results" class="control-label">
-                                            Workouts with results
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-10">
-                                        <select id="ar-workout-choice-with-results" class="form-control ar-workout-choice" name="workout-choice">
-                                            <option value="choose-a-workout">Choose a workout...</option>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <select id="ar-workout-choice-no-results" class="form-control ar-workout-choice">
+                                        <option value="choose-a-workout">
+                                            Choose a workout. . .
+                                        </option>
+                                        <optgroup id="ar-workout-choice-no-results-recent" label="Recently-added">
                                             <!-- dynamically-added workout template descriptions -->
-                                        </select>
-                                        <input class="btn btn-default ar-add-results-button" type="button" value="Add results">
-                                    </div>
-                                    <div class="col-sm-offset-2 col-sm-9">
-                                        <p class="help-block text-muted">
+                                        </optgroup>
+                                        <optgroup id="ar-workout-choice-no-results-older" label="Older">
+                                            <!-- dynamically-added workout template descriptions -->
+                                        </optgroup>
+                                    </select>
+                                    <button class="btn btn-default ar-add-results-button ar-wd-footer-button" type="button">
+                                        Add results
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row ar-chooser-row">
+                                <div class="col-md-12">
+                                    <div class="ar-wd-phase-info">
+                                        <b>
                                             Workouts you've completed before. Note that this option creates a <i>new</i> instance of that workout. To edit previously entered results, use the link next to the workout in your log.
-                                        </p>
+                                        </b>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <select id="ar-workout-choice-with-results" class="form-control ar-workout-choice">
+                                        <option value="choose-a-workout">
+                                            Choose a workout. . .
+                                        </option>
+                                        <!-- dynamically-added workout template descriptions -->
+                                    </select>
+                                    <button class="btn btn-default ar-add-results-button ar-wd-footer-button" type="button">
+                                        Add results
+                                    </button>
+                                </div>
+                            </div>
+
+                            <form class="form-horizontal" role="form">
+
+
                             </form>
                         </div> <!-- end workout-chooser form -->
 
@@ -923,8 +916,8 @@
                     <!-- modal footer -->
                     <div class="modal-footer">
                         <div id="ar-save-results-buttons" hidden>
-                            <input type="button" id="ar-save-and-add-another" class="btn btn-default ar-save-button log-button-text ar-wd-footer-button" value="Save and add another" data-add-another="true" style="display:none">
-                            <input type="button" id="ar-save-results" class="btn btn-primary ar-save-button log-button-text ar-wd-footer-button" value="Save results" data-add-another="false">
+                            <input type="button" id="ar-save-and-add-another" class="btn btn-default ar-save-button ar-wd-footer-button" value="Save and add another" data-add-another="true" style="display:none">
+                            <input type="button" id="ar-save-results" class="btn btn-primary ar-save-button ar-wd-footer-button" value="Save results" data-add-another="false">
                         </div>
                     </div> <!-- end of modal footer -->
 

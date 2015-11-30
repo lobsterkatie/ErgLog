@@ -24,12 +24,13 @@ $(document).ready(function () {
     //reset all forms
     resetForms();
 
-    //capture the initial states of the create-a-workout and add-results modals
+    //capture the initial states of the create-a-workout, add-results, and
+    //workout-details modals
     var gCAWModalInitial = $("#create-a-workout-modal").html();
     var gARModalInitial = $("#add-results-modal").html();
     var gARModalHeaderInitial = $("#ar-modal-header").html();
     var gARModalChooserInitial = $("#ar-choose-workout").html();
-    var gARModalFormInitial = $("#add-results-form").html();
+    var gARModalFormInitial = $("#ar-add-results-form").html();
     var gWDModalInitial = $("#workout-details-modal").html();
 
     //set defaults for datepickers
@@ -467,7 +468,7 @@ $(document).ready(function () {
     //initial state
     $("#add-results-modal").on("hidden.bs.modal", function (evt) {
         $("#add-results-modal").html(gARModalInitial);
-        $("#add-results-form")[0].reset();
+        $("#ar-add-results-form")[0].reset();
     });
 
 
@@ -687,7 +688,7 @@ $(document).ready(function () {
         if (primaryZone) {
             $("#ar-workout-description").append(" (" + primaryZone + ")");
         }
-        $("#ar-header-while-adding-results").show();
+        $("#ar-add-results-header").show();
 
         //add the given workout template ID and the number of pieces in the
         //workout to their respective spots on the form
@@ -879,7 +880,7 @@ $(document).ready(function () {
             cellAttributes = undefined;
             cellComment = "<!-- time -->";
             contentAttributes = {
-                "class": "ar-dist-time",
+                "class": "ar-wd-dist-time",
                 "type": "text",
                 "name": "time-piece-" + pieceNum,
                 "value": template.time_string,
@@ -895,7 +896,7 @@ $(document).ready(function () {
             cellAttributes = undefined;
             cellComment = "<!-- distance -->";
             contentAttributes = {
-                "class": "ar-dist-time ar-dist-field",
+                "class": "ar-wd-dist-time ar-dist-field",
                 "type": "text",
                 "name": "distance-piece-" + pieceNum,
                 "value": template.distance,
@@ -930,7 +931,7 @@ $(document).ready(function () {
             cellComment = "<!-- ordinal in phase -->";
             cellContent = $("<input>");
             contentAttributes = {
-                "class": "ar-ordinal",
+                "class": "ar-wd-ordinal",
                 "type": "text",
                 "name": "ordinal-in-phase-piece-" + pieceNum,
                 "value": template.ordinal_in_phase,
@@ -948,7 +949,7 @@ $(document).ready(function () {
             cellComment = "<!-- label -->";
             cellContent = $("<input>");
             contentAttributes = {
-                "class": "ar-label",
+                "class": "ar-wd-label",
                 "type": "text",
                 "value": template.label,
                 "aria-label": "label-piece-" + pieceNum,
@@ -1151,7 +1152,7 @@ $(document).ready(function () {
         gTemplates.upToDate = false;
 
         //get data from the form
-        var formData = $("#add-results-form").serialize();
+        var formData = $("#ar-add-results-form").serialize();
 
         //save the workout to the database, update gResults, and add the
         //workout to the table on the log page
@@ -1189,7 +1190,7 @@ $(document).ready(function () {
             //close and reset the modal
             $('#add-results-modal').modal('hide');
             $("#add-results-modal").html(gARModalInitial);
-            $("#add-results-form")[0].reset();
+            $("#ar-add-results-form")[0].reset();
 
             //update gTemplates
             $.get("/get-workout-templates.json", function(data) {
@@ -1326,7 +1327,7 @@ $(document).ready(function () {
     //initial state
     $("#workout-details-modal").on("hidden.bs.modal", function (evt) {
         $("#workout-details-modal").html(gWDModalInitial);
-        $("#edit-results-form")[0].reset();
+        $("#wd-edit-results-form")[0].reset();
     });
 
 
@@ -1399,7 +1400,7 @@ $(document).ready(function () {
             "onfocus": "this.blur()",
             "readonly": ""
         });
-        $(".wd-skipped").hide();
+        //$(".wd-skipped").hide();
 
         //now that it's all ready, show the modal
         $("#workout-details-modal").modal("show");
@@ -1537,7 +1538,7 @@ $(document).ready(function () {
             cellComment = "<!-- ordinal in phase -->";
             cellContent = $("<input>");
             contentAttributes = {
-                "class": "ar-ordinal",
+                "class": "ar-wd-ordinal",
                 "type": "text",
                 "name": "ordinal-in-phase-piece-" + pieceNum,
                 "value": template.ordinal_in_phase,
@@ -1555,7 +1556,7 @@ $(document).ready(function () {
             cellComment = "<!-- label -->";
             cellContent = $("<input>");
             contentAttributes = {
-                "class": "ar-label",
+                "class": "ar-wd-label",
                 "type": "text",
                 "value": template.label,
                 "aria-label": "label-piece-" + pieceNum,
@@ -1577,7 +1578,7 @@ $(document).ready(function () {
                 cellAttributes = undefined;
                 cellComment = "<!-- distance -->";
                 contentAttributes = {
-                    "class": "ar-dist-time ar-dist-field wd-field",
+                    "class": "ar-wd-dist-time ar-dist-field wd-field",
                     "type": "text",
                     "name": "distance-piece-" + pieceNum,
                     "value": result.total_meters  || "-",
@@ -1596,7 +1597,7 @@ $(document).ready(function () {
                 cellAttributes = undefined;
                 cellComment = "<!-- time -->";
                 contentAttributes = {
-                    "class": "ar-dist-time wd-field",
+                    "class": "ar-wd-dist-time wd-field",
                     "type": "text",
                     "name": "time-piece-" + pieceNum,
                     "value": result.total_time_string  || "-",
@@ -1710,7 +1711,7 @@ $(document).ready(function () {
             //add the now-complete row to the end of the table body
             tableBody.append(row);
         }
-    } //end populateARPieceTable()
+    } //end populateWDPieceTable()
 
 
     //Populate the notes field for the given phase on the workout details

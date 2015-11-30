@@ -46,8 +46,8 @@
             <img id="log-table-cols-underline" src="/static/img/divider1.png">
         </div>
     </div>
+    <!-- RECENT WORKOUTS TABLE -->
     <div class="row">
-        <!-- RECENT WORKOUTS TABLE -->
         <div class="col-xs-12 col-md-10 col-md-offset-1">
             <table id="recent-workouts-table" class="table">
                 <thead>
@@ -516,44 +516,66 @@
             </div>
         </div> <!-- END OF CREATE A WORKOUT MODAL -->
 
-        <!-- ADD RESULTS MODAL -->
-        <div class="modal fade" id="add-results-modal" tabindex="-1" role="dialog" data-keyboard="false">
+        <!-- ADD RESULTS MODAL (NEW) -->
+        <div id="add-results-modal" class="modal fade" tabindex="-1" role="dialog" data-keyboard="false">
             <div class="modal-dialog modal-lg">
-                <div class="modal-content">
+                <div class="modal-content paper-bg modal-margins">
 
                     <!-- modal header -->
-                    <div id="ar-modal-header" class="modal-header">
+                    <div class="modal-header ar-wd-modal-header">
                         <button type="button" class="close" data-dismiss="modal">
                             &times;
                         </button>
-                        <h1 class="modal-title">
-                            Input workout results
-                        </h1>
-                        <div id="ar-header-while-adding-results" hidden>
-                            <h3 id="ar-workout-description">
-                            </h3>
-                            <h4>
-                                Total meters:
-                                <input id="ar-total-meters" name="total-meters" value="0" form="add-results-form" onfocus="this.blur()" readonly>
-                            </h4>
+                        <div id="ar-workout-chooser-header">
+                            <span class="modal-title">
+                                Input workout results
+                            </span>
+                            <div class="row">
+                                <span id="ar-chooser-header-directions" class="ar-wd-header-info">
+                                    Please choose a workout to which to add results.
+                                </span>
+                            </div>
+                        </div>
+                        <div id="ar-add-results-header" hidden>
+                            <span id="ar-workout-title" class="modal-title">
+                                <!-- dynamically added workout description/zone -->
+                            </span>
+                            <div class="row">
+                                <input id="ar-date" class="ar-field ar-wd-header-info ar-wd-date" type="text" name="date" form="ar-add-results-form" placeholder="Date (ex: Mon, Jan 1, 2015)" data-provide="datepicker">
+                                <input id="ar-time-of-day" class="ar-field ar-wd-header-info ar-wd-time-of-day" type="text" name="time" form="ar-add-results-form" placeholder="Time (ex: 5:15 am)">
+                                <div class="ar-wd-total-distance">
+                                    <span class="ar-wd-header-info">
+                                        Total meters:
+                                    </span>
+                                    <input id="ar-total-meters-input" class="ar-field ar-wd-header-info" type="hidden" name="total-meters" value="0" form="ar-add-results-form">
+                                    <span id="ar-total-meters" class="ar-wd-header-info">
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div> <!-- end of modal header -->
 
                     <!-- modal body -->
-                    <div class="modal-body">
+                    <div class="modal-body ar-wd-modal-body">
 
-                        <!-- workout-chooser pane -->
+                        <!-- workout-chooser form -->
                         <div id="ar-choose-workout">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <h3>Choose a workout</h3>
+                            <!-- <div class="row">
+                                <div class="col-md-12"> -->
+                                    <!-- <div class="ar-wd-section-heading">
+                                        Choose a workout
+                                    </div> -->
+                                    <!-- <div class="ar-wd-phase-info">
+                                        Please choose a workout to which to add results.
+                                    </div> -->
+                                    <!-- <h3>Choose a workout</h3>
                                     <h4>
                                         <small class="text-muted">
                                             Please choose a workout to which to add results.
                                         </small>
-                                    </h4>
-                                </div>
-                            </div>
+                                    </h4> -->
+                                <!-- </div>
+                            </div> -->
                             <form class="form-horizontal" role="form">
                                 <div class="form-group">
                                     <div class="col-sm-2 text-right">
@@ -599,594 +621,310 @@
                                     </div>
                                 </div>
                             </form>
-                        </div> <!-- end workout-chooser pane -->
+                        </div> <!-- end workout-chooser form -->
 
-                        <form id="add-results-form" class="form-horizontal" role="form">
-                            <!-- hidden info -->
-                            <input id="ar-workout-template-id" type="hidden" name="workout-template-id">
-                            <input id="ar-num-pieces" type="hidden" name="num-pieces">
+                        <!-- add results form -->
+                        <div id="ar-add-results" hidden>
+                            <form id="ar-add-results-form" class="form-horizontal" role="form">
+                                <!-- hidden info -->
+                                <input id="ar-workout-template-id" type="hidden" name="workout-template-id">
+                                <input id="ar-num-pieces" type="hidden" name="num-pieces">
 
-                            <!-- overall results pane -->
-                            <div id="ar-overall-results" hidden>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <h3>Overall results</h3>
-                                        <h4>
-                                            <small class="text-muted">
-                                                Enter details about the overall workout here. Required fields are marked with a *.
-                                            </small>
-                                        </h4>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        Date*
-                                        <input id="ar-date" class="text-center" type="text" name="date" data-provide="datepicker">
-                                    </div>
-                                    <div class="col-sm-3">
-                                        Time
-                                        <input id="ar-time" class="text-center" type="text" name="time" placeholder="H:MM AM/PM">
-                                    </div>
-                                    <div class="col-sm-3">
-                                        Average HR
-                                        <input id="ar-overall-HR" class="text-center" type="text" name="overall-avg-hr">
-                                    </div>
-                                    <div class="col-sm-3">
-                                        Calories Burned
-                                        <input id="ar-calories" class="text-center" type="text" name="calories">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        What were your goals for this workout?
-                                        <textarea id="ar-workout-goals" class="form-control fixed-textarea" rows="4" cols="100" name="workout-goals" placeholder="(add goals here)"></textarea>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        How did the workout go?
-                                        <textarea id="ar-workout-comments" class="form-control fixed-textarea" rows="4" cols="100" name="workout-comments" placeholder="(add comments here)"></textarea>
-                                    </div>
-                                </div>
-                                <!-- pane navigation buttons -->
-                                <div class="form-group">
-                                    <div class="col-sm-10 col-sm-offset-2 text-right">
-                                        <!-- <button type="button" id="ar-overall-previous-button" class="btn btn-default">
-                                            Previous
-                                        </button> -->
-                                        <button type="button" id="ar-overall-next-button" class="btn btn-default">
-                                            Next
-                                        </button>
-                                    </div>
-                                </div> <!-- end pane navigation buttons -->
-                            </div> <!-- end overall results pane -->
+                                <!-- warmup section -->
+                                <div id="ar-warmup-results" class="ar-wd-section">
 
-                            <!-- warmup results pane -->
-                            <div id="ar-warmup-results" hidden>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <span class="ar-phase-title h3">
-                                            Warmup
-                                        </span>
-                                    </div>
-                                </div>
-                                <!-- warmup info (format, SR, notes) -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <table class="table table-condensed ar-fsrn-table">
-                                            <tr id="ar-warmup-format-row" hidden>
-                                                <th>
-                                                    Format
-                                                </th>
-                                                <td id="ar-warmup-format">
-                                                    <!-- dynamically added content -->
-                                                </td>
-                                            </tr>
-                                            <tr id="ar-warmup-sr-row" hidden>
-                                                <th>
-                                                    Stroke Rates
-                                                </th>
-                                                <td id="ar-warmup-sr">
-                                                    <!-- dynamically added content -->
-                                                </td>
-                                            </tr>
-                                            <tr id="ar-warmup-notes-row" hidden>
-                                                <th>
-                                                    Notes
-                                                </th>
-                                                <td id="ar-warmup-notes">
-                                                    <!-- dynamically added content -->
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </div> <!-- end warmup info -->
+                                    <!-- warmup section headings -->
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="ar-wd-section-heading">
+                                                Warmup
+                                            </div>
+                                            <div id="ar-warmup-phase-info" class="ar-wd-phase-info">
+                                                <!-- format, stroke rates, notes -->
+                                            </div>
+                                        </div>
+                                    </div> <!-- end warmup section headings -->
 
-                                <!-- time pieces table -->
-                                <div id="ar-warmup-time-pieces" class="row">
-                                    <div class="col-md-12">
-                                        <span class="ar-table-title h4">
-                                            Time-based Pieces:
-                                        </span>
-                                        <table id="ar-warmup-time-table" class="table table-condensed ar-piece-table" data-piece-type="time" data-div-id="ar-warmup-time-pieces">
-                                            <colgroup>
-                                                <col class="ar-ordinal-col">
-                                                <col class="ar-label-col">
-                                                <col class="ar-dist-time-col">
-                                                <col class="ar-split-col">
-                                                <col class="ar-sr-col">
-                                                <col class="ar-watts-col">
-                                                <col class="ar-hr-col">
-                                                <col class="ar-splits-col">
-                                                <col class="ar-skipped-col">
-                                            </colgroup>
-                                            <thead>
-                                                <tr>
-                                                    <th colspan="2">
-                                                        Piece
-                                                    </th>
-                                                    <th>
-                                                        Distance
-                                                    </th>
-                                                    <th>
-                                                        Avg/500m
-                                                    </th>
-                                                    <th>
-                                                        Avg SR
-                                                    </th>
-                                                    <th>
-                                                        Avg Watts
-                                                    </th>
-                                                    <th>
-                                                        Avg HR
-                                                    </th>
-                                                    <th>
-                                                        Splits
-                                                    </th>
-                                                    <th>
-                                                        Skipped
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                    <!-- warmup piece results -->
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <table id="ar-warmup-table" class="table table-condensed ar-wd-piece-table ar-piece-table" data-section-div-id="ar-warmup-results">
+                                                <colgroup>
+                                                    <col class="ar-wd-ordinal-col">
+                                                    <col class="ar-wd-label-col">
+                                                    <col class="ar-wd-dist-time-col">
+                                                    <col class="ar-split-col">
+                                                    <col class="ar-sr-col">
+                                                    <col class="ar-watts-col">
+                                                    <col class="ar-hr-col">
+                                                    <col class="ar-splits-col">
+                                                    <col class="ar-skipped-col">
+                                                </colgroup>
+                                                <thead>
+                                                    <tr>
+                                                        <th class="ar-wd-blank-cell" colspan="2">
 
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div> <!-- end time pieces table -->
+                                                        </th>
+                                                        <th>
+                                                            Time/<br>
+                                                            Dist
+                                                        </th>
+                                                        <th>
+                                                            Avg/<br>500m
+                                                        </th>
+                                                        <th>
+                                                            Avg SPM
+                                                        </th>
+                                                        <th>
+                                                            Avg Watts
+                                                        </th>
+                                                        <th>
+                                                            Avg HR
+                                                        </th>
+                                                        <th>
+                                                            Splits
+                                                        </th>
+                                                        <th class="wd-skipped">
+                                                            Skipped
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- dynamically added rows -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div> <!-- end warmup piece results -->
 
-                                <!-- distance pieces table -->
-                                <div id="ar-warmup-distance-pieces" class="row">
-                                    <div class="col-md-12">
-                                        <span class="ar-table-title h4">
-                                            Distance-based Pieces:
-                                        </span>
-                                        <table id="ar-warmup-distance-table" class="table table-condensed ar-piece-table" data-piece-type="distance" data-div-id="ar-warmup-distance-pieces">
-                                            <colgroup>
-                                                <col class="ar-ordinal-col">
-                                                <col class="ar-label-col">
-                                                <col class="ar-dist-time-col">
-                                                <col class="ar-split-col">
-                                                <col class="ar-sr-col">
-                                                <col class="ar-watts-col">
-                                                <col class="ar-hr-col">
-                                                <col class="ar-splits-col">
-                                                <col class="ar-skipped-col">
-                                            </colgroup>
-                                            <thead>
-                                                <tr>
-                                                    <th colspan="2">
-                                                        Piece
-                                                    </th>
-                                                    <th>
-                                                        Time
-                                                    </th>
-                                                    <th>
-                                                        Avg/500m
-                                                    </th>
-                                                    <th>
-                                                        Avg SR
-                                                    </th>
-                                                    <th>
-                                                        Avg Watts
-                                                    </th>
-                                                    <th>
-                                                        Avg HR
-                                                    </th>
-                                                    <th>
-                                                        Splits
-                                                    </th>
-                                                    <th>
-                                                        Skipped
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                    <!-- warmup comments -->
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <a id="ar-add-warmup-comments" class="ar-add-comments" href="#" data-comments-div-id="ar-warmup-comments-div">
+                                                Add notes
+                                            </a>
+                                            <div id="ar-warmup-comments-div"  hidden>
+                                                <span class="ar-wd-subsection-heading">
+                                                    Notes:
+                                                </span>
+                                                <textarea id="ar-warmup-comments-input" class="form-control fixed-textarea ar-field" rows="4" cols="100" name="warmup-comments" placeholder="(add comments here)"></textarea>
+                                            </div>
+                                        </div>
+                                    </div> <!-- end warmup comments -->
+                                </div> <!-- end warmup section -->
 
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div> <!-- end distance pieces table -->
+                                <!-- main section -->
+                                <div id="ar-main-results" class="ar-wd-section">
 
-                                <!-- comments div -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <a id="ar-add-warmup-comments" class="ar-add-comments" href="#" data-comments-div-id="ar-warmup-comments-div">
-                                            Add notes
-                                        </a>
-                                        <div id="ar-warmup-comments-div" hidden>
-                                            Notes:
-                                            <textarea id="ar-warmup-comments" class="form-control fixed-textarea" rows="4" cols="100" name="warmup-comments" placeholder="(add comments here)"></textarea>
+                                    <!-- main section headings -->
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="ar-wd-section-heading">
+                                                Main Workout
+                                            </div>
+                                            <div id="ar-main-phase-info" class="ar-wd-phase-info">
+                                                <!-- format, stroke rates, notes -->
+                                            </div>
+                                        </div>
+                                    </div> <!-- end main section headings -->
+
+                                    <!-- main piece results -->
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <table id="ar-main-table" class="table table-condensed ar-wd-piece-table ar-piece-table" data-section-div-id="ar-main-results">
+                                                <colgroup>
+                                                    <col class="ar-wd-ordinal-col">
+                                                    <col class="ar-wd-label-col">
+                                                    <col class="ar-wd-dist-time-col">
+                                                    <col class="ar-split-col">
+                                                    <col class="ar-sr-col">
+                                                    <col class="ar-watts-col">
+                                                    <col class="ar-hr-col">
+                                                    <col class="ar-splits-col">
+                                                    <col class="ar-skipped-col">
+                                                </colgroup>
+                                                <thead>
+                                                    <tr>
+                                                        <th class="ar-wd-blank-cell" colspan="2">
+
+                                                        </th>
+                                                        <th>
+                                                            Time/<br>
+                                                            Dist
+                                                        </th>
+                                                        <th>
+                                                            Avg/<br>500m
+                                                        </th>
+                                                        <th>
+                                                            Avg SPM
+                                                        </th>
+                                                        <th>
+                                                            Avg Watts
+                                                        </th>
+                                                        <th>
+                                                            Avg HR
+                                                        </th>
+                                                        <th>
+                                                            Splits
+                                                        </th>
+                                                        <th class="wd-skipped">
+                                                            Skipped
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- dynamically added rows -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div> <!-- end main piece results -->
+
+                                    <!-- main comments -->
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <a id="ar-add-main-comments" class="ar-add-comments" href="#" data-comments-div-id="ar-main-comments-div">
+                                                Add notes
+                                            </a>
+                                            <div id="ar-main-comments-div" hidden>
+                                                <span class="ar-wd-subsection-heading">
+                                                    Notes:
+                                                </span>
+                                                <textarea id="ar-main-comments-input" class="form-control fixed-textarea ar-field" rows="4" cols="100" name="main-comments" placeholder="(add comments here)"></textarea>
+                                            </div>
+                                        </div>
+                                    </div> <!-- end main comments -->
+                                </div> <!-- end main section -->
+
+                                <!-- cooldown section -->
+                                <div id="ar-cooldown-results" class="ar-wd-section">
+
+                                    <!-- cooldown section headings -->
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="ar-wd-section-heading">
+                                                Cooldown
+                                            </div>
+                                            <div id="ar-cooldown-phase-info" class="ar-wd-phase-info">
+                                                <!-- format, stroke rates, notes -->
+                                            </div>
+                                        </div>
+                                    </div> <!-- end cooldown section headings -->
+
+                                    <!-- cooldown piece results -->
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <table id="ar-cooldown-table" class="table table-condensed ar-wd-piece-table ar-piece-table" data-section-div-id="ar-cooldown-results">
+                                                <colgroup>
+                                                    <col class="ar-wd-ordinal-col">
+                                                    <col class="ar-wd-label-col">
+                                                    <col class="ar-wd-dist-time-col">
+                                                    <col class="ar-split-col">
+                                                    <col class="ar-sr-col">
+                                                    <col class="ar-watts-col">
+                                                    <col class="ar-hr-col">
+                                                    <col class="ar-splits-col">
+                                                    <col class="ar-skipped-col">
+                                                </colgroup>
+                                                <thead>
+                                                    <tr>
+                                                        <th class="ar-wd-blank-cell" colspan="2">
+
+                                                        </th>
+                                                        <th>
+                                                            Time/<br>
+                                                            Dist
+                                                        </th>
+                                                        <th>
+                                                            Avg/<br>500m
+                                                        </th>
+                                                        <th>
+                                                            Avg SPM
+                                                        </th>
+                                                        <th>
+                                                            Avg Watts
+                                                        </th>
+                                                        <th>
+                                                            Avg HR
+                                                        </th>
+                                                        <th>
+                                                            Splits
+                                                        </th>
+                                                        <th class="wd-skipped">
+                                                            Skipped
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- dynamically added rows -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div> <!-- end cooldown piece results -->
+
+                                    <!-- cooldown comments -->
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <a id="ar-add-cooldown-comments" class="ar-add-comments" href="#" data-comments-div-id="ar-cooldown-comments-div">
+                                                Add notes
+                                            </a>
+                                            <div id="ar-cooldown-comments-div" hidden>
+                                                <span class="ar-wd-subsection-heading">
+                                                    Notes:
+                                                </span>
+                                                <textarea id="ar-cooldown-comments-input" class="form-control fixed-textarea ar-field" rows="4" cols="100" name="cooldown-comments" placeholder="(add comments here)"></textarea>
+                                            </div>
+                                        </div>
+                                    </div> <!-- end cooldown comments -->
+                                </div> <!-- end cooldown section -->
+
+                                <!-- notes -->
+                                <div id="ar-notes" class="ar-wd-section">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="ar-wd-section-heading">
+                                                Notes
+                                            </div>
+                                            <div id="ar-overall-goals-div">
+                                                <span class="ar-wd-subsection-heading">
+                                                    What were your goals for this workout?
+                                                </span>
+                                                <textarea id="ar-overall-goals-input" class="form-control fixed-textarea" rows="4" cols="100" name="workout-goals" placeholder="(add goals here)"></textarea>
+                                            </div>
+                                            <div id="ar-overall-comments-div">
+                                                <span class="ar-wd-subsection-heading">
+                                                    How did the workout go?
+                                                </span>
+                                                <textarea id="ar-overall-comments-input" class="form-control fixed-textarea" rows="4" cols="100" name="workout-comments" placeholder="(add comments here)"></textarea>
+                                            </div>
                                         </div>
                                     </div>
-                                </div> <!-- end comments div -->
+                                </div> <!-- end notes -->
 
-                                <!-- pane navigation buttons -->
-                                <div class="form-group">
-                                    <div class="col-sm-10 col-sm-offset-2 text-right">
-                                        <button type="button" id="ar-warmup-previous-button" class="btn btn-default">
-                                            Previous
-                                        </button>
-                                        <button type="button" id="ar-warmup-next-button" class="btn btn-default">
-                                            Next
-                                        </button>
-                                    </div>
-                                </div> <!-- end pane navigation buttons -->
-
-                            </div> <!-- end warmup results pane -->
-
-                            <!-- main results pane -->
-                            <div id="ar-main-results" hidden>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <span class="ar-phase-title h3">
-                                            Main Workout
-                                        </span>
-                                    </div>
-                                </div>
-                                <!-- main workout info (format, SR, notes) -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <table class="table table-condensed ar-fsrn-table">
-                                            <tr id="ar-main-format-row" hidden>
-                                                <th>
-                                                    Format
-                                                </th>
-                                                <td id="ar-main-format">
-                                                    <!-- dynamically added content -->
-                                                </td>
-                                            </tr>
-                                            <tr id="ar-main-sr-row" hidden>
-                                                <th>
-                                                    Stroke Rates
-                                                </th>
-                                                <td id="ar-main-sr">
-                                                    <!-- dynamically added content -->
-                                                </td>
-                                            </tr>
-                                            <tr id="ar-main-notes-row" hidden>
-                                                <th>
-                                                    Notes
-                                                </th>
-                                                <td id="ar-main-notes">
-                                                    <!-- dynamically added content -->
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </div> <!-- end main workout info -->
-
-                                <!-- time pieces table -->
-                                <div id="ar-main-time-pieces" class="row">
-                                    <div class="col-md-12">
-                                        <span class="ar-table-title h4">
-                                            Time-based Pieces:
-                                        </span>
-                                        <table id="ar-main-time-table" class="table table-condensed ar-piece-table" data-piece-type="time" data-div-id="ar-main-time-pieces">
-                                            <colgroup>
-                                                <col class="ar-ordinal-col">
-                                                <col class="ar-label-col">
-                                                <col class="ar-dist-time-col">
-                                                <col class="ar-split-col">
-                                                <col class="ar-sr-col">
-                                                <col class="ar-watts-col">
-                                                <col class="ar-hr-col">
-                                                <col class="ar-splits-col">
-                                                <col class="ar-skipped-col">
-                                            </colgroup>
-                                            <thead>
-                                                <tr>
-                                                    <th colspan="2">
-                                                        Piece
-                                                    </th>
-                                                    <th>
-                                                        Distance
-                                                    </th>
-                                                    <th>
-                                                        Avg/500m
-                                                    </th>
-                                                    <th>
-                                                        Avg SR
-                                                    </th>
-                                                    <th>
-                                                        Avg Watts
-                                                    </th>
-                                                    <th>
-                                                        Avg HR
-                                                    </th>
-                                                    <th>
-                                                        Splits
-                                                    </th>
-                                                    <th>
-                                                        Skipped
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div> <!-- end time pieces table -->
-
-                                <!-- distance pieces table -->
-                                <div id="ar-main-distance-pieces" class="row">
-                                    <div class="col-md-12">
-                                        <span class="ar-table-title h4">
-                                            Distance-based Pieces:
-                                        </span>
-                                        <table id="ar-main-distance-table" class="table table-condensed ar-piece-table" data-piece-type="distance" data-div-id="ar-main-distance-pieces">
-                                            <colgroup>
-                                                <col class="ar-ordinal-col">
-                                                <col class="ar-label-col">
-                                                <col class="ar-dist-time-col">
-                                                <col class="ar-split-col">
-                                                <col class="ar-sr-col">
-                                                <col class="ar-watts-col">
-                                                <col class="ar-hr-col">
-                                                <col class="ar-splits-col">
-                                                <col class="ar-skipped-col">
-                                            </colgroup>
-                                            <thead>
-                                                <tr>
-                                                    <th colspan="2">
-                                                        Piece
-                                                    </th>
-                                                    <th>
-                                                        Time
-                                                    </th>
-                                                    <th>
-                                                        Avg/500m
-                                                    </th>
-                                                    <th>
-                                                        Avg SR
-                                                    </th>
-                                                    <th>
-                                                        Avg Watts
-                                                    </th>
-                                                    <th>
-                                                        Avg HR
-                                                    </th>
-                                                    <th>
-                                                        Splits
-                                                    </th>
-                                                    <th>
-                                                        Skipped
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div> <!-- end distance pieces table -->
-
-                                <!-- comments div -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <a id="ar-add-main-comments" class="ar-add-comments" href="#" data-comments-div-id="ar-main-comments-div">
-                                            Add notes
-                                        </a>
-                                        <div id="ar-main-comments-div" hidden>
-                                            Notes:
-                                            <textarea id="ar-main-comments" class="form-control fixed-textarea" rows="4" cols="100" name="main-comments" placeholder="(add comments here)"></textarea>
+                                <!-- other data -->
+                                <div class="ar-wd-section ar-wd-other-data">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <span class="ar-wd-subsection-heading">
+                                                Overall Avg HR:
+                                            </span>
+                                            <input id="ar-avg-hr" class="ar-field" type="text" name="overall-avg-hr">
+                                            <span class="ar-wd-subsection-heading">
+                                                Calories Burned:
+                                            </span>
+                                            <input id="ar-calories" class="ar-field" type="text" name="calories">
                                         </div>
                                     </div>
-                                </div> <!-- end comments div -->
+                                </div> <!-- end other data -->
 
-                                <!-- pane navigation buttons -->
-                                <div class="form-group">
-                                    <div class="col-sm-10 col-sm-offset-2 text-right">
-                                        <button type="button" id="ar-main-previous-button" class="btn btn-default">
-                                            Previous
-                                        </button>
-                                        <button type="button" id="ar-main-next-button" class="btn btn-default">
-                                            Next
-                                        </button>
-                                    </div>
-                                </div> <!-- end pane navigation buttons -->
+                            </form>
+                        </div> <!-- end add results form -->
 
-                            </div> <!-- end main results pane -->
-
-                            <!-- cooldown results pane -->
-                            <div id="ar-cooldown-results" hidden>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <span class="ar-phase-title h3">
-                                            Cooldown
-                                        </span>
-                                    </div>
-                                </div>
-                                <!-- cooldown info (format, SR, notes) -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <table class="table table-condensed ar-fsrn-table">
-                                            <tr id="ar-cooldown-format-row" hidden>
-                                                <th>
-                                                    Format
-                                                </th>
-                                                <td id="ar-cooldown-format">
-                                                    <!-- dynamically added content -->
-                                                </td>
-                                            </tr>
-                                            <tr id="ar-cooldown-sr-row" hidden>
-                                                <th>
-                                                    Stroke Rates
-                                                </th>
-                                                <td id="ar-cooldown-sr">
-                                                    <!-- dynamically added content -->
-                                                </td>
-                                            </tr>
-                                            <tr id="ar-cooldown-notes-row" hidden>
-                                                <th>
-                                                    Notes
-                                                </th>
-                                                <td id="ar-cooldown-notes">
-                                                    <!-- dynamically added content -->
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </div> <!-- end cooldown info -->
-
-                                <!-- time pieces table -->
-                                <div id="ar-cooldown-time-pieces" class="row">
-                                    <div class="col-md-12">
-                                        <span class="ar-table-title h4">
-                                            Time-based Pieces:
-                                        </span>
-                                        <table id="ar-cooldown-time-table" class="table table-condensed ar-piece-table" data-piece-type="time" data-div-id="ar-cooldown-time-pieces">
-                                            <colgroup>
-                                                <col class="ar-ordinal-col">
-                                                <col class="ar-label-col">
-                                                <col class="ar-dist-time-col">
-                                                <col class="ar-split-col">
-                                                <col class="ar-sr-col">
-                                                <col class="ar-watts-col">
-                                                <col class="ar-hr-col">
-                                                <col class="ar-splits-col">
-                                                <col class="ar-skipped-col">
-                                            </colgroup>
-                                            <thead>
-                                                <tr>
-                                                    <th colspan="2">
-                                                        Piece
-                                                    </th>
-                                                    <th>
-                                                        Distance
-                                                    </th>
-                                                    <th>
-                                                        Avg/500m
-                                                    </th>
-                                                    <th>
-                                                        Avg SR
-                                                    </th>
-                                                    <th>
-                                                        Avg Watts
-                                                    </th>
-                                                    <th>
-                                                        Avg HR
-                                                    </th>
-                                                    <th>
-                                                        Splits
-                                                    </th>
-                                                    <th>
-                                                        Skipped
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div> <!-- end time pieces table -->
-
-                                <!-- distance pieces table -->
-                                <div id="ar-cooldown-distance-pieces" class="row">
-                                    <div class="col-md-12">
-                                        <span class="ar-table-title h4">
-                                            Distance-based Pieces:
-                                        </span>
-                                        <table id="ar-cooldown-distance-table" class="table table-condensed ar-piece-table" data-piece-type="distance" data-div-id="ar-cooldown-distance-pieces">
-                                            <colgroup>
-                                                <col class="ar-ordinal-col">
-                                                <col class="ar-label-col">
-                                                <col class="ar-dist-time-col">
-                                                <col class="ar-split-col">
-                                                <col class="ar-sr-col">
-                                                <col class="ar-watts-col">
-                                                <col class="ar-hr-col">
-                                                <col class="ar-splits-col">
-                                                <col class="ar-skipped-col">
-                                            </colgroup>
-                                            <thead>
-                                                <tr>
-                                                    <th colspan="2">
-                                                        Piece
-                                                    </th>
-                                                    <th>
-                                                        Time
-                                                    </th>
-                                                    <th>
-                                                        Avg/500m
-                                                    </th>
-                                                    <th>
-                                                        Avg SR
-                                                    </th>
-                                                    <th>
-                                                        Avg Watts
-                                                    </th>
-                                                    <th>
-                                                        Avg HR
-                                                    </th>
-                                                    <th>
-                                                        Splits
-                                                    </th>
-                                                    <th>
-                                                        Skipped
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div> <!-- end distance pieces table -->
-
-                                <!-- comments div -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <a id="ar-add-cooldown-comments" class="ar-add-comments" href="#" data-comments-div-id="ar-cooldown-comments-div">
-                                            Add notes
-                                        </a>
-                                        <div id="ar-cooldown-comments-div" hidden>
-                                            Notes:
-                                            <textarea id="ar-cooldown-comments" class="form-control fixed-textarea" rows="4" cols="100" name="cooldown-comments" placeholder="(add comments here)"></textarea>
-                                        </div>
-                                    </div>
-                                </div> <!-- end comments div -->
-
-                                <!-- pane navigation buttons -->
-                                <div class="form-group">
-                                    <div class="col-sm-10 col-sm-offset-2 text-right">
-                                        <button type="button" id="ar-cooldown-previous-button" class="btn btn-default">
-                                            Previous
-                                        </button>
-                                    </div>
-                                </div> <!-- end pane navigation buttons -->
-
-                            </div> <!-- end cooldown results pane -->
-                        </form>
-                    </div> <!-- end of modal body -->
+                    </div> <!-- end modal body -->
 
                     <!-- modal footer -->
                     <div class="modal-footer">
                         <div id="ar-save-results-buttons" hidden>
-                            <input type="button" id="ar-save-and-add-another" class="btn btn-default ar-save-button" value="Save and add another" data-add-another="true" style="display:none">
-                            <input type="button" id="ar-save-results" class="btn btn-primary ar-save-button" value="Save results" data-add-another="false">
+                            <input type="button" id="ar-save-and-add-another" class="btn btn-default ar-save-button log-button-text ar-wd-footer-button" value="Save and add another" data-add-another="true" style="display:none">
+                            <input type="button" id="ar-save-results" class="btn btn-primary ar-save-button log-button-text ar-wd-footer-button" value="Save results" data-add-another="false">
                         </div>
                     </div> <!-- end of modal footer -->
 
@@ -1200,7 +938,7 @@
                 <div class="modal-content paper-bg modal-margins">
 
                     <!-- modal header -->
-                    <div id="wd-modal-header" class="modal-header">
+                    <div class="modal-header ar-wd-modal-header">
                         <button type="button" class="close" data-dismiss="modal">
                             &times;
                         </button>
@@ -1208,21 +946,21 @@
                             <!-- dynamically added workout description/zone -->
                         </span>
                         <div class="row">
-                            <input id="wd-date" class="wd-field wd-header-info"type="text" name="date" form="wd-edit-results-form">
-                            <input id="wd-time-of-day" class="wd-field wd-header-info" type="text" name="time-of-day" form="wd-edit-results-form">
-                            <div id="wd-total-distance">
-                                <span class="wd-header-info">
+                            <input id="wd-date" class="wd-field ar-wd-header-info ar-wd-date" type="text" name="date" form="wd-edit-results-form" placeholder="Date (ex: Mon, Jan 1, 2015)" data-provide="datepicker">
+                            <input id="wd-time-of-day" class="wd-field ar-wd-header-info ar-wd-time-of-day" type="text" name="time" form="wd-edit-results-form" placeholder="Time (ex: 5:15 am)">
+                            <div class="ar-wd-total-distance">
+                                <span class="ar-wd-header-info">
                                     Total meters:
                                 </span>
-                                <input id="wd-total-meters-input" class="wd-field wd-header-info" type="hidden" name="total-meters" form="wd-edit-results-form">
-                                <span id="wd-total-meters" class="wd-header-info">
+                                <input id="wd-total-meters-input" class="wd-field ar-wd-header-info" type="hidden" name="total-meters" form="wd-edit-results-form">
+                                <span id="wd-total-meters" class="ar-wd-header-info">
                                 </span>
                             </div>
                         </div>
                     </div> <!-- end of modal header -->
 
                     <!-- modal body -->
-                    <div id="wd-modal-body" class="modal-body">
+                    <div class="modal-body ar-wd-modal-body">
 
                         <!-- edit results form -->
                         <form id="wd-edit-results-form" class="form-horizontal" role="form">
@@ -1230,15 +968,15 @@
                             <input id="wd-workout-results-id" type="hidden" name="workout-results-id">
 
                             <!-- warmup section -->
-                            <div id="wd-warmup-results" class="wd-section">
+                            <div id="wd-warmup-results" class="ar-wd-section">
 
                                 <!-- warmup section headings -->
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="wd-section-heading">
+                                        <div class="ar-wd-section-heading">
                                             Warmup
                                         </div>
-                                        <div id="wd-warmup-phase-info" class="wd-phase-info">
+                                        <div id="wd-warmup-phase-info" class="ar-wd-phase-info">
                                             <!-- format, stroke rates, notes -->
                                         </div>
                                     </div>
@@ -1247,11 +985,11 @@
                                 <!-- warmup piece results -->
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table id="wd-warmup-table" class="table table-condensed wd-piece-table" data-section-div-id="wd-warmup-results">
+                                        <table id="wd-warmup-table" class="table table-condensed ar-wd-piece-table wd-piece-table" data-section-div-id="wd-warmup-results">
                                             <colgroup>
-                                                <col class="ar-ordinal-col">
-                                                <col class="ar-label-col">
-                                                <col class="ar-dist-time-col">
+                                                <col class="ar-wd-ordinal-col">
+                                                <col class="ar-wd-label-col">
+                                                <col class="ar-wd-dist-time-col">
                                                 <col class="ar-split-col">
                                                 <col class="ar-sr-col">
                                                 <col class="ar-watts-col">
@@ -1261,7 +999,7 @@
                                             </colgroup>
                                             <thead>
                                                 <tr>
-                                                    <th class="wd-blank-cell" colspan="2">
+                                                    <th class="ar-wd-blank-cell" colspan="2">
 
                                                     </th>
                                                     <th>
@@ -1302,7 +1040,7 @@
                                             Add notes
                                         </a>
                                         <div id="wd-warmup-comments-div"  hidden>
-                                            <span class="wd-subsection-heading">
+                                            <span class="ar-wd-subsection-heading">
                                                 Notes:
                                             </span>
                                             <span id="wd-warmup-comments">
@@ -1314,15 +1052,15 @@
                             </div> <!-- end warmup section -->
 
                             <!-- main section -->
-                            <div id="wd-main-results" class="wd-section">
+                            <div id="wd-main-results" class="ar-wd-section">
 
                                 <!-- main section headings -->
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="wd-section-heading">
+                                        <div class="ar-wd-section-heading">
                                             Main Workout
                                         </div>
-                                        <div id="wd-main-phase-info" class="wd-phase-info">
+                                        <div id="wd-main-phase-info" class="ar-wd-phase-info">
                                             <!-- format, stroke rates, notes -->
                                         </div>
                                     </div>
@@ -1331,11 +1069,11 @@
                                 <!-- main piece results -->
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table id="wd-main-table" class="table table-condensed wd-piece-table" data-section-div-id="wd-main-results">
+                                        <table id="wd-main-table" class="table table-condensed ar-wd-piece-table wd-piece-table" data-section-div-id="wd-main-results">
                                             <colgroup>
-                                                <col class="ar-ordinal-col">
-                                                <col class="ar-label-col">
-                                                <col class="ar-dist-time-col">
+                                                <col class="ar-wd-ordinal-col">
+                                                <col class="ar-wd-label-col">
+                                                <col class="ar-wd-dist-time-col">
                                                 <col class="ar-split-col">
                                                 <col class="ar-sr-col">
                                                 <col class="ar-watts-col">
@@ -1345,7 +1083,7 @@
                                             </colgroup>
                                             <thead>
                                                 <tr>
-                                                    <th class="wd-blank-cell" colspan="2">
+                                                    <th class="ar-wd-blank-cell" colspan="2">
 
                                                     </th>
                                                     <th>
@@ -1386,7 +1124,7 @@
                                             Add notes
                                         </a>
                                         <div id="wd-main-comments-div" hidden>
-                                            <span class="wd-subsection-heading">
+                                            <span class="ar-wd-subsection-heading">
                                                 Notes:
                                             </span>
                                             <span id="wd-main-comments">
@@ -1398,15 +1136,15 @@
                             </div> <!-- end main section -->
 
                             <!-- cooldown section -->
-                            <div id="wd-cooldown-results" class="wd-section">
+                            <div id="wd-cooldown-results" class="ar-wd-section">
 
                                 <!-- cooldown section headings -->
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="wd-section-heading">
+                                        <div class="ar-wd-section-heading">
                                             Cooldown
                                         </div>
-                                        <div id="wd-cooldown-phase-info" class="wd-phase-info">
+                                        <div id="wd-cooldown-phase-info" class="ar-wd-phase-info">
                                             <!-- format, stroke rates, notes -->
                                         </div>
                                     </div>
@@ -1415,11 +1153,11 @@
                                 <!-- cooldown piece results -->
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table id="wd-cooldown-table" class="table table-condensed wd-piece-table" data-section-div-id="wd-cooldown-results">
+                                        <table id="wd-cooldown-table" class="table table-condensed ar-wd-piece-table wd-piece-table" data-section-div-id="wd-cooldown-results">
                                             <colgroup>
-                                                <col class="ar-ordinal-col">
-                                                <col class="ar-label-col">
-                                                <col class="ar-dist-time-col">
+                                                <col class="ar-wd-ordinal-col">
+                                                <col class="ar-wd-label-col">
+                                                <col class="ar-wd-dist-time-col">
                                                 <col class="ar-split-col">
                                                 <col class="ar-sr-col">
                                                 <col class="ar-watts-col">
@@ -1429,7 +1167,7 @@
                                             </colgroup>
                                             <thead>
                                                 <tr>
-                                                    <th class="wd-blank-cell" colspan="2">
+                                                    <th class="ar-wd-blank-cell" colspan="2">
 
                                                     </th>
                                                     <th>
@@ -1470,7 +1208,7 @@
                                             Add notes
                                         </a>
                                         <div id="wd-cooldown-comments-div" hidden>
-                                            <span class="wd-subsection-heading">
+                                            <span class="ar-wd-subsection-heading">
                                                 Notes:
                                             </span>
                                             <span id="wd-cooldown-comments">
@@ -1482,41 +1220,41 @@
                             </div> <!-- end cooldown section -->
 
                             <!-- notes -->
-                            <div id="wd-notes" class="wd-section">
+                            <div id="wd-notes" class="ar-wd-section">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="wd-section-heading">
+                                        <div class="ar-wd-section-heading">
                                             Notes
                                         </div>
                                         <div id="wd-overall-goals-div">
-                                            <span class="wd-subsection-heading">
-                                                Goals:
+                                            <span class="ar-wd-subsection-heading">
+                                                Goals for this workout:
                                             </span>
                                             <span id="wd-overall-goals">
                                             </span>
-                                            <textarea id="wd-overall-goals-input" class="form-control fixed-textarea" rows="4" cols="100" name="overall-goals" placeholder="(add goals here)" style="display:none"></textarea>
+                                            <textarea id="wd-overall-goals-input" class="form-control fixed-textarea" rows="4" cols="100" name="workout-goals" placeholder="(add goals here)" style="display:none"></textarea>
                                         </div>
                                         <div id="wd-overall-comments-div">
-                                            <span class="wd-subsection-heading">
-                                                Comments:
+                                            <span class="ar-wd-subsection-heading">
+                                                How the workout went:
                                             </span>
                                             <span id="wd-overall-comments">
                                             </span>
-                                            <textarea id="wd-overall-comments-input" class="form-control fixed-textarea" rows="4" cols="100" name="overall-comments" placeholder="(add comments here)" style="display:none"></textarea>
+                                            <textarea id="wd-overall-comments-input" class="form-control fixed-textarea" rows="4" cols="100" name="workout-comments" placeholder="(add comments here)" style="display:none"></textarea>
                                         </div>
                                     </div>
                                 </div>
                             </div> <!-- end notes -->
 
                             <!-- other data -->
-                            <div id="wd-other-data" class="wd-section">
+                            <div class="ar-wd-section ar-wd-other-data">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <span class="wd-subsection-heading">
+                                        <span class="ar-wd-subsection-heading">
                                             Overall Avg HR:
                                         </span>
-                                        <input id="wd-avg-hr" class="wd-field" type="text" name="avg-hr">
-                                        <span class="wd-subsection-heading">
+                                        <input id="wd-avg-hr" class="wd-field" type="text" name="overall-avg-hr">
+                                        <span class="ar-wd-subsection-heading">
                                             Calories Burned:
                                         </span>
                                         <input id="wd-calories" class="wd-field" type="text" name="calories">
@@ -1525,11 +1263,11 @@
                             </div> <!-- end other data -->
 
                         </form> <!-- end edit results form -->
-                    </div> <!-- end of modal body -->
+                    </div> <!-- end modal body -->
 
                     <!-- modal footer -->
                     <div class="modal-footer">
-                        <button id="close-workout-details-modal" class="btn btn-default log-button-text" type="button">
+                        <button id="close-workout-details-modal" class="btn btn-default log-button-text ar-wd-footer-button" type="button">
                             Close
                         </button>
                     </div> <!-- end of modal footer -->

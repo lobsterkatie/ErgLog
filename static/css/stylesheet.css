@@ -130,7 +130,7 @@ body {
 #log-buttons {
     text-align: center;
     margin-top: 15px;
-    
+
 }
 
 .log-button-outline {
@@ -383,20 +383,15 @@ input[readonly], input.wd-field[disabled] {
     text-align: left;
 }
 
-.ar-piece-table {
-    width: 100%;
-    table-layout: fixed;
-}
-
-.ar-ordinal-col {
+.ar-wd-ordinal-col {
     width: 5%;
 }
 
-.ar-label-col {
+.ar-wd-label-col {
     width: 17%;
 }
 
-.ar-dist-time-col {
+.ar-wd-dist-time-col {
     width: 12%;
 }
 
@@ -421,26 +416,26 @@ input[readonly], input.wd-field[disabled] {
 }
 
 .ar-skipped-col {
-    width: 0%;
+    width: 0;
 }
 
 /*.ar-skipped-col input {
     margin: auto;
 }*/
 
-.ar-ordinal{
+.ar-wd-ordinal{
     text-align: right;
 }
 
-.ar-label {
+.ar-wd-label {
     border-left: 1px solid #2e426b;
 }
 
-.ar-hr, 
-.ar-watts, 
-.ar-split, 
-.ar-sr, 
-.ar-dist-time,
+.ar-wd-dist-time,
+.ar-hr,
+.ar-watts,
+.ar-split,
+.ar-sr,
 .ar-add-splits {
     text-align: center;
 }
@@ -466,37 +461,41 @@ body .close {
     margin-top: -10px;
 }
 
-#wd-modal-header {
+.ar-wd-modal-header {
     padding-bottom: 0;
     border-bottom: none;
 }
 
-#wd-modal-body {
+.ar-wd-modal-body {
     padding-top: 0;
     padding-bottom: 0;
 }
 
-.wd-header-info {
+.ar-wd-header-info {
     font-size: 1.25em;
     /*color: #737373;*/
     line-height: 1;
 }
 
-#wd-date {
+.ar-wd-date {
     margin-left: 15px;
     width: 35%;
 }
 
-#wd-time-of-day {
+#ar-chooser-header-directions {
+    margin-left: 15px;
+}
+
+.ar-wd-time-of-day {
     width: 15%;
 }
 
-#wd-total-distance {
+.ar-wd-total-distance {
     float: right;
     margin-right: 15px;
 }
 
-.wd-section-heading {
+.ar-wd-section-heading {
     font-size: 1.5em;
     font-weight: bold;
     display: inline-block;
@@ -504,8 +503,8 @@ body .close {
     text-decoration: underline;
 }
 
-.wd-phase-info {
-    font-size: 1.em;
+.ar-wd-phase-info {
+    font-size: 1em;
     /*color: #737373;*/
     display: inline-block;
     vertical-align: top;
@@ -513,26 +512,34 @@ body .close {
     padding-left: 10px;
 }
 
-.wd-section {
+.ar-wd-section {
     padding-top: 18px;
     padding-bottom: 18px;
     border-bottom: 2px solid #3c3a79;
     border-bottom: 2px solid #702822;
 }
 
-#wd-other-data {
+.ar-wd-other-data {
     border-bottom: none;
     padding-bottom: 0;
 }
 
-.wd-piece-table {
-    width: 70%;
+.ar-wd-piece-table {
     table-layout: fixed;
     margin-top: 25px;
     margin-left: 10px;
+    width: 70%;
 }
 
-.wd-piece-table > thead > tr > th {
+.ar-piece-table {
+
+}
+
+.wd-piece-table {
+
+}
+
+.ar-wd-piece-table > thead > tr > th {
     text-align: center;
     padding: 0;
     line-height: 1;
@@ -541,11 +548,11 @@ body .close {
     font-weight: inherit;
 }
 
-.wd-piece-table th.wd-blank-cell {
+.ar-wd-piece-table th.ar-wd-blank-cell {
     border-bottom: none;
 }
 
-.wd-piece-table > tbody > tr > td {
+.ar-wd-piece-table > tbody > tr > td {
     padding-bottom: 0;
     padding-top: 0;
 }
@@ -562,10 +569,10 @@ body .close {
     background-image: url("/static/img/linedpaper.jpg");
 }
 
-.paper-bg input, 
+.paper-bg input,
 .paper-bg textarea.fixed-textarea {
     background-color: transparent;
-    
+
 
 }
 
@@ -573,6 +580,7 @@ body .close {
     border-top: none;
 }
 
+#add-results-modal,
 #workout-details-modal {
     font-family: 'Waiting for the Sunrise';
     font-size: 25px;
@@ -580,16 +588,17 @@ body .close {
     color: #702822;
 }
 
-#close-workout-details-modal {
+.ar-wd-footer-button {
     color: #3c3a79;
     color: #702822;
 }
 
-#close-workout-details-modal:hover {
+.ar-wd-footer-button:hover {
     background-color: transparent;
     opacity: .7;
 }
 
+#add-results-modal .modal-footer,
 #workout-details-modal .modal-footer {
     padding-top: 0;
     padding-bottom: 0;
@@ -599,6 +608,10 @@ body .close {
     pointer-events: none;
     cursor: default;
     color: #702822;
+}
+
+.wd-skipped {
+    display: none;
 }
 
 /*splits entries on wd modal which are -

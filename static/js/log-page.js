@@ -1355,13 +1355,8 @@ $(document).ready(function () {
         var totalMeters = workoutResult.total_meters;
         $("#wd-date").val(dateString);
         $("#wd-time-of-day").val(timeString);
-        $("#wd-total-meters").val(totalMeters);
-
-        //do a little magic to get the total distance to right align itself
-        $("#wd-total-meters-util").text(totalMeters);
-        var totalMetersWidth = $("#wd-total-meters-util").width();
-        console.log("totalMetersWidth", $("#wd-total-meters-util").width());
-        $("#wd-total-meters").css("width", totalMetersWidth);
+        $("#wd-total-meters").text(totalMeters);
+        $("#wd-total-meters-input").val(totalMeters);
 
         //populate subheading info (format, stroke rates, notes) for
         //each phase
@@ -1398,7 +1393,6 @@ $(document).ready(function () {
 
         //now that it's all ready, show the modal
         $("#workout-details-modal").modal("show");
-        console.log("totalMetersWidth", $("#wd-total-meters-util").width());
     });
 
 
@@ -1533,7 +1527,7 @@ $(document).ready(function () {
             cellComment = "<!-- ordinal in phase -->";
             cellContent = $("<input>");
             contentAttributes = {
-                "class": "ar-ordinal text-right",
+                "class": "ar-ordinal",
                 "type": "text",
                 "name": "ordinal-in-phase-piece-" + pieceNum,
                 "value": template.ordinal_in_phase,
@@ -1573,7 +1567,7 @@ $(document).ready(function () {
                 cellAttributes = undefined;
                 cellComment = "<!-- distance -->";
                 contentAttributes = {
-                    "class": "ar-dist-time ar-dist-field wd-field text-right",
+                    "class": "ar-dist-time ar-dist-field wd-field",
                     "type": "text",
                     "name": "distance-piece-" + pieceNum,
                     "value": result.total_meters  || "-",
@@ -1592,7 +1586,7 @@ $(document).ready(function () {
                 cellAttributes = undefined;
                 cellComment = "<!-- time -->";
                 contentAttributes = {
-                    "class": "ar-dist-time wd-field text-right",
+                    "class": "ar-dist-time wd-field",
                     "type": "text",
                     "name": "time-piece-" + pieceNum,
                     "value": result.total_time_string  || "-",
@@ -1611,7 +1605,7 @@ $(document).ready(function () {
             cellComment = "<!-- avg split -->";
             cellContent = $("<input>");
             contentAttributes = {
-                "class": "ar-split wd-field text-right",
+                "class": "ar-split wd-field",
                 "type": "text",
                 "name": "avg-split-piece-" + pieceNum,
                 "value": result.avg_split_string || "-",
@@ -1628,7 +1622,7 @@ $(document).ready(function () {
             cellComment = "<!-- avg SR -->";
             cellContent = $("<input>");
             contentAttributes = {
-                "class": "ar-sr wd-field text-right",
+                "class": "ar-sr wd-field",
                 "type": "text",
                 "name": "avg-sr-piece-" + pieceNum,
                 "value": result.avg_sr  || "-",
@@ -1644,7 +1638,7 @@ $(document).ready(function () {
             cellComment = "<!-- avg watts -->";
             cellContent = $("<input>");
             contentAttributes = {
-                "class": "ar-watts wd-field text-right",
+                "class": "ar-watts wd-field",
                 "type": "text",
                 "name": "avg-watts-piece-" + pieceNum,
                 "value": result.avg_watts  || "-",
@@ -1660,7 +1654,7 @@ $(document).ready(function () {
             cellComment = "<!-- avg HR -->";
             cellContent = $("<input>");
             contentAttributes = {
-                "class": "ar-hr wd-field text-right",
+                "class": "ar-hr wd-field",
                 "type": "text",
                 "name": "avg-hr-piece-" + pieceNum,
                 "value": result.avg_hr || "-",
@@ -1672,7 +1666,7 @@ $(document).ready(function () {
 
 
             //add splits cell
-            cellAttributes = {"class": "text-right"};
+            cellAttributes = {"class": "ar-add-splits"};
             cellComment = "<!-- add splits -->";
             cellContent = $("<a>").append(template.split_length_string ||
                                           "-");
@@ -1726,10 +1720,12 @@ $(document).ready(function () {
             link.show();
             link.closest("div.row").hide();
         }
-        //otherwise, populate and show the notes heading and field
+        //otherwise, populate and show the notes heading and field (as well
+        //as the hidden text area used for editing)
         else {
-            $("#wd-" + phase + "-comments").val(notes);
+            $("#wd-" + phase + "-comments").text(notes);
             $("#wd-" + phase + "-comments-div").show();
+            $("#wd-" + phase + "-comments-input").val(notes);
         }
     } //end populateWDPhaseNotes()
 

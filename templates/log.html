@@ -13,7 +13,8 @@
 
 {% block body %}
     <div class="row">
-        <div class="col-xs-12" id="log-owner-name">
+        <img id="log-bg-img" src="../../static/img/background-log-full.jpg">
+        <div id="log-owner-name" class="col-xs-12" >
             {{user.firstname}} {{user.lastname}}
         </div>
         <div class="col-xs-12" id="log-HOCR-counter">
@@ -27,22 +28,27 @@
     <div class="row">
         <div class="col-xs-12">
             <span id="log-buttons" class="center-block">
-                <button id="testtest">
-                    Test
-                </button>
-                <button id="create-a-workout-button" class="btn btn-default" type="button" data-toggle="modal" href="#create-a-workout-modal">
+                <img id="log-caw-button-outline" class="log-button-outline" src="/static/img/button2.png">
+                <img id="log-ar-button-outline" class="log-button-outline" src="/static/img/button2.png">
+                <button id="create-a-workout-button" class="btn btn-default log-button-text" type="button" data-toggle="modal" href="#create-a-workout-modal">
                     Create a Workout
                 </button>
-                <button id="open-add-results-modal" class="btn btn-default" type="button">
+                <button id="open-add-results-modal" class="btn btn-default log-button-text" type="button">
                     Add Results to a Workout
                 </button>
             </span>
         </div>
     </div>
     <div class="row">
+        <div class="col-xs-12">
+            <img id="log-page-divider" src="/static/img/page-divider2.png">
+            <img id="log-table-title-underline" src="/static/img/divider1.png">
+        </div>
+    </div>
+    <div class="row">
         <!-- RECENT WORKOUTS TABLE -->
-        <div id="recent-workouts-table" class="col-xs-12 col-md-10 col-md-offset-1">
-            <table class="table table-hover">
+        <div class="col-xs-12 col-md-10 col-md-offset-1">
+            <table id="recent-workouts-table" class="table">
                 <thead>
                     <tr>
                         <th id="log-table-title" colspan="5">Recent Workouts</th>
@@ -1190,16 +1196,16 @@
         <!-- WORKOUT DETAILS MODAL -->
         <div id="workout-details-modal" class="modal fade" tabindex="-1" role="dialog" data-keyboard="false">
             <div class="modal-dialog modal-lg">
-                <div class="modal-content">
+                <div class="modal-content paper-bg modal-margins">
 
                     <!-- modal header -->
                     <div id="wd-modal-header" class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">
                             &times;
                         </button>
-                        <h1 id="wd-workout-title" class="modal-title">
+                        <span id="wd-workout-title" class="modal-title">
                             <!-- dynamically added workout description/zone -->
-                        </h1>
+                        </span>
                         <div class="row">
                             <input id="wd-date" class="wd-field wd-header-info"type="text" name="date" form="wd-edit-results-form">
                             <input id="wd-time-of-day" class="wd-field wd-header-info" type="text" name="time-of-day" form="wd-edit-results-form">
@@ -1207,16 +1213,15 @@
                                 <span class="wd-header-info">
                                     Total meters:
                                 </span>
-                                <input id="wd-total-meters" class="wd-field wd-header-info" type="text" name="total-meters" form="wd-edit-results-form">
-                                <span id="wd-total-meters-util" class="wd-header-info" style="display:none">
-                                    <!-- here to help right-align the distance -->
+                                <input id="wd-total-meters-input" class="wd-field wd-header-info" type="hidden" name="total-meters" form="wd-edit-results-form">
+                                <span id="wd-total-meters" class="wd-header-info">
                                 </span>
                             </div>
                         </div>
                     </div> <!-- end of modal header -->
 
                     <!-- modal body -->
-                    <div class="modal-body">
+                    <div id="wd-modal-body" class="modal-body">
 
                         <!-- edit results form -->
                         <form id="wd-edit-results-form" class="form-horizontal" role="form">
@@ -1256,13 +1261,17 @@
                                             <thead>
                                                 <tr>
                                                     <th colspan="2">
-                                                        Piece
+
                                                     </th>
                                                     <th>
-                                                        Time or Meters
+                                                        Time/
+                                                        <br>
+                                                        <u>
+                                                            Dist
+                                                        </u>
                                                     </th>
                                                     <th>
-                                                        Avg/500m
+                                                        Avg/<br>500m
                                                     </th>
                                                     <th>
                                                         Avg SPM
@@ -1298,7 +1307,9 @@
                                             <span class="wd-subsection-heading">
                                                 Notes:
                                             </span>
-                                            <textarea id="wd-warmup-comments" class="form-control fixed-textarea  wd-field" rows="4" cols="100" name="warmup-comments" placeholder="(add comments here)"></textarea>
+                                            <span id="wd-warmup-comments">
+                                            </span>
+                                            <textarea id="wd-warmup-comments-input" class="form-control fixed-textarea  wd-field" rows="4" cols="100" name="warmup-comments" placeholder="(add comments here)" style="display:none"></textarea>
                                         </div>
                                     </div>
                                 </div> <!-- end warmup comments -->
@@ -1357,7 +1368,7 @@
                                                     <th>
                                                         Splits
                                                     </th>
-                                                    <th>
+                                                    <th class="wd-skipped">
                                                         Skipped
                                                     </th>
                                                 </tr>
@@ -1379,7 +1390,9 @@
                                             <span class="wd-subsection-heading">
                                                 Notes:
                                             </span>
-                                            <textarea id="wd-main-comments" class="form-control fixed-textarea wd-field" rows="4" cols="100" name="main-comments" placeholder="(add comments here)"></textarea>
+                                            <span id="wd-main-comments">
+                                            </span>
+                                            <textarea id="wd-main-comments-input" class="form-control fixed-textarea wd-field" rows="4" cols="100" name="main-comments" placeholder="(add comments here)" style="display:none"></textarea>
                                         </div>
                                     </div>
                                 </div> <!-- end main comments -->
@@ -1438,7 +1451,7 @@
                                                     <th>
                                                         Splits
                                                     </th>
-                                                    <th>
+                                                    <th  class="wd-skipped">
                                                         Skipped
                                                     </th>
                                                 </tr>
@@ -1460,7 +1473,9 @@
                                             <span class="wd-subsection-heading">
                                                 Notes:
                                             </span>
-                                            <textarea id="wd-cooldown-comments" class="form-control fixed-textarea wd-field" rows="4" cols="100" name="cooldown-comments" placeholder="(add comments here)"></textarea>
+                                            <span id="wd-cooldown-comments">
+                                            </span>
+                                            <textarea id="wd-cooldown-comments-input" class="form-control fixed-textarea wd-field" rows="4" cols="100" name="cooldown-comments" placeholder="(add comments here)" style="display:none"></textarea>
                                         </div>
                                     </div>
                                 </div> <!-- end cooldown comments -->

@@ -1322,6 +1322,16 @@ $(document).ready(function () {
 
     /************ functions dealing with the workout details modal ************/
 
+    //Make is so that closing the workout-details modal resets it to its
+    //initial state
+    $("#workout-details-modal").on("hidden.bs.modal", function (evt) {
+        $("#workout-details-modal").html(gWDModalInitial);
+        $("#edit-results-form")[0].reset();
+    });
+
+
+
+
     //When a date in the log table is clicked, populate the workout details
     //modal with the details of the corresponding workout and show it
     $(document).on("click", ".log-table-date-link", function() {
@@ -1745,19 +1755,27 @@ $(document).ready(function () {
         //otherwise, populate (or hide) the individual sections as needed
         else {
             if (goals) {
-                $("#wd-overall-goals").val(goals);
+                $("#wd-overall-goals").text(goals);
+                $("#wd-overall-goals-input").val(goals);
             }
             else {
                 $("#wd-overall-goals-div").hide();
             }
             if (comments) {
-                $("#wd-overall-comments").val(comments);
+                $("#wd-overall-comments").text(comments);
+                $("#wd-overall-comments-input").val(comments);
             }
             else {
                 $("#wd-overall-comments-div").hide();
             }
         }
     } //end populateWDOverallNotes()
+
+    //close the workout details modal when the 'close' button at the bottom
+    //is clicked
+    $(document).on("click", "#close-workout-details-modal", function() {
+        $("#workout-details-modal").modal("hide");
+    });
 
 
     //TODO trigger all modals via javascript to avoid weird post-modal focusing

@@ -43,6 +43,7 @@
         <div class="col-xs-12">
             <img id="log-page-divider" src="/static/img/page-divider2.png">
             <img id="log-table-title-underline" src="/static/img/divider1.png">
+            <img id="log-table-cols-underline" src="/static/img/divider1.png">
         </div>
     </div>
     <div class="row">
@@ -1260,15 +1261,12 @@
                                             </colgroup>
                                             <thead>
                                                 <tr>
-                                                    <th colspan="2">
+                                                    <th class="wd-blank-cell" colspan="2">
 
                                                     </th>
                                                     <th>
-                                                        Time/
-                                                        <br>
-                                                        <u>
-                                                            Dist
-                                                        </u>
+                                                        Time/<br>
+                                                        Dist
                                                     </th>
                                                     <th>
                                                         Avg/<br>500m
@@ -1347,14 +1345,15 @@
                                             </colgroup>
                                             <thead>
                                                 <tr>
-                                                    <th colspan="2">
-                                                        Piece
+                                                    <th class="wd-blank-cell" colspan="2">
+
                                                     </th>
                                                     <th>
-                                                        Time or Meters
+                                                        Time/<br>
+                                                        Dist
                                                     </th>
                                                     <th>
-                                                        Avg/500m
+                                                        Avg/<br>500m
                                                     </th>
                                                     <th>
                                                         Avg SPM
@@ -1430,14 +1429,15 @@
                                             </colgroup>
                                             <thead>
                                                 <tr>
-                                                    <th colspan="2">
-                                                        Piece
+                                                    <th class="wd-blank-cell" colspan="2">
+
                                                     </th>
                                                     <th>
-                                                        Time or Meters
+                                                        Time/<br>
+                                                        Dist
                                                     </th>
                                                     <th>
-                                                        Avg/500m
+                                                        Avg/<br>500m
                                                     </th>
                                                     <th>
                                                         Avg SPM
@@ -1451,7 +1451,7 @@
                                                     <th>
                                                         Splits
                                                     </th>
-                                                    <th  class="wd-skipped">
+                                                    <th class="wd-skipped">
                                                         Skipped
                                                     </th>
                                                 </tr>
@@ -1492,13 +1492,17 @@
                                             <span class="wd-subsection-heading">
                                                 Goals:
                                             </span>
-                                            <textarea id="wd-overall-goals" class="form-control fixed-textarea" rows="4" cols="100" name="overall-goals" placeholder="(add goals here)"></textarea>
+                                            <span id="wd-overall-goals">
+                                            </span>
+                                            <textarea id="wd-overall-goals-input" class="form-control fixed-textarea" rows="4" cols="100" name="overall-goals" placeholder="(add goals here)" style="display:none"></textarea>
                                         </div>
                                         <div id="wd-overall-comments-div">
                                             <span class="wd-subsection-heading">
                                                 Comments:
                                             </span>
-                                            <textarea id="wd-overall-comments" class="form-control fixed-textarea" rows="4" cols="100" name="overall-comments" placeholder="(add comments here)"></textarea>
+                                            <span id="wd-overall-comments">
+                                            </span>
+                                            <textarea id="wd-overall-comments-input" class="form-control fixed-textarea" rows="4" cols="100" name="overall-comments" placeholder="(add comments here)" style="display:none"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -1525,7 +1529,9 @@
 
                     <!-- modal footer -->
                     <div class="modal-footer">
-
+                        <button id="close-workout-details-modal" class="btn btn-default log-button-text" type="button">
+                            Close
+                        </button>
                     </div> <!-- end of modal footer -->
 
                 </div> <!-- end of modal content -->

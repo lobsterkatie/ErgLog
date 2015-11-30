@@ -1,9 +1,5 @@
 /* general */
 
-/*.modal-header {
-    border-bottom: none;
-    background-color: #E5E5FF;
-}*/
 
 .modal-footer {
     border-top: none;
@@ -189,7 +185,7 @@ body {
 #recent-workouts-table td {
     border: none;
     padding-left: 11px;
-    
+    font-size: 1.1em;
     color: #f6efd6;
 }
 
@@ -219,10 +215,20 @@ body {
     color: #f6efd6;
 }
 
+#log-table-cols-underline {
+    position: absolute;
+    left: 11.5%;
+    top: 198%;
+    width: 76%;
+    height: 3%;
+}
+
 #log-table-col-titles th {
     border-bottom: none;
     border-top: none;
     padding-bottom: 0;
+    font-weight: normal;
+    font-size: 1.1em
 }
 
 .hidden-modal-data {
@@ -435,7 +441,7 @@ input[readonly], input.wd-field[disabled] {
 .ar-split, 
 .ar-sr, 
 .ar-dist-time,
-.ar-splits {
+.ar-add-splits {
     text-align: center;
 }
 
@@ -444,8 +450,11 @@ input[readonly], input.wd-field[disabled] {
 }
 
 body .close {
-    margin-top: -13px;
-    margin-right: -10px;
+    /*margin-top: -19px;
+    margin-right: -10px;*/
+    position: absolute;
+    left: 97%;
+    top: 14px;
 }
 
 .modal-title {
@@ -464,6 +473,7 @@ body .close {
 
 #wd-modal-body {
     padding-top: 0;
+    padding-bottom: 0;
 }
 
 .wd-header-info {
@@ -491,6 +501,7 @@ body .close {
     font-weight: bold;
     display: inline-block;
     vertical-align: top;
+    text-decoration: underline;
 }
 
 .wd-phase-info {
@@ -498,34 +509,45 @@ body .close {
     /*color: #737373;*/
     display: inline-block;
     vertical-align: top;
-    padding-top: 5px;
+    padding-top: 13px;
     padding-left: 10px;
 }
 
 .wd-section {
-    margin-top: 18px;
+    padding-top: 18px;
+    padding-bottom: 18px;
+    border-bottom: 2px solid #3c3a79;
+    border-bottom: 2px solid #702822;
+}
+
+#wd-other-data {
+    border-bottom: none;
+    padding-bottom: 0;
 }
 
 .wd-piece-table {
     width: 70%;
     table-layout: fixed;
-    margin-top: 25px
+    margin-top: 25px;
+    margin-left: 10px;
 }
 
 .wd-piece-table > thead > tr > th {
     text-align: center;
     padding: 0;
     line-height: 1;
-    border-bottom: none;
+    border-bottom: 2px solid #3c3a79;
+    border-bottom: 2px solid #702822;
     font-weight: inherit;
+}
+
+.wd-piece-table th.wd-blank-cell {
+    border-bottom: none;
 }
 
 .wd-piece-table > tbody > tr > td {
     padding-bottom: 0;
-}
-
-#workout-details-modal.wd-piece-table > tbody > tr > td input.ar-label {
-    border-right: 1px solid;
+    padding-top: 0;
 }
 
 #workout-details-modal input {
@@ -554,7 +576,29 @@ body .close {
 #workout-details-modal {
     font-family: 'Waiting for the Sunrise';
     font-size: 25px;
-    color: #2e426b;
+    color: #3c3a79;
+    color: #702822;
+}
+
+#close-workout-details-modal {
+    color: #3c3a79;
+    color: #702822;
+}
+
+#close-workout-details-modal:hover {
+    background-color: transparent;
+    opacity: .7;
+}
+
+#workout-details-modal .modal-footer {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#workout-details-modal a {
+    pointer-events: none;
+    cursor: default;
+    color: #702822;
 }
 
 /*splits entries on wd modal which are -

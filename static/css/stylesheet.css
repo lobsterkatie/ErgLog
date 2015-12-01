@@ -615,6 +615,42 @@ body .close {
     color: #702822;
 }
 
+#create-a-workout-modal {
+    font-size: 25px;
+    color: #702822;
+}
+
+#caw-overall-description input[type=text] {
+    border-color: #702822;
+    color: #702822;
+}
+
+#caw-overall-description label {
+    font-size: .8em;
+}
+
+#create-a-workout-modal h3 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-top: -15px;
+}
+
+#create-a-workout-modal th {
+    text-align: center;
+}
+
+#create-a-workout-modal .modal-footer input,
+#create-a-workout-modal button {
+    background-color: transparent;
+    color: #702822;
+    border-color: #702822;
+    font-size: .75em;
+}
+
+#create-a-workout-modal small {
+    font-size: 1.25em;
+}
+
 .ar-wd-footer-button {
     color: #3c3a79;
     color: #702822;

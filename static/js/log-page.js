@@ -67,6 +67,7 @@ $(document).ready(function () {
         return values;
     } //end getValues()
 
+
     //Create and return a <td> with the given attributes and content (content
     //and its attributes can either be given singly or as arrays). Note that
     //even if given singly, attributes are objects of the form
@@ -117,6 +118,12 @@ $(document).ready(function () {
 
 
     /************ functions dealing with the create-a-workout modal ***********/
+
+    //Open the create-a-workout form when the button is clicked
+    $(document).on("click", "#create-a-workout-button", function() {
+        $("#create-a-workout-modal").modal("show");
+    });
+
 
     //Navigate between panes in the create-a-workout modal
     $(document).on("click", "#caw-overall-next-button", function() {
@@ -455,7 +462,7 @@ $(document).ready(function () {
                 $("#ar-overall-results").show();
 
                 //now that everything's ready, show the modal
-                $('#add-results-modal').modal('show');
+                $("#add-results-modal").modal("show");
             }
         });
     }); //end $(".caw-save-button").click()

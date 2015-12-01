@@ -360,19 +360,23 @@ input.caw-repeat {
     padding: 1px 11px;
 }
 
-#ar-total-meters-num {
-    border: none;
-}
-
-/*.ar-table-title {
-    size: 2em;
-
-}*/
-
 #ar-add-results-form input {
     width: 100%; /* make the inputs fit in their cells */
-    border-bottom: 1px black;
+}
+
+.ar-field {
+    border-bottom: 1px #702822;
     border-style: none none solid none;
+    color: #3c3a79;
+}
+
+#add-results-modal a {
+    color: #8080aa;
+}
+
+#add-results-modal .ar-wd-other-data input {
+    width: 20%;
+    text-align: center;
 }
 
 .fixed-textarea {
@@ -381,10 +385,11 @@ input.caw-repeat {
     border: none;
     box-shadow: none;
     font-size: inherit;
+    color: #3c3a79;
 }
 
 .fixed-textarea[readonly] {
-    background-color: white;
+    background-color: transparent;
     cursor: default;
 }
 
@@ -392,22 +397,6 @@ input[readonly], input.wd-field[disabled] {
     cursor: default;
 }
 
-.ar-fsrn-table {
-    width: 75%;
-    margin: auto;
-}
-
-.ar-fsrn-table > tbody > tr > th {
-    border: none;
-    width: 15%;
-    text-align: right;
-}
-
-.ar-fsrn-table > tbody > tr > td {
-    border: none;
-    width: 85%;
-    text-align: left;
-}
 
 .ar-wd-ordinal-col {
     width: 5%;
@@ -451,10 +440,11 @@ input[readonly], input.wd-field[disabled] {
 
 .ar-wd-ordinal{
     text-align: right;
+    border: none;
 }
 
 .ar-wd-label {
-    border-left: 1px solid #2e426b;
+    border: none;
 }
 
 .ar-wd-dist-time,
@@ -508,12 +498,23 @@ body .close {
     width: 35%;
 }
 
+#ar-date {
+    text-align: center;
+    width: 28%;
+}
+
 #ar-chooser-header-directions {
     margin-left: 15px;
 }
 
 .ar-wd-time-of-day {
     width: 15%;
+    text-align: center;
+}
+
+#ar-time-of-day {
+    width: 25%;
+    margin-left: 40px;
 }
 
 .ar-wd-total-distance {
@@ -622,7 +623,7 @@ body .close {
     border-width: 2px;
     background-color: transparent;
     font-weight: bold;
-    font-size: 1.2em;
+    font-size: 1em;
 }
 
 .ar-wd-footer-button:hover {
@@ -631,7 +632,7 @@ body .close {
     border-color: #702822;
     padding: 1px 11px;
     border-width: 1px;
-    
+    color: #702822;
 }
 
 #add-results-modal .modal-footer,

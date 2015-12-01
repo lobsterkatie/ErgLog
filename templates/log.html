@@ -541,7 +541,7 @@
                                 <!-- dynamically added workout description/zone -->
                             </span>
                             <div class="row">
-                                <input id="ar-date" class="ar-field ar-wd-header-info ar-wd-date" type="text" name="date" form="ar-add-results-form" placeholder="Date (ex: Mon, Jan 1, 2015)" data-provide="datepicker">
+                                <input id="ar-date" class="ar-field ar-wd-header-info ar-wd-date" type="text" name="date" form="ar-add-results-form" placeholder="Date (required)" data-provide="datepicker">
                                 <input id="ar-time-of-day" class="ar-field ar-wd-header-info ar-wd-time-of-day" type="text" name="time" form="ar-add-results-form" placeholder="Time (ex: 5:15 am)">
                                 <div class="ar-wd-total-distance">
                                     <span class="ar-wd-header-info">
@@ -915,7 +915,7 @@
 
                     <!-- modal footer -->
                     <div class="modal-footer">
-                        <div id="ar-save-results-buttons">
+                        <div id="ar-save-results-buttons" hidden>
                             <input type="button" id="ar-save-and-add-another" class="btn btn-default ar-save-button ar-wd-footer-button" value="Save and add another" data-add-another="true" style="display:none">
                             <input type="button" id="ar-save-results" class="btn btn-primary ar-save-button ar-wd-footer-button" value="Save results" data-add-another="false">
                         </div>

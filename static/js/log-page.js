@@ -657,6 +657,7 @@ $(document).ready(function () {
         $("#ar-choose-workout").hide();
         $("#ar-add-results-header").show();
         $("#ar-add-results").show();
+        $("#ar-save-results-buttons").show();
     }); //end $(".ar-add-results-button").click()
 
 
@@ -1113,7 +1114,7 @@ $(document).ready(function () {
 
         //if the highlight option is chosen, highlight the change
         if (highlightChange) {
-            $("#ar-total-meters").effect("highlight", {color: "#ff0000"}, 400);
+            $("#ar-total-meters").effect("highlight", {color: "#702822"}, 400);
         }
     } //end updateTotalMeters()
 
@@ -1213,9 +1214,10 @@ $(document).ready(function () {
         var dateString = resultObj.workout_result.date_string;
 
         //create a new row and give the required data
-        var row = $("<tr>").data({
-            "date": resultDate,
-            "workout-id": resultID
+        var row = $("<tr>");
+        row.attr({
+            "data-date": resultDate,
+            "data-workout-id": resultID
         });
 
         //define some variables for convenience
@@ -1387,8 +1389,8 @@ $(document).ready(function () {
         populateWDOverallNotes(workoutResult);
 
         //populate calories and overall average HR
-        $("#wd-avg-hr").val(workoutResult.avg_hr);
-        $("#wd-calories").val(workoutResult.calories);
+        $("#wd-avg-hr").val(workoutResult.avg_hr || "-");
+        $("#wd-calories").val(workoutResult.calories || "-");
 
         //find all the fields on the modal and disable them
         $(".wd-field").attr({
